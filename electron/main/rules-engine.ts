@@ -4,11 +4,13 @@ import { app } from 'electron'
 import type { RuleDefinition, ScanMode } from './types'
 
 function getRulesDir(): string {
-  // 开发时从项目根目录读取，打包后从 resources 目录读取
   if (app.isPackaged) {
     return join(process.resourcesPath, 'rules')
   }
-  return resolve(__dirname, '../../rules')
+  // Dev mode: electron-vite 编译到 out/main/，rules 在项目根
+  // __dirname = <project>/out/main, 所以 ../../rules = <project>/rules
+  const devPath = resolve(__dirname, '../../rules')
+  return devPath
 }
 
 async function loadJsonFile<T>(filePath: string): Promise<T | null> {

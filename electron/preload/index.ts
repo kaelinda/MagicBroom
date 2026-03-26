@@ -1,35 +1,28 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 
-export type ScanMode = 'daily' | 'developer'
-
-export interface MagicBroomAPI {
-  scan: {
-    start: (mode: ScanMode, profiles?: string[]) => Promise<{ jobId: string }>
-    onProgress: (callback: (data: { jobId: string; items: unknown[]; progress: number }) => void) => void
-    onComplete: (callback: (data: { jobId: string; results: unknown[]; totalBytes: number }) => void) => void
-    onError: (callback: (data: { jobId: string; error: string }) => void) => void
-  }
-  clean: {
-    dryRun: (items: string[]) => Promise<{ wouldFree: number; items: unknown[] }>
-    execute: (items: string[]) => Promise<{ freed: number; succeeded: string[]; failed: unknown[] }>
-    onProgress: (callback: (data: { item: string; freed: number }) => void) => void
-  }
-  rules: {
-    list: (mode: ScanMode) => Promise<unknown[]>
+function createListener(channel: string, callback: (data: unknown) => void): () => void {
+  const handler = (_event: IpcRendererEvent, data: unknown) => callback(data)
+  ipcRenderer.on(channel, handler)
+  return () => {
+    ipcRenderer.removeListener(channel, handler)
   }
 }
 
-// 只暴露高层业务 API，不暴露 ipcRenderer 本身或通道名
 contextBridge.exposeInMainWorld('api', {
   scan: {
-    start: (mode: ScanMode, profiles: string[] = []) =>
+    start: (mode: string, profiles: string[] = []) =>
       ipcRenderer.invoke('scan:start', { mode, profiles }),
     onProgress: (callback: (data: unknown) => void) =>
-      ipcRenderer.on('scan:progress', (_event, data) => callback(data)),
+      createListener('scan:progress', callback),
     onComplete: (callback: (data: unknown) => void) =>
-      ipcRenderer.on('scan:complete', (_event, data) => callback(data)),
+      createListener('scan:complete', callback),
     onError: (callback: (data: unknown) => void) =>
-      ipcRenderer.on('scan:error', (_event, data) => callback(data)),
+      createListener('scan:error', callback),
+    removeAllListeners: () => {
+      ipcRenderer.removeAllListeners('scan:progress')
+      ipcRenderer.removeAllListeners('scan:complete')
+      ipcRenderer.removeAllListeners('scan:error')
+    },
   },
   clean: {
     dryRun: (items: string[]) =>
@@ -37,10 +30,10 @@ contextBridge.exposeInMainWorld('api', {
     execute: (items: string[]) =>
       ipcRenderer.invoke('clean:execute', { items }),
     onProgress: (callback: (data: unknown) => void) =>
-      ipcRenderer.on('clean:progress', (_event, data) => callback(data)),
+      createListener('clean:progress', callback),
   },
   rules: {
-    list: (mode: ScanMode) =>
+    list: (mode: string) =>
       ipcRenderer.invoke('rules:list', { mode }),
   },
-} satisfies MagicBroomAPI)
+})

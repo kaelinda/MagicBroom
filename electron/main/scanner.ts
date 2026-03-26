@@ -1,8 +1,7 @@
 import { spawn } from 'child_process'
 import { stat, realpath } from 'fs/promises'
 import { homedir } from 'os'
-import { resolve } from 'path'
-import type { RuleDefinition, RuleResult, ScanCallbacks, PROTECTED_PATHS } from './types'
+import type { RuleDefinition, RuleResult, ScanCallbacks } from './types'
 import { isProtectedPath } from './safety'
 
 const DU_TIMEOUT_MS = 15_000
