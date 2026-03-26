@@ -69,11 +69,20 @@ describe('JSON 规则文件验证', () => {
     expect(rules.length).toBeGreaterThan(0)
   })
 
+  it('developer/android.json 格式正确', async () => {
+    const rules = await loadAndValidate(join(rulesDir, 'developer/android.json'))
+    expect(rules.length).toBeGreaterThan(0)
+    for (const rule of rules) {
+      expect(rule.tags.some((t: string) => ['android', 'gradle', 'maven', 'android-studio', 'sdk', 'emulator', 'avd', 'ndk', 'snapshot'].includes(t))).toBe(true)
+    }
+  })
+
   it('所有规则 ID 唯一', async () => {
     const allIds = new Set<string>()
     const files = [
       'daily.json',
       'developer/ios.json',
+      'developer/android.json',
       'developer/docker.json',
       'developer/frontend.json',
       'developer/python.json',
@@ -94,6 +103,7 @@ describe('JSON 规则文件验证', () => {
     const files = [
       'daily.json',
       'developer/ios.json',
+      'developer/android.json',
       'developer/docker.json',
       'developer/frontend.json',
       'developer/python.json',

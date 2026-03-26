@@ -17,10 +17,11 @@ function formatSize(bytes: number): string {
 }
 
 const envConfig: Record<string, { name: string; tags: string[]; description: string }> = {
-  ios: { name: 'iOS 开发环境', tags: ['ios', 'xcode', 'cocoapods', 'swift'], description: 'Xcode 及 iOS 开发相关缓存' },
+  ios: { name: 'iOS 开发环境', tags: ['ios', 'xcode', 'cocoapods', 'carthage', 'swift', 'simulator', 'preview-cache', 'playground'], description: 'Xcode、模拟器、SPM、CocoaPods、Carthage 缓存' },
+  android: { name: 'Android 开发环境', tags: ['android', 'gradle', 'maven', 'android-studio', 'sdk', 'emulator', 'avd', 'ndk', 'snapshot'], description: 'Gradle、Android SDK、AVD 模拟器、Maven 缓存' },
   docker: { name: 'Docker 容器环境', tags: ['docker'], description: 'Docker 镜像和构建缓存' },
   frontend: { name: '前端开发环境', tags: ['frontend', 'npm', 'yarn', 'pnpm'], description: 'Node.js 包管理器缓存' },
-  python: { name: 'Python / AI 环境', tags: ['python', 'pip', 'conda'], description: 'Python 包和虚拟环境' },
+  python: { name: 'Python / AI 环境', tags: ['python', 'pip', 'conda', 'uv'], description: 'pip、conda、uv 包和虚拟环境' },
 }
 
 export function EnvironmentDetail() {

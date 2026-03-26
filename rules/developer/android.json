@@ -1,0 +1,132 @@
+[
+  {
+    "id": "gradle-caches",
+    "name": "Gradle 构建缓存",
+    "path": "~/.gradle/caches",
+    "risk": "safe",
+    "size_estimate": "2-15 GB",
+    "impact": "删除后首次构建会重新下载依赖和编译缓存，构建时间显著增加",
+    "conditions": ["path_exists:~/.gradle"],
+    "tags": ["android", "gradle", "build-cache"]
+  },
+  {
+    "id": "gradle-wrapper-dists",
+    "name": "Gradle Wrapper 分发包",
+    "path": "~/.gradle/wrapper/dists",
+    "risk": "safe",
+    "size_estimate": "500 MB - 3 GB",
+    "impact": "删除后每个项目首次构建会重新下载对应版本的 Gradle",
+    "conditions": ["path_exists:~/.gradle/wrapper"],
+    "tags": ["android", "gradle", "runtime"]
+  },
+  {
+    "id": "gradle-daemon-logs",
+    "name": "Gradle Daemon 日志",
+    "path": "~/.gradle/daemon",
+    "risk": "safe",
+    "size_estimate": "50 MB - 500 MB",
+    "impact": "删除后 Gradle Daemon 会在下次构建时重新创建",
+    "conditions": ["path_exists:~/.gradle/daemon"],
+    "tags": ["android", "gradle", "logs"]
+  },
+  {
+    "id": "android-sdk-build-tools",
+    "name": "Android SDK Build Tools（旧版本）",
+    "path": "~/Library/Android/sdk/build-tools",
+    "risk": "warning",
+    "size_estimate": "500 MB - 3 GB",
+    "impact": "删除后需要通过 SDK Manager 重新安装；建议仅删除不再使用的旧版本",
+    "conditions": ["path_exists:~/Library/Android/sdk"],
+    "tags": ["android", "sdk", "build-tools"]
+  },
+  {
+    "id": "android-sdk-system-images",
+    "name": "Android 模拟器系统镜像",
+    "path": "~/Library/Android/sdk/system-images",
+    "risk": "warning",
+    "size_estimate": "2-20 GB",
+    "impact": "删除后 AVD 模拟器将无法启动对应版本，需通过 SDK Manager 重新下载",
+    "conditions": ["path_exists:~/Library/Android/sdk/system-images"],
+    "tags": ["android", "sdk", "emulator"]
+  },
+  {
+    "id": "android-avd",
+    "name": "Android 虚拟设备 (AVD)",
+    "path": "~/.android/avd",
+    "risk": "warning",
+    "size_estimate": "2-10 GB",
+    "impact": "删除后所有已创建的虚拟设备将丢失，需在 AVD Manager 中重新创建",
+    "conditions": ["path_exists:~/.android/avd"],
+    "tags": ["android", "emulator", "avd"]
+  },
+  {
+    "id": "android-sdk-ndk",
+    "name": "Android NDK",
+    "path": "~/Library/Android/sdk/ndk",
+    "risk": "warning",
+    "size_estimate": "2-8 GB",
+    "impact": "删除后 native C/C++ 项目无法编译，需通过 SDK Manager 重新安装",
+    "conditions": ["path_exists:~/Library/Android/sdk/ndk"],
+    "tags": ["android", "sdk", "ndk"]
+  },
+  {
+    "id": "android-sdk-platforms",
+    "name": "Android SDK Platforms（旧版本）",
+    "path": "~/Library/Android/sdk/platforms",
+    "risk": "warning",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后对应 API Level 的项目无法编译，需重新安装",
+    "conditions": ["path_exists:~/Library/Android/sdk/platforms"],
+    "tags": ["android", "sdk", "platform"]
+  },
+  {
+    "id": "android-studio-caches",
+    "name": "Android Studio 缓存",
+    "path": "~/Library/Caches/Google/AndroidStudio2024.3",
+    "risk": "safe",
+    "size_estimate": "500 MB - 3 GB",
+    "impact": "删除后 Android Studio 首次启动会重建索引，启动稍慢",
+    "conditions": ["path_exists:~/Library/Caches/Google"],
+    "tags": ["android", "android-studio", "cache"]
+  },
+  {
+    "id": "android-studio-system",
+    "name": "Android Studio 系统文件",
+    "path": "~/Library/Application Support/Google/AndroidStudio2024.3",
+    "risk": "safe",
+    "size_estimate": "200 MB - 1 GB",
+    "impact": "删除后 Android Studio 的本地历史和插件缓存将丢失",
+    "conditions": ["path_exists:~/Library/Application Support/Google"],
+    "tags": ["android", "android-studio", "system"]
+  },
+  {
+    "id": "android-studio-logs",
+    "name": "Android Studio 日志",
+    "path": "~/Library/Logs/Google/AndroidStudio2024.3",
+    "risk": "safe",
+    "size_estimate": "50 MB - 500 MB",
+    "impact": "删除后无法查看历史 IDE 日志",
+    "conditions": ["path_exists:~/Library/Logs/Google"],
+    "tags": ["android", "android-studio", "logs"]
+  },
+  {
+    "id": "android-emulator-snapshots",
+    "name": "模拟器快照",
+    "path": "~/.android/avd",
+    "risk": "safe",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后模拟器快速启动（Quick Boot）将失效，首次启动变慢",
+    "conditions": ["path_exists:~/.android/avd"],
+    "tags": ["android", "emulator", "snapshot"]
+  },
+  {
+    "id": "maven-local-repo",
+    "name": "Maven 本地仓库",
+    "path": "~/.m2/repository",
+    "risk": "safe",
+    "size_estimate": "1-10 GB",
+    "impact": "删除后 Gradle/Maven 会重新从远程仓库下载依赖",
+    "conditions": ["path_exists:~/.m2/repository"],
+    "tags": ["android", "maven", "package-cache"]
+  }
+]

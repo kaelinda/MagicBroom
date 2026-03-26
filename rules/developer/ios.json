@@ -31,6 +31,16 @@
     "tags": ["ios", "xcode", "device-support"]
   },
   {
+    "id": "xcode-watchos-device-support",
+    "name": "watchOS DeviceSupport",
+    "path": "~/Library/Developer/Xcode/watchOS DeviceSupport",
+    "risk": "safe",
+    "size_estimate": "500 MB - 2 GB",
+    "impact": "删除后连接 Apple Watch 时会重新下载调试符号",
+    "conditions": ["app:com.apple.dt.Xcode"],
+    "tags": ["ios", "xcode", "device-support"]
+  },
+  {
     "id": "ios-simulator-data",
     "name": "iOS 模拟器数据",
     "path": "~/Library/Developer/CoreSimulator/Devices",
@@ -39,6 +49,16 @@
     "impact": "会删除模拟器中安装的应用和用户数据",
     "conditions": ["app:com.apple.dt.Xcode"],
     "tags": ["ios", "simulator"]
+  },
+  {
+    "id": "ios-simulator-caches",
+    "name": "模拟器缓存",
+    "path": "~/Library/Developer/CoreSimulator/Caches",
+    "risk": "safe",
+    "size_estimate": "200 MB - 2 GB",
+    "impact": "删除后模拟器首次启动会稍慢，缓存会自动重建",
+    "conditions": ["app:com.apple.dt.Xcode"],
+    "tags": ["ios", "simulator", "cache"]
   },
   {
     "id": "spm-cache",
@@ -51,6 +71,16 @@
     "tags": ["ios", "swift", "package-cache"]
   },
   {
+    "id": "spm-repositories",
+    "name": "SPM 仓库克隆",
+    "path": "~/Library/Developer/Xcode/DerivedData/SourcePackages",
+    "risk": "safe",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后 Xcode resolve 时会重新克隆远程包仓库",
+    "conditions": ["app:com.apple.dt.Xcode"],
+    "tags": ["ios", "swift", "package-cache"]
+  },
+  {
     "id": "cocoapods-cache",
     "name": "CocoaPods 缓存",
     "path": "~/Library/Caches/CocoaPods",
@@ -59,5 +89,65 @@
     "impact": "删除后 pod install 会重新下载",
     "conditions": ["path_exists:~/.cocoapods"],
     "tags": ["ios", "cocoapods", "package-cache"]
+  },
+  {
+    "id": "cocoapods-repos",
+    "name": "CocoaPods 本地 Specs 仓库",
+    "path": "~/.cocoapods/repos",
+    "risk": "safe",
+    "size_estimate": "500 MB - 2 GB",
+    "impact": "删除后 pod install 会重新克隆 Specs 仓库（trunk），首次较慢",
+    "conditions": ["path_exists:~/.cocoapods/repos"],
+    "tags": ["ios", "cocoapods", "package-cache"]
+  },
+  {
+    "id": "carthage-cache",
+    "name": "Carthage 构建缓存",
+    "path": "~/Library/Caches/org.carthage.CarthageKit",
+    "risk": "safe",
+    "size_estimate": "200 MB - 3 GB",
+    "impact": "删除后 carthage bootstrap 会重新编译依赖",
+    "conditions": ["path_exists:~/Library/Caches/org.carthage.CarthageKit"],
+    "tags": ["ios", "carthage", "package-cache"]
+  },
+  {
+    "id": "xcode-previews",
+    "name": "Xcode Previews 缓存",
+    "path": "~/Library/Developer/Xcode/UserData/Previews",
+    "risk": "safe",
+    "size_estimate": "200 MB - 2 GB",
+    "impact": "删除后 SwiftUI Preview 首次渲染会重新编译",
+    "conditions": ["app:com.apple.dt.Xcode"],
+    "tags": ["ios", "xcode", "preview-cache"]
+  },
+  {
+    "id": "xcode-logs",
+    "name": "Xcode 日志",
+    "path": "~/Library/Developer/Xcode/DerivedData/Logs",
+    "risk": "safe",
+    "size_estimate": "100 MB - 1 GB",
+    "impact": "删除后无法查看历史构建日志",
+    "conditions": ["app:com.apple.dt.Xcode"],
+    "tags": ["ios", "xcode", "logs"]
+  },
+  {
+    "id": "instruments-data",
+    "name": "Instruments 性能数据",
+    "path": "~/Library/Developer/Xcode/Products",
+    "risk": "safe",
+    "size_estimate": "100 MB - 2 GB",
+    "impact": "删除后历史性能分析数据将丢失",
+    "conditions": ["app:com.apple.dt.Xcode"],
+    "tags": ["ios", "xcode", "profiling"]
+  },
+  {
+    "id": "playground-data",
+    "name": "Xcode Playground 数据",
+    "path": "~/Library/Developer/XCPGDevices",
+    "risk": "safe",
+    "size_estimate": "100 MB - 500 MB",
+    "impact": "删除后 Playground 历史运行数据将丢失",
+    "conditions": ["app:com.apple.dt.Xcode"],
+    "tags": ["ios", "xcode", "playground"]
   }
 ]

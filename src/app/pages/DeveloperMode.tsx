@@ -1,4 +1,4 @@
-import { Smartphone, Container, Globe, Code2, ChevronRight, Sparkles } from 'lucide-react'
+import { Smartphone, TabletSmartphone, Container, Globe, Code2, ChevronRight, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useMagicBroom } from '../hooks/useMagicBroom'
 
@@ -13,10 +13,11 @@ function formatSize(bytes: number): string {
 }
 
 const environments = [
-  { id: 'ios', name: 'iOS 开发', icon: Smartphone, tags: ['ios', 'xcode'], description: 'Xcode、模拟器、构建缓存' },
+  { id: 'ios', name: 'iOS 开发', icon: Smartphone, tags: ['ios', 'xcode', 'cocoapods', 'carthage', 'swift', 'simulator'], description: 'Xcode、模拟器、SPM、CocoaPods、Carthage' },
+  { id: 'android', name: 'Android 开发', icon: TabletSmartphone, tags: ['android', 'gradle', 'maven', 'android-studio', 'sdk', 'emulator', 'avd', 'ndk'], description: 'Gradle、SDK、AVD 模拟器、Maven' },
   { id: 'docker', name: 'Docker 容器', icon: Container, tags: ['docker'], description: '镜像、容器、构建缓存' },
   { id: 'frontend', name: '前端 Node', icon: Globe, tags: ['frontend', 'npm', 'yarn', 'pnpm'], description: 'npm、yarn、pnpm 缓存' },
-  { id: 'python', name: 'Python / AI', icon: Code2, tags: ['python', 'pip', 'conda'], description: 'pip、conda、虚拟环境' },
+  { id: 'python', name: 'Python / AI', icon: Code2, tags: ['python', 'pip', 'conda', 'uv'], description: 'pip、conda、uv、虚拟环境' },
 ]
 
 export function DeveloperMode() {
