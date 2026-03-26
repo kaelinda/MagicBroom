@@ -1,0 +1,101 @@
+import { AlertTriangle, Trash2, Shield } from 'lucide-react'
+import type { ScanItem } from '../context/ScanContext'
+
+function formatSize(bytes: number): string {
+  if (bytes === 0) return '0 B'
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.floor(Math.log(bytes) / Math.log(1024))
+  return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
+}
+
+interface CleanConfirmDialogProps {
+  items: ScanItem[]
+  totalSize: number
+  onConfirm: () => void
+  onCancel: () => void
+}
+
+export function CleanConfirmDialog({ items, totalSize, onConfirm, onCancel }: CleanConfirmDialogProps) {
+  const warningCount = items.filter((i) => i.risk === 'warning').length
+  const dangerCount = items.filter((i) => i.risk === 'danger').length
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.2)] w-full max-w-[460px] overflow-hidden">
+        {/* Header */}
+        <div className="px-6 py-5 border-b border-gray-100/60">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center">
+              <Trash2 className="w-5 h-5 text-emerald-600" />
+            </div>
+            <div>
+              <h2 className="text-[17px] font-semibold text-gray-900">确认清理</h2>
+              <p className="text-[12px] text-gray-400">请确认以下清理操作</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Summary */}
+        <div className="px-6 py-4 space-y-3">
+          <div className="flex items-center justify-between p-3 bg-emerald-50/60 rounded-xl border border-emerald-100/60">
+            <span className="text-[13px] text-emerald-700">将释放空间</span>
+            <span className="text-[18px] font-semibold text-emerald-600">{formatSize(totalSize)}</span>
+          </div>
+
+          <div className="flex gap-3">
+            <div className="flex-1 p-3 bg-gray-50/60 rounded-xl border border-gray-100/60">
+              <div className="text-[11px] text-gray-400 mb-0.5">清理项目</div>
+              <div className="text-[16px] font-semibold text-gray-900">{items.length} 项</div>
+            </div>
+            {warningCount > 0 && (
+              <div className="flex-1 p-3 bg-amber-50/60 rounded-xl border border-amber-100/60">
+                <div className="text-[11px] text-amber-600 mb-0.5">警告项</div>
+                <div className="text-[16px] font-semibold text-amber-600">{warningCount} 项</div>
+              </div>
+            )}
+            {dangerCount > 0 && (
+              <div className="flex-1 p-3 bg-red-50/60 rounded-xl border border-red-100/60">
+                <div className="text-[11px] text-red-500 mb-0.5">危险项</div>
+                <div className="text-[16px] font-semibold text-red-500">{dangerCount} 项</div>
+              </div>
+            )}
+          </div>
+
+          {/* Safety notice */}
+          <div className="flex items-start gap-2 p-3 bg-blue-50/60 rounded-xl border border-blue-100/40">
+            <Shield className="w-4 h-4 text-[#6B7FED] mt-0.5 flex-shrink-0" />
+            <p className="text-[12px] text-blue-700 leading-relaxed">
+              所有文件将移入废纸篓，可在废纸篓中恢复。不会永久删除。
+            </p>
+          </div>
+
+          {(warningCount > 0 || dangerCount > 0) && (
+            <div className="flex items-start gap-2 p-3 bg-amber-50/60 rounded-xl border border-amber-100/40">
+              <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+              <p className="text-[12px] text-amber-700 leading-relaxed">
+                包含 {warningCount + dangerCount} 个需要注意的项目，请确认已查看其删除影响。
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-100/60 flex gap-3">
+          <button
+            onClick={onCancel}
+            className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200/60 text-[13px] font-medium text-gray-600 hover:bg-gray-100/60 transition-colors"
+          >
+            取消
+          </button>
+          <button
+            onClick={onConfirm}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-b from-emerald-500 to-emerald-600 text-white rounded-xl text-[13px] font-medium shadow-[0_2px_8px_rgba(16,185,129,0.3)] hover:shadow-[0_4px_12px_rgba(16,185,129,0.4)] transition-all"
+          >
+            <Trash2 className="w-4 h-4" />
+            确认清理
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
