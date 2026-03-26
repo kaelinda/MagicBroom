@@ -47,6 +47,23 @@ function SectionCard({ title, children }: { title: string; children: React.React
   )
 }
 
+function PresetTag({ path, excluded, onAdd }: { path: string; excluded: string[]; onAdd: (p: string) => void }) {
+  const added = excluded.includes(path)
+  return (
+    <button
+      disabled={added}
+      onClick={() => !added && onAdd(path)}
+      className={`px-2.5 py-1 rounded-lg text-[10px] transition-colors ${
+        added
+          ? 'bg-gray-100/40 text-gray-300 cursor-not-allowed'
+          : 'bg-gray-50/60 text-gray-500 hover:bg-[#6B7FED]/10 hover:text-[#6B7FED] border border-gray-100/60'
+      }`}
+    >
+      {added ? '✓' : '+'} {path.replace(/^~\//, '').replace(/^~\/Library\/Application Support\//, '')}
+    </button>
+  )
+}
+
 const tabs: { id: SettingsTab; label: string; icon: React.ElementType }[] = [
   { id: 'general', label: '通用', icon: SettingsIcon },
   { id: 'scan', label: '扫描与清理', icon: HardDrive },
@@ -65,6 +82,7 @@ export function Settings() {
   const [excluded, setExcluded] = useState([
     '~/Documents', '~/Desktop', '~/Pictures', '~/Music', '~/Movies',
     '/Applications', '~/.ssh', '~/.gnupg',
+    '~/.claude', '~/.cursor', '~/.codex',
   ])
   const [notifyComplete, setNotifyComplete] = useState(true)
   const [notifyLowSpace, setNotifyLowSpace] = useState(true)
@@ -216,6 +234,9 @@ export function Settings() {
                         const presets = [
                           '~/Projects', '~/Code', '~/Work',
                           '~/.config', '~/Library/Keychains',
+                          '~/.claude', '~/.cursor', '~/.codex',
+                          '~/.github-copilot', '~/.continue',
+                          '~/.vscode', '~/.zed',
                         ]
                         const available = presets.filter((p) => !excluded.includes(p))
                         if (available.length > 0) {
@@ -229,26 +250,39 @@ export function Settings() {
                     </button>
                   </div>
 
-                  {/* 常见预设提示 */}
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {['~/Projects', '~/Code', '~/Work', '~/.config', '~/Library/Keychains'].map((preset) => (
-                      <button
-                        key={preset}
-                        disabled={excluded.includes(preset)}
-                        onClick={() => {
-                          if (!excluded.includes(preset)) {
-                            setExcluded((prev) => [...prev, preset])
-                          }
-                        }}
-                        className={`px-2.5 py-1 rounded-lg text-[10px] transition-colors ${
-                          excluded.includes(preset)
-                            ? 'bg-gray-100/40 text-gray-300 cursor-not-allowed'
-                            : 'bg-gray-50/60 text-gray-500 hover:bg-[#6B7FED]/10 hover:text-[#6B7FED] border border-gray-100/60'
-                        }`}
-                      >
-                        + {preset}
-                      </button>
-                    ))}
+                  {/* 常见预设：按分类 */}
+                  <div className="mt-4 space-y-3">
+                    <div>
+                      <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1.5">工作目录</div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {['~/Projects', '~/Code', '~/Work', '~/.config', '~/Library/Keychains'].map((preset) => (
+                          <PresetTag key={preset} path={preset} excluded={excluded} onAdd={(p) => setExcluded((prev) => [...prev, p])} />
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1.5">AI 编程工具</div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {[
+                          '~/.claude', '~/.cursor', '~/.codex',
+                          '~/.github-copilot', '~/.continue',
+                          '~/.codeium', '~/.tabnine',
+                        ].map((preset) => (
+                          <PresetTag key={preset} path={preset} excluded={excluded} onAdd={(p) => setExcluded((prev) => [...prev, p])} />
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1.5">编辑器 / IDE</div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {[
+                          '~/.vscode', '~/.zed',
+                          '~/Library/Application Support/JetBrains',
+                        ].map((preset) => (
+                          <PresetTag key={preset} path={preset} excluded={excluded} onAdd={(p) => setExcluded((prev) => [...prev, p])} />
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </SectionCard>
