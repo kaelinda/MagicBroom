@@ -219,7 +219,15 @@ export function Settings() {
                   <div className="flex gap-2">
                     <button
                       onClick={async () => {
-                        const path = await window.api?.shell.selectDirectory()
+                        if (!window.api?.shell?.selectDirectory) {
+                          // fallback: 手动输入
+                          const input = prompt('请输入要排除的目录路径（如 ~/Projects）')
+                          if (input && input.trim() && !excluded.includes(input.trim())) {
+                            setExcluded((prev) => [...prev, input.trim()])
+                          }
+                          return
+                        }
+                        const path = await window.api.shell.selectDirectory()
                         if (path && !excluded.includes(path)) {
                           setExcluded((prev) => [...prev, path])
                         }
