@@ -1,10 +1,12 @@
 import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'path'
 import { registerIpcHandlers } from './ipc-handlers'
+import { createTray, shouldMinimizeToTray, destroyTray } from './tray'
 
 const isDev = !app.isPackaged
 
 let mainWindow: BrowserWindow | null = null
+let isQuitting = false
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
@@ -28,6 +30,14 @@ function createWindow(): void {
     mainWindow?.show()
   })
 
+  // 关闭窗口时：如果启用了"最小化到托盘"，则隐藏而非关闭
+  mainWindow.on('close', (event) => {
+    if (!isQuitting && shouldMinimizeToTray()) {
+      event.preventDefault()
+      mainWindow?.hide()
+    }
+  })
+
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
@@ -44,11 +54,28 @@ app.whenReady().then(() => {
   registerIpcHandlers()
   createWindow()
 
+  // 创建托盘图标
+  if (mainWindow) {
+    createTray(mainWindow)
+  }
+
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
+    if (mainWindow) {
+      mainWindow.show()
+      mainWindow.focus()
+    } else {
       createWindow()
     }
   })
+})
+
+// 标记正在退出（区分关闭窗口和退出应用）
+app.on('before-quit', () => {
+  isQuitting = true
+})
+
+app.on('will-quit', () => {
+  destroyTray()
 })
 
 app.on('window-all-closed', () => {

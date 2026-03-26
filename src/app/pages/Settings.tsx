@@ -113,11 +113,28 @@ export function Settings() {
                 <SettingRow label="开机自动启动" desc="登录 macOS 后自动启动">
                   <Toggle enabled={autoStart} onChange={() => setAutoStart(!autoStart)} />
                 </SettingRow>
-                <SettingRow label="关闭时最小化到托盘" desc="点击关闭按钮时保留在菜单栏">
-                  <Toggle enabled={minimizeToTray} onChange={() => setMinimizeToTray(!minimizeToTray)} />
-                </SettingRow>
                 <SettingRow label="自动检查更新" desc="有新版本时自动提示">
                   <Toggle enabled={autoUpdate} onChange={() => setAutoUpdate(!autoUpdate)} />
+                </SettingRow>
+              </SectionCard>
+              <SectionCard title="状态栏托盘">
+                <SettingRow label="关闭时最小化到托盘" desc="点击关闭按钮时隐藏到菜单栏，而不是退出应用">
+                  <Toggle
+                    enabled={minimizeToTray}
+                    onChange={() => {
+                      const next = !minimizeToTray
+                      setMinimizeToTray(next)
+                      window.api?.tray.updateConfig({ minimizeToTray: next })
+                    }}
+                  />
+                </SettingRow>
+                <SettingRow label="托盘图标" desc="在 macOS 菜单栏显示 MagicBroom 图标">
+                  <span className="text-[12px] text-emerald-600 font-medium px-2 py-1 bg-emerald-50 rounded-lg border border-emerald-200/60">
+                    已启用
+                  </span>
+                </SettingRow>
+                <SettingRow label="托盘菜单" desc="右键托盘图标可快速扫描、打开设置或退出">
+                  <span className="text-[11px] text-gray-400">右键点击托盘图标</span>
                 </SettingRow>
               </SectionCard>
               <SectionCard title="数据管理">

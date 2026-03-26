@@ -20,6 +20,12 @@ interface MagicBroomAPI {
     showInFinder: (path: string) => Promise<void>
     selectDirectory: () => Promise<string | null>
   }
+  tray: {
+    getConfig: () => Promise<{ minimizeToTray: boolean; showDiskUsage: boolean }>
+    updateConfig: (config: { minimizeToTray?: boolean; showDiskUsage?: boolean }) => Promise<{ minimizeToTray: boolean; showDiskUsage: boolean }>
+    onQuickScan: (callback: () => void) => () => void
+    onOpenSettings: (callback: () => void) => () => void
+  }
 }
 
 interface Window {

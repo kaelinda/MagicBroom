@@ -2,6 +2,7 @@ import { ipcMain, BrowserWindow, shell, dialog } from 'electron'
 import { Scanner } from './scanner'
 import { Cleaner } from './cleaner'
 import { RulesEngine } from './rules-engine'
+import { updateTrayConfig, getTrayConfig } from './tray'
 import type { ScanMode } from './types'
 
 const scanner = new Scanner()
@@ -64,5 +65,15 @@ export function registerIpcHandlers(): void {
     })
     if (result.canceled || result.filePaths.length === 0) return null
     return result.filePaths[0]
+  })
+
+  // 托盘设置
+  ipcMain.handle('tray:get-config', async () => {
+    return getTrayConfig()
+  })
+
+  ipcMain.handle('tray:update-config', async (_event, args: { minimizeToTray?: boolean; showDiskUsage?: boolean }) => {
+    updateTrayConfig(args)
+    return getTrayConfig()
   })
 }

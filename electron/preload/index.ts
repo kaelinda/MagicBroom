@@ -42,4 +42,14 @@ contextBridge.exposeInMainWorld('api', {
     selectDirectory: () =>
       ipcRenderer.invoke('shell:select-directory'),
   },
+  tray: {
+    getConfig: () =>
+      ipcRenderer.invoke('tray:get-config'),
+    updateConfig: (config: { minimizeToTray?: boolean; showDiskUsage?: boolean }) =>
+      ipcRenderer.invoke('tray:update-config', config),
+    onQuickScan: (callback: () => void) =>
+      createListener('tray:quick-scan', callback),
+    onOpenSettings: (callback: () => void) =>
+      createListener('tray:open-settings', callback),
+  },
 })
