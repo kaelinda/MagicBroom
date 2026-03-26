@@ -52,8 +52,8 @@ export interface CleanCallbacks {
   onProgress: (item: string, freed: number) => void
 }
 
-/** 硬编码禁止清理路径 */
-export const PROTECTED_PATHS = [
+/** 硬编码禁止清理的绝对路径 */
+export const PROTECTED_SYSTEM_PATHS = [
   '/Applications',
   '/System',
   '/Library',
@@ -61,6 +61,10 @@ export const PROTECTED_PATHS = [
   '/bin',
   '/sbin',
   '/private',
+]
+
+/** 硬编码禁止清理的用户目录（相对于 $HOME） */
+export const PROTECTED_HOME_PATHS = [
   '/Documents',
   '/Desktop',
   '/Pictures',
