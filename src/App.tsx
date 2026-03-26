@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import { ScanProvider } from './app/context/ScanContext'
 import { AppLayout } from './app/components/AppLayout'
 import { Dashboard } from './app/pages/Dashboard'
@@ -10,7 +10,7 @@ import { Settings } from './app/pages/Settings'
 export default function App() {
   return (
     <ScanProvider>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route element={<AppLayout />}>
             <Route index element={<Dashboard />} />
@@ -20,7 +20,7 @@ export default function App() {
             <Route path="settings" element={<Settings />} />
           </Route>
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </ScanProvider>
   )
 }
