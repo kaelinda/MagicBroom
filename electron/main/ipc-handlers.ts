@@ -1,4 +1,4 @@
-import { ipcMain, BrowserWindow, shell } from 'electron'
+import { ipcMain, BrowserWindow, shell, dialog } from 'electron'
 import { Scanner } from './scanner'
 import { Cleaner } from './cleaner'
 import { RulesEngine } from './rules-engine'
@@ -52,5 +52,17 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('shell:show-in-finder', async (_event, args: { path: string }) => {
     shell.showItemInFolder(args.path)
+  })
+
+  ipcMain.handle('shell:select-directory', async (event) => {
+    const sender = BrowserWindow.fromWebContents(event.sender)
+    if (!sender) return null
+    const result = await dialog.showOpenDialog(sender, {
+      properties: ['openDirectory'],
+      title: '选择排除目录',
+      buttonLabel: '选择',
+    })
+    if (result.canceled || result.filePaths.length === 0) return null
+    return result.filePaths[0]
   })
 }

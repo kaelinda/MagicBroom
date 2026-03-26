@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
-  Settings as SettingsIcon, HardDrive, Bell, Palette, Info,
-  Trash2, RotateCcw, FolderOpen, XCircle, ExternalLink, Sun,
+  Settings as SettingsIcon, HardDrive, Bell, Info,
+  Trash2, RotateCcw, FolderOpen, XCircle, ExternalLink, Plus, Shield,
 } from 'lucide-react'
 
 const cardClass =
@@ -62,7 +62,10 @@ export function Settings() {
   const [skipSystemFiles, setSkipSystemFiles] = useState(true)
   const [confirmBeforeDelete, setConfirmBeforeDelete] = useState(true)
   const [moveToTrash, setMoveToTrash] = useState(true)
-  const [excluded, setExcluded] = useState(['~/Documents/重要项目', '~/Pictures', '/Applications'])
+  const [excluded, setExcluded] = useState([
+    '~/Documents', '~/Desktop', '~/Pictures', '~/Music', '~/Movies',
+    '/Applications', '~/.ssh', '~/.gnupg',
+  ])
   const [notifyComplete, setNotifyComplete] = useState(true)
   const [notifyLowSpace, setNotifyLowSpace] = useState(true)
   const [notifyScheduled, setNotifyScheduled] = useState(true)
@@ -151,27 +154,85 @@ export function Settings() {
               </SectionCard>
               <SectionCard title="排除目录">
                 <div className="py-4">
-                  <p className="text-[11px] text-gray-400 mb-3">以下目录将不会被扫描和清理</p>
-                  <div className="space-y-1.5 mb-3">
+                  <div className="flex items-start gap-2 p-3 bg-blue-50/60 rounded-xl border border-blue-100/40 mb-4">
+                    <Shield className="w-4 h-4 text-[#6B7FED] mt-0.5 flex-shrink-0" />
+                    <p className="text-[12px] text-blue-700 leading-relaxed">
+                      以下目录将不会被扫描和清理。默认已保护用户文档、桌面、图片等重要目录。
+                    </p>
+                  </div>
+
+                  {/* 已排除列表 */}
+                  <div className="space-y-1.5 mb-4">
                     {excluded.map((p, i) => (
-                      <div key={i} className="flex items-center justify-between px-3 py-2.5 bg-gray-50/60 rounded-xl border border-gray-100/60">
+                      <div key={i} className="flex items-center justify-between px-3 py-2.5 bg-gray-50/60 rounded-xl border border-gray-100/60 group">
                         <div className="flex items-center gap-2">
                           <FolderOpen className="w-3.5 h-3.5 text-gray-400" />
                           <span className="text-[12px] text-gray-600 font-mono">{p}</span>
                         </div>
-                        <button onClick={() => setExcluded((prev) => prev.filter((_, idx) => idx !== i))} className="text-gray-400 hover:text-red-500 transition-colors">
+                        <button
+                          onClick={() => setExcluded((prev) => prev.filter((_, idx) => idx !== i))}
+                          className="text-gray-300 group-hover:text-gray-400 hover:!text-red-500 transition-colors"
+                          title="移除排除"
+                        >
                           <XCircle className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     ))}
                   </div>
-                  <button
-                    onClick={() => setExcluded((p) => [...p, '~/new-folder'])}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-gray-300/60 text-[12px] text-gray-400 hover:border-[#6B7FED] hover:text-[#6B7FED] transition-colors w-full justify-center"
-                  >
-                    <FolderOpen className="w-3.5 h-3.5" />
-                    添加排除目录
-                  </button>
+
+                  {/* 添加按钮 */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={async () => {
+                        const path = await window.api?.shell.selectDirectory()
+                        if (path && !excluded.includes(path)) {
+                          setExcluded((prev) => [...prev, path])
+                        }
+                      }}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-gray-300/60 text-[12px] text-gray-500 hover:border-[#6B7FED] hover:text-[#6B7FED] transition-colors"
+                    >
+                      <FolderOpen className="w-3.5 h-3.5" />
+                      浏览选择目录
+                    </button>
+                    <button
+                      onClick={() => {
+                        const presets = [
+                          '~/Projects', '~/Code', '~/Work',
+                          '~/.config', '~/Library/Keychains',
+                        ]
+                        const available = presets.filter((p) => !excluded.includes(p))
+                        if (available.length > 0) {
+                          setExcluded((prev) => [...prev, available[0]])
+                        }
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-gray-200/60 text-[12px] text-gray-500 hover:text-[#6B7FED] hover:border-[#6B7FED]/30 transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      快速添加
+                    </button>
+                  </div>
+
+                  {/* 常见预设提示 */}
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {['~/Projects', '~/Code', '~/Work', '~/.config', '~/Library/Keychains'].map((preset) => (
+                      <button
+                        key={preset}
+                        disabled={excluded.includes(preset)}
+                        onClick={() => {
+                          if (!excluded.includes(preset)) {
+                            setExcluded((prev) => [...prev, preset])
+                          }
+                        }}
+                        className={`px-2.5 py-1 rounded-lg text-[10px] transition-colors ${
+                          excluded.includes(preset)
+                            ? 'bg-gray-100/40 text-gray-300 cursor-not-allowed'
+                            : 'bg-gray-50/60 text-gray-500 hover:bg-[#6B7FED]/10 hover:text-[#6B7FED] border border-gray-100/60'
+                        }`}
+                      >
+                        + {preset}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </SectionCard>
             </>

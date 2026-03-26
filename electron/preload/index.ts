@@ -39,5 +39,7 @@ contextBridge.exposeInMainWorld('api', {
   shell: {
     showInFinder: (path: string) =>
       ipcRenderer.invoke('shell:show-in-finder', { path }),
+    selectDirectory: () =>
+      ipcRenderer.invoke('shell:select-directory'),
   },
 })

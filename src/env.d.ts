@@ -18,6 +18,7 @@ interface MagicBroomAPI {
   }
   shell: {
     showInFinder: (path: string) => Promise<void>
+    selectDirectory: () => Promise<string | null>
   }
 }
 
