@@ -42,6 +42,12 @@ contextBridge.exposeInMainWorld('api', {
     selectDirectory: () =>
       ipcRenderer.invoke('shell:select-directory'),
   },
+  updater: {
+    check: () => ipcRenderer.invoke('updater:check'),
+    getVersion: () => ipcRenderer.invoke('updater:get-version'),
+    onStatus: (callback: (data: unknown) => void) =>
+      createListener('updater:status', callback),
+  },
   tray: {
     getConfig: () =>
       ipcRenderer.invoke('tray:get-config'),

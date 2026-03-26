@@ -16,6 +16,11 @@ interface MagicBroomAPI {
   rules: {
     list: (mode: 'daily' | 'developer') => Promise<unknown[]>
   }
+  updater: {
+    check: () => Promise<void>
+    getVersion: () => Promise<string>
+    onStatus: (callback: (data: { status: string; version?: string; percent?: number; error?: string }) => void) => () => void
+  }
   shell: {
     showInFinder: (path: string) => Promise<void>
     selectDirectory: () => Promise<string | null>

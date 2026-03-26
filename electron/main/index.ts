@@ -2,6 +2,7 @@ import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'path'
 import { registerIpcHandlers } from './ipc-handlers'
 import { createTray, shouldMinimizeToTray, destroyTray } from './tray'
+import { initAutoUpdater, checkForUpdates } from './updater'
 
 const isDev = !app.isPackaged
 
@@ -56,6 +57,12 @@ app.whenReady().then(() => {
   // 创建托盘图标
   if (mainWindow) {
     createTray(mainWindow)
+    initAutoUpdater(mainWindow)
+
+    // 打包后自动检查更新
+    if (app.isPackaged) {
+      setTimeout(() => checkForUpdates(), 3000)
+    }
   }
 
   app.on('activate', () => {

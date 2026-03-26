@@ -3,6 +3,7 @@ import { Scanner } from './scanner'
 import { Cleaner } from './cleaner'
 import { RulesEngine } from './rules-engine'
 import { updateTrayConfig, getTrayConfig } from './tray'
+import { checkForUpdates, getAppVersion } from './updater'
 import type { ScanMode } from './types'
 
 const scanner = new Scanner()
@@ -75,5 +76,14 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('tray:update-config', async (_event, args: { minimizeToTray?: boolean; showDiskUsage?: boolean }) => {
     updateTrayConfig(args)
     return getTrayConfig()
+  })
+
+  // 更新
+  ipcMain.handle('updater:check', async () => {
+    checkForUpdates()
+  })
+
+  ipcMain.handle('updater:get-version', async () => {
+    return getAppVersion()
   })
 }
