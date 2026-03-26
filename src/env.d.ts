@@ -16,6 +16,9 @@ interface MagicBroomAPI {
   rules: {
     list: (mode: 'daily' | 'developer') => Promise<unknown[]>
   }
+  shell: {
+    showInFinder: (path: string) => Promise<void>
+  }
 }
 
 interface Window {

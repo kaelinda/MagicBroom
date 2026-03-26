@@ -28,5 +28,35 @@
     "impact": "删除后需要重新创建虚拟环境和安装依赖",
     "conditions": ["path_exists:~/miniconda3/envs"],
     "tags": ["python", "conda", "environment"]
+  },
+  {
+    "id": "uv-cache",
+    "name": "uv 包缓存",
+    "path": "~/Library/Caches/uv",
+    "risk": "safe",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后 uv pip install 会重新下载包，不影响已安装的虚拟环境",
+    "conditions": ["path_exists:~/Library/Caches/uv"],
+    "tags": ["python", "uv", "package-cache"]
+  },
+  {
+    "id": "uv-python-installs",
+    "name": "uv 管理的 Python 版本",
+    "path": "~/Library/Application Support/uv/python",
+    "risk": "warning",
+    "size_estimate": "500 MB - 3 GB",
+    "impact": "删除后需要重新通过 uv python install 安装 Python 版本",
+    "conditions": ["path_exists:~/Library/Application Support/uv"],
+    "tags": ["python", "uv", "runtime"]
+  },
+  {
+    "id": "uv-tools",
+    "name": "uv 全局工具缓存",
+    "path": "~/Library/Application Support/uv/tools",
+    "risk": "safe",
+    "size_estimate": "100 MB - 1 GB",
+    "impact": "删除后通过 uv tool install 安装的工具需要重新安装",
+    "conditions": ["path_exists:~/Library/Application Support/uv/tools"],
+    "tags": ["python", "uv", "tools"]
   }
 ]

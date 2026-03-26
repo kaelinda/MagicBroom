@@ -1,4 +1,4 @@
-import { ipcMain, BrowserWindow } from 'electron'
+import { ipcMain, BrowserWindow, shell } from 'electron'
 import { Scanner } from './scanner'
 import { Cleaner } from './cleaner'
 import { RulesEngine } from './rules-engine'
@@ -48,5 +48,9 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('rules:list', async (_event, args: { mode: ScanMode }) => {
     return rulesEngine.loadRules(args.mode)
+  })
+
+  ipcMain.handle('shell:show-in-finder', async (_event, args: { path: string }) => {
+    shell.showItemInFolder(args.path)
   })
 }

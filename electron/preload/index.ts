@@ -36,4 +36,8 @@ contextBridge.exposeInMainWorld('api', {
     list: (mode: string) =>
       ipcRenderer.invoke('rules:list', { mode }),
   },
+  shell: {
+    showInFinder: (path: string) =>
+      ipcRenderer.invoke('shell:show-in-finder', { path }),
+  },
 })

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Sparkles, AlertCircle } from 'lucide-react'
+import { ArrowLeft, Sparkles, AlertCircle, FolderOpen } from 'lucide-react'
 import { useMagicBroom } from '../hooks/useMagicBroom'
 import { RiskBadge } from '../components/RiskBadge'
 import { CleanConfirmDialog } from '../components/CleanConfirmDialog'
@@ -151,7 +151,16 @@ export function EnvironmentDetail() {
                     <RiskBadge level={item.risk} />
                     <div className="ml-auto text-[16px] font-semibold text-gray-900 tabular-nums">{formatSize(item.size)}</div>
                   </div>
-                  <div className="text-[12px] font-mono text-gray-400 mb-2">{item.path}</div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[12px] font-mono text-gray-400 truncate">{item.path}</span>
+                    <button
+                      onClick={() => window.api?.shell.showInFinder(item.path)}
+                      className="flex-shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-50/80 hover:bg-gray-100 text-[10px] text-gray-500 hover:text-[#6B7FED] transition-colors border border-gray-100/60"
+                    >
+                      <FolderOpen className="w-3 h-3" />
+                      在 Finder 中显示
+                    </button>
+                  </div>
                   <div className="bg-amber-50/50 border border-amber-100/60 rounded-xl p-3">
                     <div className="flex items-start gap-2">
                       <AlertCircle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />

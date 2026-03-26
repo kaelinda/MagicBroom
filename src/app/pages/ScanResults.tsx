@@ -3,7 +3,7 @@ import { useMagicBroom } from '../hooks/useMagicBroom'
 import { RiskBadge } from '../components/RiskBadge'
 import { CleanConfirmDialog } from '../components/CleanConfirmDialog'
 import { CelebrationScreen } from '../components/CelebrationScreen'
-import { Sparkles, Info, Filter } from 'lucide-react'
+import { Sparkles, Info, Filter, FolderOpen } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import type { RiskLevel } from '../context/ScanContext'
 
@@ -183,7 +183,20 @@ export function ScanResults() {
                       <RiskBadge level={item.risk} />
                     </div>
                     <p className="text-[12px] text-gray-400 mb-1">{item.impact}</p>
-                    <div className="text-[11px] text-gray-400 font-mono">{item.path}</div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] text-gray-400 font-mono truncate">{item.path}</span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          window.api?.shell.showInFinder(item.path)
+                        }}
+                        className="flex-shrink-0 flex items-center gap-1 text-[10px] text-[#6B7FED] hover:text-[#5468E8] transition-colors"
+                        title="在 Finder 中显示"
+                      >
+                        <FolderOpen className="w-3 h-3" />
+                        Finder
+                      </button>
+                    </div>
                   </div>
                   <div className="text-[14px] font-semibold text-gray-900 tabular-nums">{formatSize(item.size)}</div>
                 </div>
