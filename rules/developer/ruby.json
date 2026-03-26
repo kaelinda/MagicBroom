@@ -1,0 +1,102 @@
+[
+  {
+    "id": "gem-cache",
+    "name": "RubyGems 全局缓存",
+    "path": "~/.gem",
+    "risk": "safe",
+    "size_estimate": "200 MB - 3 GB",
+    "impact": "删除后 gem install 会重新从 rubygems.org 下载",
+    "conditions": ["path_exists:~/.gem"],
+    "tags": ["ruby", "gem", "cache"]
+  },
+  {
+    "id": "bundler-cache",
+    "name": "Bundler 全局缓存",
+    "path": "~/.bundle/cache",
+    "risk": "safe",
+    "size_estimate": "100 MB - 2 GB",
+    "impact": "删除后 bundle install 会重新下载 gem 包",
+    "conditions": ["path_exists:~/.bundle/cache"],
+    "tags": ["ruby", "bundler", "cache"]
+  },
+  {
+    "id": "bundler-vendor-cache",
+    "name": "Bundler vendor/cache",
+    "path": "~/Library/Caches/bundler",
+    "risk": "safe",
+    "size_estimate": "100 MB - 1 GB",
+    "impact": "删除后 bundle 操作会重新缓存，不影响项目中的 vendor/bundle",
+    "conditions": ["path_exists:~/Library/Caches/bundler"],
+    "tags": ["ruby", "bundler", "cache"]
+  },
+  {
+    "id": "rvm-rubies",
+    "name": "RVM 安装的 Ruby 版本",
+    "path": "~/.rvm/rubies",
+    "risk": "warning",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后需要通过 rvm install 重新编译安装 Ruby 版本，耗时较长",
+    "conditions": ["path_exists:~/.rvm"],
+    "tags": ["ruby", "rvm", "runtime"]
+  },
+  {
+    "id": "rvm-gems",
+    "name": "RVM gemset 缓存",
+    "path": "~/.rvm/gems",
+    "risk": "warning",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后所有 gemset 中的 gem 需重新安装",
+    "conditions": ["path_exists:~/.rvm/gems"],
+    "tags": ["ruby", "rvm", "gem", "cache"]
+  },
+  {
+    "id": "rvm-src",
+    "name": "RVM Ruby 源码缓存",
+    "path": "~/.rvm/src",
+    "risk": "safe",
+    "size_estimate": "200 MB - 2 GB",
+    "impact": "删除后重新安装 Ruby 会重新下载源码",
+    "conditions": ["path_exists:~/.rvm/src"],
+    "tags": ["ruby", "rvm", "source"]
+  },
+  {
+    "id": "rvm-archives",
+    "name": "RVM 下载归档",
+    "path": "~/.rvm/archives",
+    "risk": "safe",
+    "size_estimate": "100 MB - 1 GB",
+    "impact": "删除后 rvm install 会重新下载 Ruby 压缩包",
+    "conditions": ["path_exists:~/.rvm/archives"],
+    "tags": ["ruby", "rvm", "cache"]
+  },
+  {
+    "id": "rvm-log",
+    "name": "RVM 安装日志",
+    "path": "~/.rvm/log",
+    "risk": "safe",
+    "size_estimate": "10 MB - 200 MB",
+    "impact": "删除后无法查看历史安装日志",
+    "conditions": ["path_exists:~/.rvm/log"],
+    "tags": ["ruby", "rvm", "logs"]
+  },
+  {
+    "id": "rbenv-versions",
+    "name": "rbenv 安装的 Ruby 版本",
+    "path": "~/.rbenv/versions",
+    "risk": "warning",
+    "size_estimate": "500 MB - 3 GB",
+    "impact": "删除后需要通过 rbenv install 重新编译安装",
+    "conditions": ["path_exists:~/.rbenv/versions"],
+    "tags": ["ruby", "rbenv", "runtime"]
+  },
+  {
+    "id": "rbenv-cache",
+    "name": "rbenv 下载缓存",
+    "path": "~/.rbenv/cache",
+    "risk": "safe",
+    "size_estimate": "100 MB - 500 MB",
+    "impact": "删除后 rbenv install 会重新下载源码",
+    "conditions": ["path_exists:~/.rbenv/cache"],
+    "tags": ["ruby", "rbenv", "cache"]
+  }
+]

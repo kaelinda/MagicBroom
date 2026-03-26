@@ -1,4 +1,4 @@
-import { Smartphone, TabletSmartphone, Container, Globe, Code2, ChevronRight, Sparkles } from 'lucide-react'
+import { Smartphone, TabletSmartphone, Container, Globe, Code2, Beer, Gem, ChevronRight, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useMagicBroom } from '../hooks/useMagicBroom'
 
@@ -16,8 +16,10 @@ const environments = [
   { id: 'ios', name: 'iOS 开发', icon: Smartphone, tags: ['ios', 'xcode', 'cocoapods', 'carthage', 'swift', 'simulator'], description: 'Xcode、模拟器、SPM、CocoaPods、Carthage' },
   { id: 'android', name: 'Android 开发', icon: TabletSmartphone, tags: ['android', 'gradle', 'maven', 'android-studio', 'sdk', 'emulator', 'avd', 'ndk'], description: 'Gradle、SDK、AVD 模拟器、Maven' },
   { id: 'docker', name: 'Docker 容器', icon: Container, tags: ['docker'], description: '镜像、容器、构建缓存' },
-  { id: 'frontend', name: '前端 Node', icon: Globe, tags: ['frontend', 'npm', 'yarn', 'pnpm'], description: 'npm、yarn、pnpm 缓存' },
-  { id: 'python', name: 'Python / AI', icon: Code2, tags: ['python', 'pip', 'conda', 'uv'], description: 'pip、conda、uv、虚拟环境' },
+  { id: 'frontend', name: '前端 Node', icon: Globe, tags: ['frontend', 'npm', 'yarn', 'pnpm', 'nvm', 'fnm', 'bun'], description: 'npm、yarn、pnpm、NVM、fnm、Bun' },
+  { id: 'python', name: 'Python / AI', icon: Code2, tags: ['python', 'pip', 'conda', 'uv', 'pyenv'], description: 'pip、conda、uv、pyenv、虚拟环境' },
+  { id: 'ruby', name: 'Ruby 开发', icon: Gem, tags: ['ruby', 'gem', 'bundler', 'rvm', 'rbenv'], description: 'Gem、Bundler、RVM、rbenv' },
+  { id: 'homebrew', name: 'Homebrew', icon: Beer, tags: ['homebrew', 'cask'], description: '包缓存、Cask 下载、旧版本' },
 ]
 
 export function DeveloperMode() {

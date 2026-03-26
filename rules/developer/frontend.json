@@ -28,5 +28,45 @@
     "impact": "删除后 pnpm install 会重新下载依赖",
     "conditions": ["path_exists:~/Library/pnpm/store"],
     "tags": ["frontend", "pnpm", "package-cache"]
+  },
+  {
+    "id": "nvm-versions",
+    "name": "NVM 安装的 Node.js 版本",
+    "path": "~/.nvm/versions/node",
+    "risk": "warning",
+    "size_estimate": "1-10 GB",
+    "impact": "删除后需要通过 nvm install 重新下载安装 Node.js 版本，全局 npm 包也会丢失",
+    "conditions": ["path_exists:~/.nvm"],
+    "tags": ["frontend", "nvm", "runtime"]
+  },
+  {
+    "id": "nvm-cache",
+    "name": "NVM 下载缓存",
+    "path": "~/.nvm/.cache",
+    "risk": "safe",
+    "size_estimate": "100 MB - 1 GB",
+    "impact": "删除后 nvm install 会重新下载 Node.js 安装包",
+    "conditions": ["path_exists:~/.nvm/.cache"],
+    "tags": ["frontend", "nvm", "cache"]
+  },
+  {
+    "id": "fnm-versions",
+    "name": "fnm 安装的 Node.js 版本",
+    "path": "~/Library/Application Support/fnm/node-versions",
+    "risk": "warning",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后需要通过 fnm install 重新下载安装",
+    "conditions": ["path_exists:~/Library/Application Support/fnm"],
+    "tags": ["frontend", "fnm", "runtime"]
+  },
+  {
+    "id": "bun-install-cache",
+    "name": "Bun 安装缓存",
+    "path": "~/.bun/install/cache",
+    "risk": "safe",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后 bun install 会重新下载依赖",
+    "conditions": ["path_exists:~/.bun"],
+    "tags": ["frontend", "bun", "package-cache"]
   }
 ]

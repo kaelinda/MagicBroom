@@ -58,5 +58,25 @@
     "impact": "删除后通过 uv tool install 安装的工具需要重新安装",
     "conditions": ["path_exists:~/Library/Application Support/uv/tools"],
     "tags": ["python", "uv", "tools"]
+  },
+  {
+    "id": "pyenv-versions",
+    "name": "pyenv 安装的 Python 版本",
+    "path": "~/.pyenv/versions",
+    "risk": "warning",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后需要通过 pyenv install 重新编译安装 Python 版本",
+    "conditions": ["path_exists:~/.pyenv/versions"],
+    "tags": ["python", "pyenv", "runtime"]
+  },
+  {
+    "id": "pyenv-cache",
+    "name": "pyenv 下载缓存",
+    "path": "~/.pyenv/cache",
+    "risk": "safe",
+    "size_estimate": "100 MB - 500 MB",
+    "impact": "删除后 pyenv install 会重新下载 Python 源码包",
+    "conditions": ["path_exists:~/.pyenv/cache"],
+    "tags": ["python", "pyenv", "cache"]
   }
 ]

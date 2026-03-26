@@ -20,8 +20,10 @@ const envConfig: Record<string, { name: string; tags: string[]; description: str
   ios: { name: 'iOS 开发环境', tags: ['ios', 'xcode', 'cocoapods', 'carthage', 'swift', 'simulator', 'preview-cache', 'playground'], description: 'Xcode、模拟器、SPM、CocoaPods、Carthage 缓存' },
   android: { name: 'Android 开发环境', tags: ['android', 'gradle', 'maven', 'android-studio', 'sdk', 'emulator', 'avd', 'ndk', 'snapshot'], description: 'Gradle、Android SDK、AVD 模拟器、Maven 缓存' },
   docker: { name: 'Docker 容器环境', tags: ['docker'], description: 'Docker 镜像和构建缓存' },
-  frontend: { name: '前端开发环境', tags: ['frontend', 'npm', 'yarn', 'pnpm'], description: 'Node.js 包管理器缓存' },
-  python: { name: 'Python / AI 环境', tags: ['python', 'pip', 'conda', 'uv'], description: 'pip、conda、uv 包和虚拟环境' },
+  frontend: { name: '前端开发环境', tags: ['frontend', 'npm', 'yarn', 'pnpm', 'nvm', 'fnm', 'bun'], description: 'npm、yarn、pnpm、NVM、fnm、Bun 缓存和版本' },
+  python: { name: 'Python / AI 环境', tags: ['python', 'pip', 'conda', 'uv', 'pyenv'], description: 'pip、conda、uv、pyenv 包和虚拟环境' },
+  ruby: { name: 'Ruby 开发环境', tags: ['ruby', 'gem', 'bundler', 'rvm', 'rbenv'], description: 'Gem、Bundler、RVM、rbenv 缓存和版本' },
+  homebrew: { name: 'Homebrew', tags: ['homebrew', 'cask'], description: 'Homebrew 包缓存、Cask 下载和旧版本' },
 }
 
 export function EnvironmentDetail() {

@@ -1,0 +1,52 @@
+[
+  {
+    "id": "homebrew-cache",
+    "name": "Homebrew 下载缓存",
+    "path": "~/Library/Caches/Homebrew",
+    "risk": "safe",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后 brew install 会重新从网络下载，不影响已安装的包",
+    "conditions": ["path_exists:/opt/homebrew"],
+    "tags": ["homebrew", "cache"]
+  },
+  {
+    "id": "homebrew-old-versions",
+    "name": "Homebrew 旧版本包",
+    "path": "/opt/homebrew/Cellar",
+    "risk": "warning",
+    "size_estimate": "2-15 GB",
+    "impact": "此为 Homebrew 安装目录，建议使用 brew cleanup 清理旧版本而非直接删除",
+    "conditions": ["path_exists:/opt/homebrew/Cellar"],
+    "tags": ["homebrew", "packages"]
+  },
+  {
+    "id": "homebrew-cask-cache",
+    "name": "Homebrew Cask 下载缓存",
+    "path": "~/Library/Caches/Homebrew/Cask",
+    "risk": "safe",
+    "size_estimate": "500 MB - 10 GB",
+    "impact": "删除后重新安装 Cask 应用会重新下载 .dmg/.pkg",
+    "conditions": ["path_exists:~/Library/Caches/Homebrew/Cask"],
+    "tags": ["homebrew", "cask", "cache"]
+  },
+  {
+    "id": "homebrew-logs",
+    "name": "Homebrew 构建日志",
+    "path": "~/Library/Logs/Homebrew",
+    "risk": "safe",
+    "size_estimate": "10 MB - 200 MB",
+    "impact": "删除后无法查看历史编译日志",
+    "conditions": ["path_exists:~/Library/Logs/Homebrew"],
+    "tags": ["homebrew", "logs"]
+  },
+  {
+    "id": "homebrew-temp",
+    "name": "Homebrew 临时文件",
+    "path": "/tmp/homebrew",
+    "risk": "safe",
+    "size_estimate": "0 - 500 MB",
+    "impact": "编译中断后的残留临时文件，安全删除",
+    "conditions": ["path_exists:/tmp/homebrew"],
+    "tags": ["homebrew", "temp"]
+  }
+]

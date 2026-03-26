@@ -77,6 +77,22 @@ describe('JSON 规则文件验证', () => {
     }
   })
 
+  it('developer/ruby.json 格式正确', async () => {
+    const rules = await loadAndValidate(join(rulesDir, 'developer/ruby.json'))
+    expect(rules.length).toBeGreaterThan(0)
+    for (const rule of rules) {
+      expect(rule.tags.some((t: string) => ['ruby', 'gem', 'bundler', 'rvm', 'rbenv'].includes(t))).toBe(true)
+    }
+  })
+
+  it('developer/homebrew.json 格式正确', async () => {
+    const rules = await loadAndValidate(join(rulesDir, 'developer/homebrew.json'))
+    expect(rules.length).toBeGreaterThan(0)
+    for (const rule of rules) {
+      expect(rule.tags.some((t: string) => ['homebrew', 'cask'].includes(t))).toBe(true)
+    }
+  })
+
   it('所有规则 ID 唯一', async () => {
     const allIds = new Set<string>()
     const files = [
@@ -86,6 +102,8 @@ describe('JSON 规则文件验证', () => {
       'developer/docker.json',
       'developer/frontend.json',
       'developer/python.json',
+      'developer/ruby.json',
+      'developer/homebrew.json',
     ]
 
     for (const file of files) {
@@ -107,6 +125,8 @@ describe('JSON 规则文件验证', () => {
       'developer/docker.json',
       'developer/frontend.json',
       'developer/python.json',
+      'developer/ruby.json',
+      'developer/homebrew.json',
     ]
 
     for (const file of files) {
