@@ -4,6 +4,7 @@ import { AppLayout } from './app/components/AppLayout'
 import { Dashboard } from './app/pages/Dashboard'
 import { ScanResults } from './app/pages/ScanResults'
 import { DeveloperMode } from './app/pages/DeveloperMode'
+import { SpaceAnalysis } from './app/pages/SpaceAnalysis'
 import { EnvironmentDetail } from './app/pages/EnvironmentDetail'
 import { Settings } from './app/pages/Settings'
 
@@ -15,6 +16,7 @@ export default function App() {
           <Route element={<AppLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="scan-results" element={<ScanResults />} />
+            <Route path="space-analysis" element={<SpaceAnalysis />} />
             <Route path="developer" element={<DeveloperMode />} />
             <Route path="environment/:envId" element={<EnvironmentDetail />} />
             <Route path="settings" element={<Settings />} />
