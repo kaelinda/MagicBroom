@@ -1,0 +1,32 @@
+[
+  {
+    "id": "npm-cache",
+    "name": "npm 全局缓存",
+    "path": "~/.npm",
+    "risk": "safe",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后下载依赖包会重新从网络获取",
+    "conditions": ["path_exists:~/.npm"],
+    "tags": ["frontend", "npm", "package-cache"]
+  },
+  {
+    "id": "yarn-cache",
+    "name": "Yarn 缓存",
+    "path": "~/Library/Caches/Yarn",
+    "risk": "safe",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后 yarn install 会重新下载",
+    "conditions": ["path_exists:~/Library/Caches/Yarn"],
+    "tags": ["frontend", "yarn", "package-cache"]
+  },
+  {
+    "id": "pnpm-store",
+    "name": "pnpm 全局存储",
+    "path": "~/Library/pnpm/store",
+    "risk": "safe",
+    "size_estimate": "1-10 GB",
+    "impact": "删除后 pnpm install 会重新下载依赖",
+    "conditions": ["path_exists:~/Library/pnpm/store"],
+    "tags": ["frontend", "pnpm", "package-cache"]
+  }
+]

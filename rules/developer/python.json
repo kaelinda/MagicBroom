@@ -1,0 +1,32 @@
+[
+  {
+    "id": "pip-cache",
+    "name": "pip 下载缓存",
+    "path": "~/Library/Caches/pip",
+    "risk": "safe",
+    "size_estimate": "200 MB - 3 GB",
+    "impact": "删除后 pip install 会重新从 PyPI 下载",
+    "conditions": ["path_exists:~/Library/Caches/pip"],
+    "tags": ["python", "pip", "package-cache"]
+  },
+  {
+    "id": "conda-pkgs",
+    "name": "Conda 包缓存",
+    "path": "~/miniconda3/pkgs",
+    "risk": "safe",
+    "size_estimate": "1-10 GB",
+    "impact": "删除后 conda install 会重新下载包",
+    "conditions": ["path_exists:~/miniconda3"],
+    "tags": ["python", "conda", "package-cache"]
+  },
+  {
+    "id": "conda-envs-cache",
+    "name": "Conda 环境缓存",
+    "path": "~/miniconda3/envs",
+    "risk": "warning",
+    "size_estimate": "2-20 GB",
+    "impact": "删除后需要重新创建虚拟环境和安装依赖",
+    "conditions": ["path_exists:~/miniconda3/envs"],
+    "tags": ["python", "conda", "environment"]
+  }
+]

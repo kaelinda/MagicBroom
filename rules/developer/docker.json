@@ -1,0 +1,22 @@
+[
+  {
+    "id": "docker-disk-image",
+    "name": "Docker 虚拟磁盘",
+    "path": "~/Library/Containers/com.docker.docker/Data/vms/0/data/Docker.raw",
+    "risk": "danger",
+    "size_estimate": "10-60 GB",
+    "impact": "删除后将丢失所有 Docker 镜像、容器和数据卷，需要重新拉取和构建",
+    "conditions": ["app:com.docker.docker"],
+    "tags": ["docker", "disk-image"]
+  },
+  {
+    "id": "docker-build-cache",
+    "name": "Docker 构建缓存",
+    "path": "~/Library/Containers/com.docker.docker/Data/docker/buildkit",
+    "risk": "safe",
+    "size_estimate": "2-15 GB",
+    "impact": "删除后重新构建镜像会更慢，但不影响已有镜像",
+    "conditions": ["app:com.docker.docker"],
+    "tags": ["docker", "build-cache"]
+  }
+]

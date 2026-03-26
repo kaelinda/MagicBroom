@@ -1,0 +1,40 @@
+[
+  {
+    "id": "safari-cache",
+    "name": "Safari 浏览器缓存",
+    "path": "~/Library/Caches/com.apple.Safari",
+    "risk": "safe",
+    "size_estimate": "200 MB - 2 GB",
+    "impact": "删除后网页首次加载会稍慢，缓存会自动重建",
+    "conditions": ["app:com.apple.Safari"],
+    "tags": ["browser", "cache"]
+  },
+  {
+    "id": "chrome-cache",
+    "name": "Chrome 浏览器缓存",
+    "path": "~/Library/Caches/Google/Chrome",
+    "risk": "safe",
+    "size_estimate": "500 MB - 4 GB",
+    "impact": "删除后网页首次加载会稍慢，缓存会自动重建",
+    "conditions": ["app:com.google.Chrome"],
+    "tags": ["browser", "cache"]
+  },
+  {
+    "id": "system-logs",
+    "name": "用户日志文件",
+    "path": "~/Library/Logs",
+    "risk": "safe",
+    "size_estimate": "100 MB - 1 GB",
+    "impact": "删除后无法查看历史应用日志，不影响系统运行",
+    "tags": ["system", "logs"]
+  },
+  {
+    "id": "trash-old",
+    "name": "废纸篓（超过48小时的文件）",
+    "path": "~/.Trash",
+    "risk": "warning",
+    "size_estimate": "0 - 10 GB",
+    "impact": "清空废纸篓中超过 48 小时的文件，最近删除的文件会保留作为恢复窗口",
+    "tags": ["system", "trash"]
+  }
+]

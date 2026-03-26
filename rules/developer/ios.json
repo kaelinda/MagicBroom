@@ -1,0 +1,63 @@
+[
+  {
+    "id": "xcode-derived-data",
+    "name": "Xcode DerivedData",
+    "path": "~/Library/Developer/Xcode/DerivedData",
+    "risk": "safe",
+    "size_estimate": "5-30 GB",
+    "impact": "下次 Xcode 编译时会自动重建，首次编译变慢",
+    "conditions": ["app:com.apple.dt.Xcode"],
+    "tags": ["ios", "xcode", "build-cache"],
+    "version_hint": ">=15.0"
+  },
+  {
+    "id": "xcode-archives",
+    "name": "Xcode Archives",
+    "path": "~/Library/Developer/Xcode/Archives",
+    "risk": "warning",
+    "size_estimate": "2-10 GB",
+    "impact": "删除后无法直接提交到 App Store Connect，需重新打包",
+    "conditions": ["app:com.apple.dt.Xcode"],
+    "tags": ["ios", "xcode", "archive"]
+  },
+  {
+    "id": "xcode-device-support",
+    "name": "iOS DeviceSupport",
+    "path": "~/Library/Developer/Xcode/iOS DeviceSupport",
+    "risk": "safe",
+    "size_estimate": "2-8 GB",
+    "impact": "删除后连接真机时会重新下载，首次连接变慢",
+    "conditions": ["app:com.apple.dt.Xcode"],
+    "tags": ["ios", "xcode", "device-support"]
+  },
+  {
+    "id": "ios-simulator-data",
+    "name": "iOS 模拟器数据",
+    "path": "~/Library/Developer/CoreSimulator/Devices",
+    "risk": "warning",
+    "size_estimate": "1-5 GB",
+    "impact": "会删除模拟器中安装的应用和用户数据",
+    "conditions": ["app:com.apple.dt.Xcode"],
+    "tags": ["ios", "simulator"]
+  },
+  {
+    "id": "spm-cache",
+    "name": "Swift Package Manager 缓存",
+    "path": "~/Library/Caches/org.swift.swiftpm",
+    "risk": "safe",
+    "size_estimate": "500 MB - 3 GB",
+    "impact": "删除后需要重新下载 Swift 包依赖",
+    "conditions": ["app:com.apple.dt.Xcode"],
+    "tags": ["ios", "swift", "package-cache"]
+  },
+  {
+    "id": "cocoapods-cache",
+    "name": "CocoaPods 缓存",
+    "path": "~/Library/Caches/CocoaPods",
+    "risk": "safe",
+    "size_estimate": "500 MB - 3 GB",
+    "impact": "删除后 pod install 会重新下载",
+    "conditions": ["path_exists:~/.cocoapods"],
+    "tags": ["ios", "cocoapods", "package-cache"]
+  }
+]
