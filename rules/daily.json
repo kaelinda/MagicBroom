@@ -192,6 +192,193 @@
     "tags": ["messaging", "cache"]
   },
   {
+    "id": "wecom-cache",
+    "name": "企业微信缓存",
+    "path": "~/Library/Containers/com.tencent.WeWorkMac/Data/Library/Application Support/WXWork",
+    "risk": "warning",
+    "size_estimate": "1 - 15 GB",
+    "impact": "删除后企微聊天中的图片、视频、文件缓存将丢失，需重新加载",
+    "conditions": ["app:com.tencent.WeWorkMac"],
+    "tags": ["messaging", "cache"]
+  },
+  {
+    "id": "telegram-cache",
+    "name": "Telegram 缓存",
+    "path": "~/Library/Group Containers/6N38VWS5BX.ru.keepcoder.Telegram/account-0/postbox",
+    "risk": "warning",
+    "size_estimate": "1 - 20 GB",
+    "impact": "删除后聊天中的媒体文件需从服务器重新下载，文字消息不受影响",
+    "conditions": ["app:ru.keepcoder.Telegram"],
+    "tags": ["messaging", "cache"]
+  },
+  {
+    "id": "telegram-macos-cache",
+    "name": "Telegram macOS 版缓存",
+    "path": "~/Library/Containers/ru.keepcoder.Telegram/Data/Library/Caches",
+    "risk": "safe",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后 Telegram 会重新缓存媒体预览",
+    "conditions": ["app:ru.keepcoder.Telegram"],
+    "tags": ["messaging", "cache"]
+  },
+  {
+    "id": "imessage-attachments",
+    "name": "iMessage 附件缓存",
+    "path": "~/Library/Messages/Attachments",
+    "risk": "warning",
+    "size_estimate": "1 - 20 GB",
+    "impact": "删除后聊天中的图片、视频附件本地副本会移除，部分可在打开对话时重新下载",
+    "conditions": ["app:com.apple.MobileSMS"],
+    "tags": ["messaging", "cache"]
+  },
+  {
+    "id": "discord-cache",
+    "name": "Discord 缓存",
+    "path": "~/Library/Application Support/discord/Cache",
+    "risk": "safe",
+    "size_estimate": "200 MB - 3 GB",
+    "impact": "删除后 Discord 会重新缓存媒体与频道资源，不影响聊天记录",
+    "conditions": ["app:com.hnc.Discord"],
+    "tags": ["messaging", "cache"]
+  },
+  {
+    "id": "zoom-cache",
+    "name": "Zoom 缓存数据",
+    "path": "~/Library/Application Support/zoom.us/data",
+    "risk": "safe",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后 Zoom 会重新生成临时数据，不影响账号与会议记录",
+    "conditions": ["app:us.zoom.xos"],
+    "tags": ["meeting", "cache"]
+  },
+  {
+    "id": "zoom-local-recordings",
+    "name": "Zoom 本地录制文件",
+    "path": "~/Documents/Zoom",
+    "risk": "warning",
+    "size_estimate": "1 - 100 GB",
+    "impact": "删除后本地会议录制将永久丢失，请先确认已备份或上传云端",
+    "conditions": ["app:us.zoom.xos"],
+    "tags": ["meeting", "recording"]
+  },
+  {
+    "id": "teams-cache",
+    "name": "Microsoft Teams 缓存",
+    "path": "~/Library/Containers/com.microsoft.teams2/Data/Library/Caches",
+    "risk": "safe",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后 Teams 会重新生成缓存，首次启动和频道加载会稍慢",
+    "conditions": ["app:com.microsoft.teams2"],
+    "tags": ["meeting", "cache"]
+  },
+  {
+    "id": "adobe-media-cache",
+    "name": "Adobe 媒体缓存文件",
+    "path": "~/Library/Application Support/Adobe/Common/Media Cache Files",
+    "risk": "safe",
+    "size_estimate": "2 - 100 GB",
+    "impact": "删除后 Premiere Pro/After Effects 会重新生成预览缓存，首次打开项目变慢",
+    "tags": ["creative", "cache", "media"]
+  },
+  {
+    "id": "final-cut-backups",
+    "name": "Final Cut Pro 自动备份",
+    "path": "~/Movies/Final Cut Backups",
+    "risk": "warning",
+    "size_estimate": "5 - 200 GB",
+    "impact": "删除后将失去项目自动备份，当前项目文件不受影响但恢复能力降低",
+    "conditions": ["app:com.apple.FinalCut"],
+    "tags": ["creative", "backup", "video"]
+  },
+  {
+    "id": "google-drive-cache",
+    "name": "Google Drive 本地缓存",
+    "path": "~/Library/Application Support/Google/DriveFS",
+    "risk": "warning",
+    "size_estimate": "2 - 50 GB",
+    "impact": "删除后 Google Drive 需重新建立本地索引，离线文件需重新下载",
+    "conditions": ["app:com.google.drivefs"],
+    "tags": ["cloud", "sync", "cache"]
+  },
+  {
+    "id": "onedrive-cache",
+    "name": "OneDrive 缓存",
+    "path": "~/Library/Containers/com.microsoft.OneDrive-mac/Data/Library/Caches",
+    "risk": "safe",
+    "size_estimate": "500 MB - 10 GB",
+    "impact": "删除后 OneDrive 会重新生成缓存，不影响云端文件",
+    "conditions": ["app:com.microsoft.OneDrive-mac"],
+    "tags": ["cloud", "sync", "cache"]
+  },
+  {
+    "id": "dropbox-cache",
+    "name": "Dropbox 缓存",
+    "path": "~/Library/Caches/com.getdropbox.dropbox",
+    "risk": "safe",
+    "size_estimate": "500 MB - 10 GB",
+    "impact": "删除后 Dropbox 会自动重建缓存",
+    "conditions": ["app:com.getdropbox.dropbox"],
+    "tags": ["cloud", "sync", "cache"]
+  },
+  {
+    "id": "outlook-cache",
+    "name": "Outlook 缓存",
+    "path": "~/Library/Containers/com.microsoft.Outlook/Data/Library/Caches",
+    "risk": "safe",
+    "size_estimate": "500 MB - 10 GB",
+    "impact": "删除后 Outlook 会重新下载邮件资源与搜索缓存",
+    "conditions": ["app:com.microsoft.Outlook"],
+    "tags": ["office", "mail", "cache"]
+  },
+  {
+    "id": "steam-shader-cache",
+    "name": "Steam 着色器缓存",
+    "path": "~/Library/Application Support/Steam/steamapps/shadercache",
+    "risk": "safe",
+    "size_estimate": "1 - 20 GB",
+    "impact": "删除后首次启动游戏可能短暂卡顿，缓存会自动重建",
+    "conditions": ["app:com.valvesoftware.steam"],
+    "tags": ["gaming", "cache"]
+  },
+  {
+    "id": "steam-download-cache",
+    "name": "Steam 下载残留",
+    "path": "~/Library/Application Support/Steam/steamapps/downloading",
+    "risk": "safe",
+    "size_estimate": "500 MB - 50 GB",
+    "impact": "删除后未完成的下载需重新下载，不影响已安装游戏",
+    "conditions": ["app:com.valvesoftware.steam"],
+    "tags": ["gaming", "download"]
+  },
+  {
+    "id": "quicklook-thumbnail",
+    "name": "Quick Look 缩略图缓存",
+    "path": "~/Library/Caches/com.apple.QuickLook.thumbnailcache",
+    "risk": "safe",
+    "size_estimate": "200 MB - 5 GB",
+    "impact": "删除后 Finder 预览缩略图会重新生成，首次浏览文件夹可能变慢",
+    "tags": ["system", "cache", "finder"]
+  },
+  {
+    "id": "saved-app-state",
+    "name": "应用恢复状态缓存",
+    "path": "~/Library/Saved Application State",
+    "risk": "safe",
+    "size_estimate": "100 MB - 3 GB",
+    "impact": "删除后应用将不会恢复上次窗口状态，不影响文档与账号数据",
+    "tags": ["system", "cache"]
+  },
+  {
+    "id": "vlc-cache",
+    "name": "VLC 播放器缓存",
+    "path": "~/Library/Caches/org.videolan.vlc",
+    "risk": "safe",
+    "size_estimate": "200 MB - 3 GB",
+    "impact": "删除后 VLC 会重新生成媒体缓存，不影响本地视频文件",
+    "conditions": ["app:org.videolan.vlc"],
+    "tags": ["media", "cache", "video"]
+  },
+  {
     "id": "spotify-cache",
     "name": "Spotify 离线缓存",
     "path": "~/Library/Caches/com.spotify.client",

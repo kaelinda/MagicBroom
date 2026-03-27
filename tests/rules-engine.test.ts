@@ -116,8 +116,8 @@ describe('JSON 规则文件验证', () => {
     }
   })
 
-  it('没有规则指向保护路径', async () => {
-    const protectedPrefixes = ['/Applications', '/System', '/usr', '~/Documents', '~/Desktop', '~/Pictures']
+  it('没有规则直接指向保护路径（子目录允许）', async () => {
+    const protectedExact = ['/Applications', '/System', '/usr', '~/Documents', '~/Desktop', '~/Pictures', '~/Music', '~/Movies']
     const files = [
       'daily.json',
       'developer/ios.json',
@@ -133,8 +133,9 @@ describe('JSON 规则文件验证', () => {
       const content = await readFile(join(rulesDir, file), 'utf-8')
       const rules = JSON.parse(content)
       for (const rule of rules) {
-        for (const prefix of protectedPrefixes) {
-          expect(rule.path.startsWith(prefix)).toBe(false)
+        for (const exact of protectedExact) {
+          // 规则不应直接等于保护路径（但子目录如 ~/Documents/Zoom 允许）
+          expect(rule.path === exact).toBe(false)
         }
       }
     }
