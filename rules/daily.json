@@ -20,6 +20,74 @@
     "tags": ["browser", "cache"]
   },
   {
+    "id": "firefox-cache",
+    "name": "Firefox 浏览器缓存",
+    "path": "~/Library/Caches/Firefox/Profiles",
+    "risk": "safe",
+    "size_estimate": "200 MB - 2 GB",
+    "impact": "删除后网页首次加载会稍慢，缓存会自动重建",
+    "conditions": ["app:org.mozilla.firefox"],
+    "tags": ["browser", "cache"]
+  },
+  {
+    "id": "edge-cache",
+    "name": "Edge 浏览器缓存",
+    "path": "~/Library/Caches/Microsoft Edge",
+    "risk": "safe",
+    "size_estimate": "200 MB - 2 GB",
+    "impact": "删除后网页首次加载会稍慢，缓存会自动重建",
+    "conditions": ["app:com.microsoft.edgemac"],
+    "tags": ["browser", "cache"]
+  },
+  {
+    "id": "arc-cache",
+    "name": "Arc 浏览器缓存",
+    "path": "~/Library/Caches/company.thebrowser.Browser",
+    "risk": "safe",
+    "size_estimate": "200 MB - 2 GB",
+    "impact": "删除后网页首次加载会稍慢，缓存会自动重建",
+    "conditions": ["app:company.thebrowser.Browser"],
+    "tags": ["browser", "cache"]
+  },
+  {
+    "id": "downloads-installers",
+    "name": "下载目录中的安装包",
+    "path": "~/Downloads",
+    "risk": "warning",
+    "size_estimate": "1 - 20 GB",
+    "impact": "仅建议删除已安装应用的 .dmg/.pkg/.zip 文件，请确认不再需要",
+    "tags": ["downloads", "installer"]
+  },
+  {
+    "id": "mail-attachments",
+    "name": "邮件附件缓存",
+    "path": "~/Library/Containers/com.apple.mail/Data/Library/Mail Downloads",
+    "risk": "safe",
+    "size_estimate": "100 MB - 3 GB",
+    "impact": "删除后查看邮件附件时会重新从服务器下载",
+    "conditions": ["app:com.apple.mail"],
+    "tags": ["mail", "cache"]
+  },
+  {
+    "id": "mail-data-cache",
+    "name": "邮件数据缓存",
+    "path": "~/Library/Mail/V10",
+    "risk": "warning",
+    "size_estimate": "1 - 10 GB",
+    "impact": "删除后 Mail 需要重新同步所有邮件，初次加载会很慢",
+    "conditions": ["app:com.apple.mail"],
+    "tags": ["mail", "cache"]
+  },
+  {
+    "id": "spotlight-index",
+    "name": "Spotlight 搜索索引",
+    "path": "~/.Spotlight-V100",
+    "risk": "safe",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后 macOS 会自动重建搜索索引，期间搜索功能暂时不可用",
+    "tags": ["system", "index"]
+  },
+  {
     "id": "system-logs",
     "name": "用户日志文件",
     "path": "~/Library/Logs",
@@ -27,6 +95,130 @@
     "size_estimate": "100 MB - 1 GB",
     "impact": "删除后无法查看历史应用日志，不影响系统运行",
     "tags": ["system", "logs"]
+  },
+  {
+    "id": "crash-reports",
+    "name": "应用崩溃报告",
+    "path": "~/Library/Logs/DiagnosticReports",
+    "risk": "safe",
+    "size_estimate": "50 MB - 500 MB",
+    "impact": "删除后无法查看历史崩溃日志，不影响系统运行",
+    "tags": ["system", "logs"]
+  },
+  {
+    "id": "itunes-backup",
+    "name": "iOS 设备备份",
+    "path": "~/Library/Application Support/MobileSync/Backup",
+    "risk": "warning",
+    "size_estimate": "5 - 50 GB",
+    "impact": "删除后 iPhone/iPad 的本地备份将丢失，建议先确认 iCloud 备份已开启",
+    "tags": ["apple", "backup"]
+  },
+  {
+    "id": "itunes-software-updates",
+    "name": "iOS 更新固件",
+    "path": "~/Library/iTunes/iPhone Software Updates",
+    "risk": "safe",
+    "size_estimate": "2 - 10 GB",
+    "impact": "删除后重新更新 iOS 时会重新下载固件",
+    "tags": ["apple", "firmware"]
+  },
+  {
+    "id": "xcode-coredata",
+    "name": "Xcode 相关缓存（非开发者）",
+    "path": "~/Library/Developer/CoreSimulator/Caches",
+    "risk": "safe",
+    "size_estimate": "200 MB - 2 GB",
+    "impact": "如果你不做 iOS 开发，这些缓存完全可以安全删除",
+    "tags": ["system", "cache"]
+  },
+  {
+    "id": "app-caches-general",
+    "name": "应用通用缓存",
+    "path": "~/Library/Caches",
+    "risk": "warning",
+    "size_estimate": "2 - 15 GB",
+    "impact": "删除所有应用的缓存，部分应用首次启动会变慢。不会丢失数据",
+    "tags": ["system", "cache"]
+  },
+  {
+    "id": "wechat-cache",
+    "name": "微信缓存",
+    "path": "~/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat",
+    "risk": "warning",
+    "size_estimate": "2 - 30 GB",
+    "impact": "删除后聊天中的图片、视频、文件缓存将丢失，需重新从服务器加载",
+    "conditions": ["app:com.tencent.xinWeChat"],
+    "tags": ["messaging", "cache"]
+  },
+  {
+    "id": "qq-cache",
+    "name": "QQ 缓存",
+    "path": "~/Library/Containers/com.tencent.qq/Data/Library/Application Support/QQ",
+    "risk": "warning",
+    "size_estimate": "1 - 10 GB",
+    "impact": "删除后聊天中的图片、视频缓存将丢失",
+    "conditions": ["app:com.tencent.qq"],
+    "tags": ["messaging", "cache"]
+  },
+  {
+    "id": "dingtalk-cache",
+    "name": "钉钉缓存",
+    "path": "~/Library/Containers/com.alibaba.DingTalkMac/Data/Library/Application Support/DingTalkMac",
+    "risk": "warning",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后钉钉聊天中的文件缓存将丢失",
+    "conditions": ["app:com.alibaba.DingTalkMac"],
+    "tags": ["messaging", "cache"]
+  },
+  {
+    "id": "feishu-cache",
+    "name": "飞书缓存",
+    "path": "~/Library/Containers/com.bytedance.macos.feishu/Data",
+    "risk": "warning",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后飞书聊天中的文件缓存将丢失",
+    "conditions": ["app:com.bytedance.macos.feishu"],
+    "tags": ["messaging", "cache"]
+  },
+  {
+    "id": "slack-cache",
+    "name": "Slack 缓存",
+    "path": "~/Library/Containers/com.tinyspeck.slackmacgap/Data/Library/Application Support/Slack",
+    "risk": "safe",
+    "size_estimate": "500 MB - 3 GB",
+    "impact": "删除后 Slack 会重新缓存频道数据，不影响消息记录",
+    "conditions": ["app:com.tinyspeck.slackmacgap"],
+    "tags": ["messaging", "cache"]
+  },
+  {
+    "id": "spotify-cache",
+    "name": "Spotify 离线缓存",
+    "path": "~/Library/Caches/com.spotify.client",
+    "risk": "safe",
+    "size_estimate": "1 - 10 GB",
+    "impact": "删除后已下载的离线歌曲需要重新下载",
+    "conditions": ["app:com.spotify.client"],
+    "tags": ["media", "cache"]
+  },
+  {
+    "id": "apple-music-cache",
+    "name": "Apple Music 缓存",
+    "path": "~/Library/Caches/com.apple.AMPLibraryAgent",
+    "risk": "safe",
+    "size_estimate": "200 MB - 3 GB",
+    "impact": "删除后部分缓存的歌曲需重新加载",
+    "conditions": ["app:com.apple.Music"],
+    "tags": ["media", "cache"]
+  },
+  {
+    "id": "icloud-local-cache",
+    "name": "iCloud Drive 本地缓存",
+    "path": "~/Library/Mobile Documents",
+    "risk": "danger",
+    "size_estimate": "5 - 50 GB",
+    "impact": "包含 iCloud Drive 同步的本地副本，删除后需要重新从 iCloud 下载。确保网络和 iCloud 存储正常",
+    "tags": ["apple", "cloud", "cache"]
   },
   {
     "id": "trash-old",
