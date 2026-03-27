@@ -1,10 +1,12 @@
 import { spawn } from 'child_process'
-import { stat, realpath } from 'fs/promises'
+import { stat, realpath, readdir } from 'fs/promises'
 import { homedir } from 'os'
+import { join } from 'path'
 import type { RuleDefinition, RuleResult, ScanCallbacks } from './types'
 import { isProtectedPath } from './safety'
 
 const DU_TIMEOUT_MS = 15_000
+const TRASH_COOLDOWN_MS = 48 * 60 * 60 * 1000 // 48 小时
 const MAX_CONCURRENCY = 8
 const PROGRESS_BATCH_MS = 300
 
@@ -105,6 +107,45 @@ function checkAppInstalled(bundleId: string): Promise<boolean> {
   })
 }
 
+/**
+ * 计算废纸篓中超过 48 小时的文件总大小
+ * 只统计顶层条目的修改时间（不递归进子目录）
+ */
+async function trashOldSize(trashPath: string): Promise<number> {
+  const now = Date.now()
+  let totalSize = 0
+
+  try {
+    const entries = await readdir(trashPath)
+    for (const entry of entries) {
+      if (entry.startsWith('.')) continue // 跳过隐藏的 .DS_Store 等
+      try {
+        const entryPath = join(trashPath, entry)
+        const info = await stat(entryPath)
+        const ageMs = now - info.mtimeMs
+        if (ageMs > TRASH_COOLDOWN_MS) {
+          // 对目录使用 du 获取大小，对文件直接用 stat.size
+          if (info.isDirectory()) {
+            try {
+              totalSize += await duSize(entryPath)
+            } catch {
+              totalSize += info.size
+            }
+          } else {
+            totalSize += info.size
+          }
+        }
+      } catch {
+        // 单个条目 stat 失败跳过
+      }
+    }
+  } catch {
+    // readdir 失败（权限等）
+  }
+
+  return totalSize
+}
+
 async function scanRule(rule: RuleDefinition): Promise<RuleResult> {
   const expandedPath = expandPath(rule.path)
 
@@ -154,12 +195,15 @@ async function scanRule(rule: RuleDefinition): Promise<RuleResult> {
     }
   }
 
-  // 计算大小
+  // 计算大小（废纸篓特殊处理：只统计 >48h 的文件）
   let size: number
   try {
-    size = await duSize(expandedPath)
+    if (rule.id === 'trash-old') {
+      size = await trashOldSize(expandedPath)
+    } else {
+      size = await duSize(expandedPath)
+    }
   } catch {
-    // du 超时或失败 → 返回 exists: true 但 size: 0
     size = 0
   }
 
