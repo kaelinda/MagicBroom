@@ -16,6 +16,10 @@ interface MagicBroomAPI {
   rules: {
     list: (mode: 'daily' | 'developer') => Promise<unknown[]>
   }
+  settings: {
+    get: () => Promise<Record<string, unknown>>
+    update: (settings: Record<string, unknown>) => Promise<Record<string, unknown>>
+  }
   updater: {
     check: () => Promise<void>
     getVersion: () => Promise<string>

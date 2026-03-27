@@ -42,6 +42,11 @@ contextBridge.exposeInMainWorld('api', {
     selectDirectory: () =>
       ipcRenderer.invoke('shell:select-directory'),
   },
+  settings: {
+    get: () => ipcRenderer.invoke('settings:get'),
+    update: (settings: Record<string, unknown>) =>
+      ipcRenderer.invoke('settings:update', settings),
+  },
   updater: {
     check: () => ipcRenderer.invoke('updater:check'),
     getVersion: () => ipcRenderer.invoke('updater:get-version'),

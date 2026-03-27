@@ -176,7 +176,14 @@ async function scanRule(rule: RuleDefinition): Promise<RuleResult> {
 }
 
 export class Scanner {
-  async scan(rules: RuleDefinition[], callbacks: ScanCallbacks): Promise<void> {
+  async scan(rules: RuleDefinition[], callbacks: ScanCallbacks, excludedPaths: string[] = []): Promise<void> {
+    // 过滤排除路径：展开 ~ 后比较
+    const expandedExcluded = excludedPaths.map(expandPath)
+    const filteredRules = rules.filter((rule) => {
+      const expanded = expandPath(rule.path)
+      return !expandedExcluded.some((ex) => expanded === ex || expanded.startsWith(ex + '/'))
+    })
+
     const results: RuleResult[] = []
     let completed = 0
     let batchBuffer: RuleResult[] = []
@@ -184,7 +191,7 @@ export class Scanner {
 
     const flushBatch = (): void => {
       if (batchBuffer.length > 0) {
-        callbacks.onProgress([...batchBuffer], completed / rules.length)
+        callbacks.onProgress([...batchBuffer], completed / filteredRules.length)
         batchBuffer = []
         lastFlush = Date.now()
       }
@@ -192,8 +199,8 @@ export class Scanner {
 
     // 并发控制：最多 MAX_CONCURRENCY 个同时
     const chunks: RuleDefinition[][] = []
-    for (let i = 0; i < rules.length; i += MAX_CONCURRENCY) {
-      chunks.push(rules.slice(i, i + MAX_CONCURRENCY))
+    for (let i = 0; i < filteredRules.length; i += MAX_CONCURRENCY) {
+      chunks.push(filteredRules.slice(i, i + MAX_CONCURRENCY))
     }
 
     try {

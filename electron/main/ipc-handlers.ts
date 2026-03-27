@@ -4,6 +4,7 @@ import { Cleaner } from './cleaner'
 import { RulesEngine } from './rules-engine'
 import { updateTrayConfig, getTrayConfig } from './tray'
 import { checkForUpdates, getAppVersion } from './updater'
+import { getSettings, updateSettings, getExcludedPaths } from './store'
 import type { ScanMode } from './types'
 
 const scanner = new Scanner()
@@ -18,7 +19,9 @@ export function registerIpcHandlers(): void {
     const jobId = `scan-${Date.now()}`
     const rules = await rulesEngine.loadRules(args.mode)
 
-    // 异步启动扫描，通过事件推送进度
+    // 获取排除路径，传递给 scanner
+    const excludedPaths = getExcludedPaths()
+
     scanner.scan(rules, {
       onProgress: (items, progress) => {
         sender.webContents.send('scan:progress', { jobId, items, progress })
@@ -29,7 +32,7 @@ export function registerIpcHandlers(): void {
       onError: (error) => {
         sender.webContents.send('scan:error', { jobId, error: error.message })
       },
-    })
+    }, excludedPaths)
 
     return { jobId }
   })
@@ -66,6 +69,15 @@ export function registerIpcHandlers(): void {
     })
     if (result.canceled || result.filePaths.length === 0) return null
     return result.filePaths[0]
+  })
+
+  // 设置持久化
+  ipcMain.handle('settings:get', async () => {
+    return getSettings()
+  })
+
+  ipcMain.handle('settings:update', async (_event, args: Record<string, unknown>) => {
+    return updateSettings(args as any)
   })
 
   // 托盘设置

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   Settings as SettingsIcon, HardDrive, Bell, Info,
   Trash2, RotateCcw, FolderOpen, XCircle, ExternalLink, Plus, Shield,
@@ -79,14 +79,43 @@ export function Settings() {
   const [skipSystemFiles, setSkipSystemFiles] = useState(true)
   const [confirmBeforeDelete, setConfirmBeforeDelete] = useState(true)
   const [moveToTrash, setMoveToTrash] = useState(true)
-  const [excluded, setExcluded] = useState([
-    '~/Documents', '~/Desktop', '~/Pictures', '~/Music', '~/Movies',
-    '/Applications', '~/.ssh', '~/.gnupg',
-    '~/.claude', '~/.cursor', '~/.codex',
-  ])
+  const [excluded, setExcluded] = useState<string[]>([])
   const [notifyComplete, setNotifyComplete] = useState(true)
   const [notifyLowSpace, setNotifyLowSpace] = useState(true)
   const [notifyScheduled, setNotifyScheduled] = useState(true)
+  const [loaded, setLoaded] = useState(false)
+
+  // 从持久化存储加载设置
+  useEffect(() => {
+    window.api?.settings.get().then((s: any) => {
+      if (s) {
+        setAutoStart(s.autoStart ?? true)
+        setMinimizeToTray(s.minimizeToTray ?? true)
+        setAutoUpdate(s.autoUpdate ?? true)
+        setSkipSystemFiles(s.skipSystemFiles ?? true)
+        setConfirmBeforeDelete(s.confirmBeforeDelete ?? true)
+        setMoveToTrash(s.moveToTrash ?? true)
+        setExcluded(s.excludedPaths ?? [])
+        setNotifyComplete(s.notifyComplete ?? true)
+        setNotifyLowSpace(s.notifyLowSpace ?? true)
+        setNotifyScheduled(s.notifyScheduled ?? true)
+      }
+      setLoaded(true)
+    }).catch(() => setLoaded(true))
+  }, [])
+
+  // 保存设置到持久化存储
+  const persist = useCallback((key: string, value: unknown) => {
+    window.api?.settings.update({ [key]: value })
+  }, [])
+
+  const updateExcluded = useCallback((updater: (prev: string[]) => string[]) => {
+    setExcluded((prev) => {
+      const next = updater(prev)
+      window.api?.settings.update({ excludedPaths: next })
+      return next
+    })
+  }, [])
 
   const selectClass =
     'px-3 py-[7px] rounded-lg border border-gray-200/60 text-[12px] text-gray-800 bg-white/60 focus:outline-none focus:border-[#6B7FED] focus:ring-2 focus:ring-[#6B7FED]/10 transition-all'
@@ -129,10 +158,10 @@ export function Settings() {
             <>
               <SectionCard title="启动与运行">
                 <SettingRow label="开机自动启动" desc="登录 macOS 后自动启动">
-                  <Toggle enabled={autoStart} onChange={() => setAutoStart(!autoStart)} />
+                  <Toggle enabled={autoStart} onChange={() => { setAutoStart(!autoStart); persist('autoStart', !autoStart) }} />
                 </SettingRow>
                 <SettingRow label="自动检查更新" desc="有新版本时自动提示">
-                  <Toggle enabled={autoUpdate} onChange={() => setAutoUpdate(!autoUpdate)} />
+                  <Toggle enabled={autoUpdate} onChange={() => { setAutoUpdate(!autoUpdate); persist('autoUpdate', !autoUpdate) }} />
                 </SettingRow>
               </SectionCard>
               <SectionCard title="状态栏托盘">
@@ -176,15 +205,15 @@ export function Settings() {
             <>
               <SectionCard title="扫描偏好">
                 <SettingRow label="跳过系统关键文件" desc="自动排除 macOS 系统核心文件">
-                  <Toggle enabled={skipSystemFiles} onChange={() => setSkipSystemFiles(!skipSystemFiles)} />
+                  <Toggle enabled={skipSystemFiles} onChange={() => { setSkipSystemFiles(!skipSystemFiles); persist('skipSystemFiles', !skipSystemFiles) }} />
                 </SettingRow>
               </SectionCard>
               <SectionCard title="清理行为">
                 <SettingRow label="删除前确认" desc="执行清理前弹出确认对话框">
-                  <Toggle enabled={confirmBeforeDelete} onChange={() => setConfirmBeforeDelete(!confirmBeforeDelete)} />
+                  <Toggle enabled={confirmBeforeDelete} onChange={() => { setConfirmBeforeDelete(!confirmBeforeDelete); persist('confirmBeforeDelete', !confirmBeforeDelete) }} />
                 </SettingRow>
                 <SettingRow label="移到废纸篓而非永久删除" desc="清理的文件先移入废纸篓">
-                  <Toggle enabled={moveToTrash} onChange={() => setMoveToTrash(!moveToTrash)} />
+                  <Toggle enabled={moveToTrash} onChange={() => { setMoveToTrash(!moveToTrash); persist('moveToTrash', !moveToTrash) }} />
                 </SettingRow>
               </SectionCard>
               <SectionCard title="排除目录">
@@ -205,7 +234,7 @@ export function Settings() {
                           <span className="text-[12px] text-gray-600 font-mono">{p}</span>
                         </div>
                         <button
-                          onClick={() => setExcluded((prev) => prev.filter((_, idx) => idx !== i))}
+                          onClick={() => updateExcluded((prev) => prev.filter((_, idx) => idx !== i))}
                           className="text-gray-300 group-hover:text-gray-400 hover:!text-red-500 transition-colors"
                           title="移除排除"
                         >
@@ -223,13 +252,13 @@ export function Settings() {
                           // fallback: 手动输入
                           const input = prompt('请输入要排除的目录路径（如 ~/Projects）')
                           if (input && input.trim() && !excluded.includes(input.trim())) {
-                            setExcluded((prev) => [...prev, input.trim()])
+                            updateExcluded((prev) => [...prev, input.trim()])
                           }
                           return
                         }
                         const path = await window.api.shell.selectDirectory()
                         if (path && !excluded.includes(path)) {
-                          setExcluded((prev) => [...prev, path])
+                          updateExcluded((prev) => [...prev, path])
                         }
                       }}
                       className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-gray-300/60 text-[12px] text-gray-500 hover:border-[#6B7FED] hover:text-[#6B7FED] transition-colors"
@@ -248,7 +277,7 @@ export function Settings() {
                         ]
                         const available = presets.filter((p) => !excluded.includes(p))
                         if (available.length > 0) {
-                          setExcluded((prev) => [...prev, available[0]])
+                          updateExcluded((prev) => [...prev, available[0]])
                         }
                       }}
                       className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-gray-200/60 text-[12px] text-gray-500 hover:text-[#6B7FED] hover:border-[#6B7FED]/30 transition-colors"
@@ -264,7 +293,7 @@ export function Settings() {
                       <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1.5">工作目录</div>
                       <div className="flex flex-wrap gap-1.5">
                         {['~/Projects', '~/Code', '~/Work', '~/.config', '~/Library/Keychains'].map((preset) => (
-                          <PresetTag key={preset} path={preset} excluded={excluded} onAdd={(p) => setExcluded((prev) => [...prev, p])} />
+                          <PresetTag key={preset} path={preset} excluded={excluded} onAdd={(p) => updateExcluded((prev) => [...prev, p])} />
                         ))}
                       </div>
                     </div>
@@ -276,7 +305,7 @@ export function Settings() {
                           '~/.github-copilot', '~/.continue',
                           '~/.codeium', '~/.tabnine',
                         ].map((preset) => (
-                          <PresetTag key={preset} path={preset} excluded={excluded} onAdd={(p) => setExcluded((prev) => [...prev, p])} />
+                          <PresetTag key={preset} path={preset} excluded={excluded} onAdd={(p) => updateExcluded((prev) => [...prev, p])} />
                         ))}
                       </div>
                     </div>
@@ -287,7 +316,7 @@ export function Settings() {
                           '~/.vscode', '~/.zed',
                           '~/Library/Application Support/JetBrains',
                         ].map((preset) => (
-                          <PresetTag key={preset} path={preset} excluded={excluded} onAdd={(p) => setExcluded((prev) => [...prev, p])} />
+                          <PresetTag key={preset} path={preset} excluded={excluded} onAdd={(p) => updateExcluded((prev) => [...prev, p])} />
                         ))}
                       </div>
                     </div>
@@ -300,13 +329,13 @@ export function Settings() {
           {activeTab === 'notification' && (
             <SectionCard title="通知偏好">
               <SettingRow label="扫描完成通知" desc="扫描完成后发送系统通知">
-                <Toggle enabled={notifyComplete} onChange={() => setNotifyComplete(!notifyComplete)} />
+                <Toggle enabled={notifyComplete} onChange={() => { setNotifyComplete(!notifyComplete); persist('notifyComplete', !notifyComplete) }} />
               </SettingRow>
               <SettingRow label="磁盘空间不足警告" desc="可用空间低于阈值时警告">
-                <Toggle enabled={notifyLowSpace} onChange={() => setNotifyLowSpace(!notifyLowSpace)} />
+                <Toggle enabled={notifyLowSpace} onChange={() => { setNotifyLowSpace(!notifyLowSpace); persist('notifyLowSpace', !notifyLowSpace) }} />
               </SettingRow>
               <SettingRow label="定时任务执行通知" desc="定时任务结果通知">
-                <Toggle enabled={notifyScheduled} onChange={() => setNotifyScheduled(!notifyScheduled)} />
+                <Toggle enabled={notifyScheduled} onChange={() => { setNotifyScheduled(!notifyScheduled); persist('notifyScheduled', !notifyScheduled) }} />
               </SettingRow>
             </SectionCard>
           )}
