@@ -1,5 +1,5 @@
 import { Smartphone, TabletSmartphone, Container, Globe, Code2, Beer, Gem, ChevronRight, Sparkles } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useMagicBroom } from '../hooks/useMagicBroom'
 
 const cardClass =
@@ -24,6 +24,7 @@ const environments = [
 
 export function DeveloperMode() {
   const { state, startScan } = useMagicBroom()
+  const navigate = useNavigate()
   const hasData = state.status === 'complete'
 
   // 按 tag 分组统计
@@ -47,7 +48,7 @@ export function DeveloperMode() {
         </div>
         {!hasData && (
           <button
-            onClick={() => startScan('developer')}
+            onClick={() => { startScan('developer'); navigate('/') }}
             className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-b from-[#6B7FED] to-[#5468E8] text-white rounded-xl text-[12px] font-medium shadow-[0_2px_8px_rgba(107,127,237,0.3)] transition-all"
           >
             <Sparkles className="w-4 h-4" />
