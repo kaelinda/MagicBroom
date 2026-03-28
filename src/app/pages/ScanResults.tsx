@@ -117,6 +117,7 @@ export function ScanResults() {
           </div>
           <button
             disabled={state.selectedItems.size === 0}
+            data-clean-trigger
             onClick={() => setShowConfirm(true)}
             className="h-[42px] px-6 bg-gradient-to-b from-emerald-500 to-emerald-600 text-white rounded-xl flex items-center gap-2 text-[13px] font-medium shadow-[0_2px_8px_rgba(16,185,129,0.3)] disabled:from-gray-200 disabled:to-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed transition-all"
           >

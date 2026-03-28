@@ -6,7 +6,7 @@ export function Topbar() {
     <header
       className="h-[56px] flex items-center justify-between px-6 border-b border-black/[0.06]"
       style={{
-        background: 'rgba(255,255,255,0.55)',
+        background: 'var(--topbar-bg)',
         backdropFilter: 'blur(40px) saturate(180%)',
         WebkitBackdropFilter: 'blur(40px) saturate(180%)',
       }}

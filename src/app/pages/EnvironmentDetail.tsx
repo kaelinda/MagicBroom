@@ -145,6 +145,7 @@ export function EnvironmentDetail() {
           </div>
           <button
             disabled={selectedItems.size === 0}
+            data-clean-trigger
             onClick={() => setShowConfirm(true)}
             className="h-[36px] px-4 bg-gradient-to-b from-emerald-500 to-emerald-600 text-white rounded-xl flex items-center gap-2 text-[12px] font-medium shadow-[0_2px_6px_rgba(16,185,129,0.3)] disabled:from-gray-200 disabled:to-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed transition-all"
           >

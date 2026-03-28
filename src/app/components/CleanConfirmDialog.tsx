@@ -20,7 +20,7 @@ export function CleanConfirmDialog({ items, totalSize, onConfirm, onCancel }: Cl
   const dangerCount = items.filter((i) => i.risk === 'danger').length
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="确认清理">
       <div className="bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.2)] w-full max-w-[460px] overflow-hidden">
         {/* Header */}
         <div className="px-6 py-5 border-b border-gray-100/60">
@@ -83,12 +83,14 @@ export function CleanConfirmDialog({ items, totalSize, onConfirm, onCancel }: Cl
         <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-100/60 flex gap-3">
           <button
             onClick={onCancel}
+            data-cancel-action
             className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200/60 text-[13px] font-medium text-gray-600 hover:bg-gray-100/60 transition-colors"
           >
-            取消
+            取消 <kbd className="ml-1 text-[10px] text-gray-400 font-mono">Esc</kbd>
           </button>
           <button
             onClick={onConfirm}
+            data-confirm-action
             className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-b from-emerald-500 to-emerald-600 text-white rounded-xl text-[13px] font-medium shadow-[0_2px_8px_rgba(16,185,129,0.3)] hover:shadow-[0_4px_12px_rgba(16,185,129,0.4)] transition-all"
           >
             <Trash2 className="w-4 h-4" />

@@ -10,7 +10,7 @@ export function AppLayout() {
   return (
     <div
       className="flex h-screen overflow-hidden"
-      style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #eef1f5 50%, #f0f2f6 100%)' }}
+      style={{ background: 'var(--page-gradient)' }}
     >
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
