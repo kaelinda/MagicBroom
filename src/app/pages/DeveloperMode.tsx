@@ -47,8 +47,8 @@ export function DeveloperMode() {
     <div className="p-8 max-w-[1400px] mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-[22px] font-semibold text-gray-900 tracking-[-0.02em] mb-1">开发者模式</h1>
-          <p className="text-[13px] text-gray-500">智能识别开发环境，按环境深度治理磁盘空间</p>
+          <h1 className="text-[22px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em] mb-1">开发者模式</h1>
+          <p className="text-[13px] text-gray-500 dark:text-gray-400">智能识别开发环境，按环境深度治理磁盘空间</p>
         </div>
         {!hasData && (
           <button
@@ -66,17 +66,17 @@ export function DeveloperMode() {
         <div className="grid grid-cols-3 gap-4 mb-5">
           <div className={`${cardClass} p-5`}>
             <div className="text-[12px] text-gray-400 mb-1">已识别环境</div>
-            <div className="text-[28px] font-semibold text-gray-900 tracking-[-0.02em]">
+            <div className="text-[28px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em]">
               {environments.filter((e) => getEnvStats(e.tags).count > 0).length}
             </div>
           </div>
           <div className={`${cardClass} p-5`}>
             <div className="text-[12px] text-gray-400 mb-1">可释放空间</div>
-            <div className="text-[28px] font-semibold text-emerald-600 tracking-[-0.02em]">{formatSize(totalReleasable)}</div>
+            <div className="text-[28px] font-semibold text-emerald-600 dark:text-emerald-400 tracking-[-0.02em]">{formatSize(totalReleasable)}</div>
           </div>
           <div className={`${cardClass} p-5`}>
             <div className="text-[12px] text-gray-400 mb-1">清理项目</div>
-            <div className="text-[28px] font-semibold text-gray-900 tracking-[-0.02em]">
+            <div className="text-[28px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em]">
               {state.results.filter((r) => r.exists).length}
             </div>
           </div>
@@ -86,7 +86,7 @@ export function DeveloperMode() {
       {/* Environment cards */}
       <div className={`${cardClass} p-6`}>
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-[15px] font-semibold text-gray-900">开发环境</h2>
+          <h2 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100">开发环境</h2>
         </div>
         <div className="grid grid-cols-2 gap-4">
           {environments.map((env) => {
@@ -99,38 +99,38 @@ export function DeveloperMode() {
               <div
                 className={`border rounded-2xl p-5 transition-all duration-200 group ${
                   canNavigate
-                    ? 'border-gray-100/80 bg-white/40 hover:border-[#6B7FED]/30 hover:shadow-[0_4px_16px_rgba(107,127,237,0.08)] cursor-pointer'
-                    : 'border-gray-100/60 bg-gray-50/30 opacity-70 cursor-default'
+                    ? 'border-gray-100/80 dark:border-white/[0.08] bg-white/40 dark:bg-white/[0.04] hover:border-[#6B7FED]/30 hover:shadow-[0_4px_16px_rgba(107,127,237,0.08)] cursor-pointer'
+                    : 'border-gray-100/60 dark:border-white/[0.05] bg-gray-50/30 dark:bg-white/[0.02] opacity-70 cursor-default'
                 }`}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${canNavigate ? 'bg-gradient-to-br from-blue-50 to-indigo-50/50' : 'bg-gray-100/60'}`}>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${canNavigate ? 'bg-gradient-to-br from-blue-50 to-indigo-50/50 dark:from-[#6B7FED]/20 dark:to-[#5468E8]/10' : 'bg-gray-100/60 dark:bg-white/[0.06]'}`}>
                       <Icon className={`w-5 h-5 ${canNavigate ? 'text-[#6B7FED]' : 'text-gray-400'}`} />
                     </div>
                     <div>
-                      <h3 className={`text-[15px] font-semibold mb-0.5 transition-colors ${canNavigate ? 'text-gray-900 group-hover:text-[#6B7FED]' : 'text-gray-500'}`}>
+                      <h3 className={`text-[15px] font-semibold mb-0.5 transition-colors ${canNavigate ? 'text-gray-900 dark:text-gray-100 group-hover:text-[#6B7FED]' : 'text-gray-500 dark:text-gray-500'}`}>
                         {env.name}
                       </h3>
                       <p className="text-[11px] text-gray-400">{env.description}</p>
                     </div>
                   </div>
-                  {canNavigate && <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-[#6B7FED] transition-colors mt-1" />}
+                  {canNavigate && <ChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-[#6B7FED] transition-colors mt-1" />}
                 </div>
 
                 {detected ? (
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3 bg-gray-50/60 rounded-xl">
+                    <div className="p-3 bg-gray-50/60 dark:bg-white/[0.04] rounded-xl">
                       <div className="text-[11px] text-gray-400 mb-0.5">可释放</div>
-                      <div className="text-[18px] font-semibold text-emerald-600 tabular-nums">{formatSize(stats.total)}</div>
+                      <div className="text-[18px] font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">{formatSize(stats.total)}</div>
                     </div>
-                    <div className="p-3 bg-gray-50/60 rounded-xl">
+                    <div className="p-3 bg-gray-50/60 dark:bg-white/[0.04] rounded-xl">
                       <div className="text-[11px] text-gray-400 mb-0.5">项目数</div>
-                      <div className="text-[18px] font-semibold text-gray-900 tabular-nums">{stats.count}</div>
+                      <div className="text-[18px] font-semibold text-gray-900 dark:text-gray-100 tabular-nums">{stats.count}</div>
                     </div>
                   </div>
                 ) : (
-                  <div className="p-3 bg-gray-50/40 rounded-xl text-center">
+                  <div className="p-3 bg-gray-50/40 dark:bg-white/[0.03] rounded-xl text-center">
                     <p className="text-[12px] text-gray-400">{hasData ? '未检测到此环境' : '请先扫描开发环境'}</p>
                   </div>
                 )}
