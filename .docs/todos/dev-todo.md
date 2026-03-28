@@ -118,9 +118,9 @@
 
 ## 四、UI/UX 问题
 
-- [ ] 环境卡片没有扫描数据时不可点击（应提示"先扫描"而非进入空详情页）
+- [x] 环境卡片没有扫描数据时不可点击（应提示"先扫描"而非进入空详情页） ✅
 - [x] EnvironmentDetail 页面缺少"全选"和"反选"按钮 ✅
-- [ ] 缺少按风险等级排序/分组的能力
+- [x] 缺少按风险等级排序/分组的能力 ✅
 - [ ] 清理完成后应自动刷新 DeveloperMode 页面的统计数据
 - [x] 缺少"上次扫描时间"显示 ✅
 
@@ -134,7 +134,7 @@
 | **P0** | ~~新增 Rust/Go/Java 环境 + 规则~~ | ✅ 已完成 |
 | **P0** | ~~补全 HuggingFace 模型缓存、Docker volumes、Simulator Runtimes~~ | ✅ 已完成 |
 | **P1** | ~~路径动态化（Android Studio 版本、Conda 路径、Homebrew Intel）~~ | ✅ 已完成 |
-| **P1** | 新增 .NET/Flutter/JetBrains 环境 | 1h |
-| **P1** | ~~EnvironmentDetail 全选/反选~~ + 风险排序 | 全选 ✅ / 排序待做 |
+| **P1** | ~~新增 .NET/Flutter/JetBrains 环境~~ | ✅ 已完成 |
+| **P1** | ~~EnvironmentDetail 全选/反选 + 风险排序~~ | ✅ 已完成 |
 | **P2** | 命令型清理建议（brew cleanup、docker prune）| 3h |
 | **P2** | ~~上次扫描时间显示~~ | ✅ 已完成 |
