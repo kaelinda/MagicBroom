@@ -123,11 +123,23 @@ export function AgentMode() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-5 text-[12px] text-gray-500">
               <span>
-                已选择 <span className="font-semibold text-gray-900">{selectedItems.size}</span> 项
+                已选择 <span className="font-semibold text-gray-900">{selectedItems.size}</span> / {agentItems.length} 项
               </span>
               <span>
                 可清理 <span className="font-semibold text-violet-600">{formatSize(selectedSize)}</span>
               </span>
+              <button
+                onClick={() => setSelectedItems(new Set(agentItems.map((i) => i.id)))}
+                className="text-violet-500 hover:text-violet-700 font-medium transition-colors"
+              >
+                全选
+              </button>
+              <button
+                onClick={() => setSelectedItems(new Set())}
+                className="text-gray-400 hover:text-gray-600 font-medium transition-colors"
+              >
+                取消全选
+              </button>
             </div>
             <button
               disabled={selectedItems.size === 0}

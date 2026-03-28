@@ -112,11 +112,23 @@ export function EnvironmentDetail() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-5 text-[12px] text-gray-500">
             <span>
-              已选择 <span className="font-semibold text-gray-900">{selectedItems.size}</span> 项
+              已选择 <span className="font-semibold text-gray-900">{selectedItems.size}</span> / {envItems.length} 项
             </span>
             <span>
               可清理 <span className="font-semibold text-emerald-600">{formatSize(selectedSize)}</span>
             </span>
+            <button
+              onClick={() => setSelectedItems(new Set(envItems.map((i) => i.id)))}
+              className="text-[#6B7FED] hover:text-[#5468E8] font-medium transition-colors"
+            >
+              全选
+            </button>
+            <button
+              onClick={() => setSelectedItems(new Set())}
+              className="text-gray-400 hover:text-gray-600 font-medium transition-colors"
+            >
+              取消全选
+            </button>
           </div>
           <button
             disabled={selectedItems.size === 0}
