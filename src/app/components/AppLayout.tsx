@@ -2,8 +2,11 @@ import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
 import { ToastContainer } from './ToastContainer'
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts'
 
 export function AppLayout() {
+  useKeyboardShortcuts()
+
   return (
     <div
       className="flex h-screen overflow-hidden"

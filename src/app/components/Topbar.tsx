@@ -16,6 +16,7 @@ export function Topbar() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-[15px] h-[15px] text-gray-400" style={{ strokeWidth: 2 }} />
           <input
             type="text"
+            data-search-input
             placeholder="搜索文件、目录或操作..."
             className="w-full h-[34px] pl-9 pr-4 bg-black/[0.04] rounded-[9px] text-[13px] text-gray-800 placeholder:text-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#6B7FED]/30 transition-all duration-200"
           />
