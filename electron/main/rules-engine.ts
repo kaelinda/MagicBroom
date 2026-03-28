@@ -1,5 +1,6 @@
 import { readFile, readdir } from 'fs/promises'
-import { join, resolve } from 'path'
+import { join, resolve, basename } from 'path'
+import { homedir } from 'os'
 import { app } from 'electron'
 import type { RuleDefinition, ScanMode } from './types'
 
@@ -49,15 +50,91 @@ function validateRule(rule: unknown, sourceFile: string): rule is RuleDefinition
   return true
 }
 
+/**
+ * 展开路径中的通配符 `*`，返回匹配的具体路径列表。
+ * 仅支持单段通配（如 `~/Caches/Google/AndroidStudio*`）。
+ */
+async function expandGlob(pathPattern: string): Promise<string[]> {
+  const expanded = pathPattern.replace(/^~/, homedir())
+  const parts = expanded.split('/')
+  const globIdx = parts.findIndex((p) => p.includes('*'))
+  if (globIdx === -1) return [pathPattern]
+
+  const parentDir = parts.slice(0, globIdx).join('/')
+  const pattern = parts[globIdx]
+  const remaining = parts.slice(globIdx + 1)
+
+  const regex = new RegExp(
+    '^' + pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$'
+  )
+
+  try {
+    const entries = await readdir(parentDir)
+    const matches = entries.filter((e) => regex.test(e))
+    return matches.map((m) => {
+      const full = remaining.length > 0 ? [parentDir, m, ...remaining].join('/') : [parentDir, m].join('/')
+      // 转回 ~ 写法
+      return full.replace(homedir(), '~')
+    })
+  } catch {
+    return []
+  }
+}
+
+/**
+ * 将含通配符的规则展开为多条具体规则。
+ * 例：path `~/Caches/Google/AndroidStudio*` 在文件系统找到
+ * AndroidStudio2024.3 和 AndroidStudio2025.1 → 生成两条规则。
+ */
+export async function expandWildcardRules(rules: RuleDefinition[]): Promise<RuleDefinition[]> {
+  const result: RuleDefinition[] = []
+
+  for (const rule of rules) {
+    if (!rule.path.includes('*')) {
+      result.push(rule)
+      continue
+    }
+
+    const matches = await expandGlob(rule.path)
+
+    if (matches.length === 0) {
+      // 保留原始规则，Scanner 会标记为 exists: false
+      result.push(rule)
+    } else {
+      for (const matchPath of matches) {
+        const suffix = basename(matchPath.replace(/^~/, homedir()))
+        result.push({
+          ...rule,
+          id: `${rule.id}-${suffix.toLowerCase()}`,
+          name: `${rule.name} (${suffix})`,
+          path: matchPath,
+        })
+      }
+    }
+  }
+
+  return result
+}
+
 export class RulesEngine {
   private cache = new Map<ScanMode, RuleDefinition[]>()
 
   async loadRules(mode: ScanMode): Promise<RuleDefinition[]> {
-    // 缓存命中
+    // 缓存命中：缓存的是原始规则，通配符每次展开（目录可能变化）
+    let rawRules: RuleDefinition[]
+
     if (this.cache.has(mode)) {
-      return this.cache.get(mode)!
+      rawRules = this.cache.get(mode)!
+    } else {
+      rawRules = await this.loadRawRules(mode)
+      this.cache.set(mode, rawRules)
     }
 
+    // 展开通配符路径
+    return expandWildcardRules(rawRules)
+  }
+
+  private async loadRawRules(mode: ScanMode): Promise<RuleDefinition[]> {
     const rulesDir = getRulesDir()
     const rules: RuleDefinition[] = []
 
@@ -90,7 +167,6 @@ export class RulesEngine {
       }
     }
 
-    this.cache.set(mode, rules)
     return rules
   }
 

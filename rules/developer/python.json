@@ -10,23 +10,43 @@
     "tags": ["python", "pip", "package-cache"]
   },
   {
-    "id": "conda-pkgs",
-    "name": "Conda 包缓存",
+    "id": "miniconda-pkgs",
+    "name": "Miniconda 包缓存",
     "path": "~/miniconda3/pkgs",
     "risk": "safe",
     "size_estimate": "1-10 GB",
     "impact": "删除后 conda install 会重新下载包",
-    "conditions": ["path_exists:~/miniconda3"],
+    "conditions": ["path_exists:~/miniconda3/pkgs"],
     "tags": ["python", "conda", "package-cache"]
   },
   {
-    "id": "conda-envs-cache",
-    "name": "Conda 环境缓存",
+    "id": "miniconda-envs",
+    "name": "Miniconda 虚拟环境",
     "path": "~/miniconda3/envs",
     "risk": "warning",
     "size_estimate": "2-20 GB",
-    "impact": "删除后需要重新创建虚拟环境和安装依赖",
+    "impact": "删除后需���重新创建虚拟环境和安装依赖",
     "conditions": ["path_exists:~/miniconda3/envs"],
+    "tags": ["python", "conda", "environment"]
+  },
+  {
+    "id": "anaconda-pkgs",
+    "name": "Anaconda 包缓存",
+    "path": "~/anaconda3/pkgs",
+    "risk": "safe",
+    "size_estimate": "1-10 GB",
+    "impact": "删除后 conda install 会重新下载包",
+    "conditions": ["path_exists:~/anaconda3/pkgs"],
+    "tags": ["python", "conda", "package-cache"]
+  },
+  {
+    "id": "anaconda-envs",
+    "name": "Anaconda 虚拟环境",
+    "path": "~/anaconda3/envs",
+    "risk": "warning",
+    "size_estimate": "2-20 GB",
+    "impact": "删除后需要重新创建虚拟环境和安装依赖",
+    "conditions": ["path_exists:~/anaconda3/envs"],
     "tags": ["python", "conda", "environment"]
   },
   {

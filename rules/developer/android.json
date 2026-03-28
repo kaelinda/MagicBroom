@@ -82,7 +82,7 @@
   {
     "id": "android-studio-caches",
     "name": "Android Studio 缓存",
-    "path": "~/Library/Caches/Google/AndroidStudio2024.3",
+    "path": "~/Library/Caches/Google/AndroidStudio*",
     "risk": "safe",
     "size_estimate": "500 MB - 3 GB",
     "impact": "删除后 Android Studio 首次启动会重建索引，启动稍慢",
@@ -92,7 +92,7 @@
   {
     "id": "android-studio-system",
     "name": "Android Studio 系统文件",
-    "path": "~/Library/Application Support/Google/AndroidStudio2024.3",
+    "path": "~/Library/Application Support/Google/AndroidStudio*",
     "risk": "safe",
     "size_estimate": "200 MB - 1 GB",
     "impact": "删除后 Android Studio 的本地历史和插件缓存将丢失",
@@ -102,7 +102,7 @@
   {
     "id": "android-studio-logs",
     "name": "Android Studio 日志",
-    "path": "~/Library/Logs/Google/AndroidStudio2024.3",
+    "path": "~/Library/Logs/Google/AndroidStudio*",
     "risk": "safe",
     "size_estimate": "50 MB - 500 MB",
     "impact": "删除后无法查看历史 IDE 日志",

@@ -1,6 +1,51 @@
 import { describe, it, expect, vi } from 'vitest'
-import { readFile } from 'fs/promises'
+import { readFile, mkdtemp, mkdir, rm } from 'fs/promises'
 import { join } from 'path'
+import { tmpdir } from 'os'
+import { expandWildcardRules } from '../electron/main/rules-engine'
+import type { RuleDefinition } from '../electron/main/types'
+
+function makeRule(id: string, path: string): RuleDefinition {
+  return { id, name: id, path, risk: 'safe', size_estimate: '', impact: '', tags: ['test'] }
+}
+
+describe('expandWildcardRules', () => {
+  it('无通配符的规则原样返回', async () => {
+    const rules = [makeRule('a', '~/Library/Caches/pip')]
+    const result = await expandWildcardRules(rules)
+    expect(result).toHaveLength(1)
+    expect(result[0].path).toBe('~/Library/Caches/pip')
+  })
+
+  it('通配符展开为匹配的具体目录', async () => {
+    // 创建临时目录模拟 AndroidStudio* 结构
+    const tmp = await mkdtemp(join(tmpdir(), 'mb-test-'))
+    await mkdir(join(tmp, 'AndroidStudio2024.3'))
+    await mkdir(join(tmp, 'AndroidStudio2025.1'))
+    await mkdir(join(tmp, 'OtherDir'))
+
+    try {
+      const rules = [makeRule('as-cache', `${tmp}/AndroidStudio*`)]
+      const result = await expandWildcardRules(rules)
+
+      expect(result).toHaveLength(2)
+      expect(result.map((r) => r.id).sort()).toEqual([
+        'as-cache-androidstudio2024.3',
+        'as-cache-androidstudio2025.1',
+      ])
+      expect(result.every((r) => !r.path.includes('*'))).toBe(true)
+    } finally {
+      await rm(tmp, { recursive: true })
+    }
+  })
+
+  it('无匹配时保留原始规则', async () => {
+    const rules = [makeRule('x', '/nonexistent/path/Foo*')]
+    const result = await expandWildcardRules(rules)
+    expect(result).toHaveLength(1)
+    expect(result[0].path).toBe('/nonexistent/path/Foo*')
+  })
+})
 
 // 直接测试 JSON 规则文件的格式是否正确
 describe('JSON 规则文件验证', () => {
