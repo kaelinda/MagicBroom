@@ -15,6 +15,15 @@ function formatSize(bytes: number): string {
   return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
 }
 
+function formatScanTime(timestamp: number): string {
+  const diff = Date.now() - timestamp
+  if (diff < 60_000) return '刚刚扫描完成'
+  if (diff < 3600_000) return `${Math.floor(diff / 60_000)} 分钟前扫描`
+  if (diff < 86400_000) return `${Math.floor(diff / 3600_000)} 小时前扫描`
+  const date = new Date(timestamp)
+  return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')} 扫描`
+}
+
 const TAG_COLORS: Record<string, string> = {
   ios: '#6B7FED',
   xcode: '#6B7FED',
@@ -150,7 +159,7 @@ export function Dashboard() {
         </div>
         <div className="text-[12px] text-gray-400 flex items-center gap-1.5 bg-white/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/60">
           <Clock className="w-3.5 h-3.5" />
-          刚刚扫描完成
+          {state.lastScanTime ? formatScanTime(state.lastScanTime) : '刚刚扫描完成'}
         </div>
       </div>
 

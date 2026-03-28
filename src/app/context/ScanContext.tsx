@@ -22,6 +22,7 @@ interface ScanState {
   totalBytes: number
   selectedItems: Set<string>
   error: string | null
+  lastScanTime: number | null
 }
 
 type ScanAction =
@@ -41,6 +42,7 @@ const initialState: ScanState = {
   totalBytes: 0,
   selectedItems: new Set(),
   error: null,
+  lastScanTime: null,
 }
 
 function scanReducer(state: ScanState, action: ScanAction): ScanState {
@@ -60,6 +62,7 @@ function scanReducer(state: ScanState, action: ScanAction): ScanState {
         results: action.results,
         totalBytes: action.totalBytes,
         progress: 1,
+        lastScanTime: Date.now(),
       }
     case 'SCAN_ERROR':
       return { ...state, status: 'error', error: action.error }
