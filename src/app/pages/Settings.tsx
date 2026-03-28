@@ -3,9 +3,7 @@ import {
   Settings as SettingsIcon, HardDrive, Bell, Info,
   Trash2, RotateCcw, FolderOpen, XCircle, ExternalLink, Plus, Shield,
 } from 'lucide-react'
-
-const cardClass =
-  'bg-white/70 backdrop-blur-sm rounded-2xl border border-white/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)]'
+import { cardClass } from '../styles'
 
 type SettingsTab = 'general' | 'scan' | 'notification' | 'about'
 

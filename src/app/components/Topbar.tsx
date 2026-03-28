@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 export function Topbar() {
   return (
     <header
-      className="h-[56px] flex items-center justify-between px-6 border-b border-black/[0.06]"
+      className="h-[56px] flex items-center justify-between px-6 border-b border-black/[0.06] dark:border-white/[0.06]"
       style={{
         background: 'var(--topbar-bg)',
         backdropFilter: 'blur(40px) saturate(180%)',
@@ -18,16 +18,16 @@ export function Topbar() {
             type="text"
             data-search-input
             placeholder="搜索文件、目录或操作..."
-            className="w-full h-[34px] pl-9 pr-4 bg-black/[0.04] rounded-[9px] text-[13px] text-gray-800 placeholder:text-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#6B7FED]/30 transition-all duration-200"
+            className="w-full h-[34px] pl-9 pr-4 bg-black/[0.04] dark:bg-white/[0.08] rounded-[9px] text-[13px] text-gray-800 dark:text-gray-200 placeholder:text-gray-400 focus:outline-none focus:bg-white dark:focus:bg-white/[0.12] focus:ring-1 focus:ring-[#6B7FED]/30 transition-all duration-200"
           />
-          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 bg-white/80 border border-gray-200/60 rounded px-1.5 py-0.5 font-mono">
+          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 bg-white/80 dark:bg-white/[0.1] border border-gray-200/60 dark:border-white/[0.1] rounded px-1.5 py-0.5 font-mono">
             ⌘K
           </kbd>
         </div>
       </div>
 
       <div className="flex items-center gap-2 ml-4">
-        <button className="relative w-[34px] h-[34px] rounded-[9px] hover:bg-black/[0.04] flex items-center justify-center transition-colors duration-150">
+        <button className="relative w-[34px] h-[34px] rounded-[9px] hover:bg-black/[0.04] dark:hover:bg-white/[0.08] flex items-center justify-center transition-colors duration-150">
           <Bell className="w-[17px] h-[17px] text-gray-500" style={{ strokeWidth: 1.8 }} />
         </button>
         <Link

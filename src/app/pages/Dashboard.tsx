@@ -4,9 +4,7 @@ import { Link } from 'react-router-dom'
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
 import { useMagicBroom } from '../hooks/useMagicBroom'
 import { RiskBadge } from '../components/RiskBadge'
-
-const cardClass =
-  'bg-white/70 backdrop-blur-sm rounded-2xl border border-white/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)]'
+import { cardClass } from '../styles'
 
 function formatSize(bytes: number): string {
   if (bytes === 0) return '0 B'
@@ -58,8 +56,8 @@ export function Dashboard() {
           <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-[#6B7FED]/10 to-[#5468E8]/10 rounded-2xl flex items-center justify-center">
             <HardDrive className="w-8 h-8 text-[#6B7FED]" />
           </div>
-          <h1 className="text-[20px] font-semibold text-gray-900 mb-2">欢迎使用 MagicBroom</h1>
-          <p className="text-[14px] text-gray-500 mb-6 leading-relaxed">
+          <h1 className="text-[20px] font-semibold text-gray-900 dark:text-gray-100 mb-2">欢迎使用 MagicBroom</h1>
+          <p className="text-[14px] text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
             专为 Mac 开发者设计的磁盘清理工具。
             <br />
             开始第一次扫描，了解你的磁盘空间。
@@ -72,7 +70,7 @@ export function Dashboard() {
                 className={`px-4 py-2 rounded-xl text-[12px] font-medium transition-all ${
                   scanMode === mode
                     ? 'bg-[#6B7FED] text-white shadow-[0_1px_4px_rgba(107,127,237,0.3)]'
-                    : 'text-gray-500 hover:bg-gray-100/60 border border-gray-200/60'
+                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100/60 dark:hover:bg-white/[0.06] border border-gray-200/60 dark:border-white/[0.1]'
                 }`}
               >
                 {label}
@@ -101,11 +99,11 @@ export function Dashboard() {
               <Activity className="w-5 h-5 text-[#6B7FED]" />
             </div>
             <div>
-              <h2 className="text-[16px] font-semibold text-gray-900">扫描中...</h2>
+              <h2 className="text-[16px] font-semibold text-gray-900 dark:text-gray-100">扫描中...</h2>
               <p className="text-[12px] text-gray-400">正在分析磁盘空间</p>
             </div>
           </div>
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden mb-3">
+          <div className="h-2 bg-gray-200 dark:bg-white/[0.1] rounded-full overflow-hidden mb-3">
             <div
               className="h-full bg-gradient-to-r from-[#6B7FED] to-[#5468E8] rounded-full transition-all duration-500"
               style={{ width: `${Math.max(state.progress * 100, 5)}%` }}
@@ -113,9 +111,9 @@ export function Dashboard() {
           </div>
           <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
             {state.results.slice(-5).map((item) => (
-              <div key={item.id} className="flex items-center justify-between text-[12px] px-2 py-1.5 bg-gray-50/60 rounded-lg">
-                <span className="text-gray-600 truncate mr-3">{item.name}</span>
-                <span className="text-gray-900 font-medium tabular-nums flex-shrink-0">{formatSize(item.size)}</span>
+              <div key={item.id} className="flex items-center justify-between text-[12px] px-2 py-1.5 bg-gray-50/60 dark:bg-white/[0.05] rounded-lg">
+                <span className="text-gray-600 dark:text-gray-400 truncate mr-3">{item.name}</span>
+                <span className="text-gray-900 dark:text-gray-200 font-medium tabular-nums flex-shrink-0">{formatSize(item.size)}</span>
               </div>
             ))}
           </div>
@@ -154,10 +152,10 @@ export function Dashboard() {
     <div className="p-8 max-w-[1400px] mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-[22px] font-semibold text-gray-900 tracking-[-0.02em]">控制台</h1>
-          <p className="text-[13px] text-gray-500">磁盘空间使用概览</p>
+          <h1 className="text-[22px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em]">控制台</h1>
+          <p className="text-[13px] text-gray-500 dark:text-gray-400">磁盘空间使用概览</p>
         </div>
-        <div className="text-[12px] text-gray-400 flex items-center gap-1.5 bg-white/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/60">
+        <div className="text-[12px] text-gray-400 flex items-center gap-1.5 bg-white/60 dark:bg-white/[0.08] backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/60 dark:border-white/[0.1]">
           <Clock className="w-3.5 h-3.5" />
           {state.lastScanTime ? formatScanTime(state.lastScanTime) : '刚刚扫描完成'}
         </div>
@@ -167,7 +165,7 @@ export function Dashboard() {
       <div className="grid grid-cols-12 gap-5 mb-5">
         {/* Storage Overview with Pie Chart */}
         <div className={`col-span-8 ${cardClass} p-6`}>
-          <h2 className="text-[15px] font-semibold text-gray-900 mb-5">空间占用分布</h2>
+          <h2 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100 mb-5">空间占用分布</h2>
           <div className="flex items-center gap-8">
             <div className="w-[180px] h-[180px] relative flex-shrink-0">
               <ResponsiveContainer width="100%" height="100%">

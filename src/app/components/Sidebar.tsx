@@ -47,7 +47,7 @@ export function Sidebar() {
           ${
             isActive
               ? 'bg-gradient-to-b from-[#6B7FED] to-[#5468E8] text-white shadow-[0_1px_5px_rgba(84,104,232,0.35),inset_0_1px_0_rgba(255,255,255,0.22)]'
-              : 'text-gray-500 hover:text-gray-800 hover:bg-black/[0.04]'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06]'
           }
         `}
       >
@@ -83,7 +83,7 @@ export function Sidebar() {
 
   return (
     <aside
-      className={`${collapsed ? 'w-[64px]' : 'w-[232px]'} flex flex-col border-r border-black/[0.06] relative transition-[width] duration-200`}
+      className={`${collapsed ? 'w-[64px]' : 'w-[232px]'} flex flex-col border-r border-black/[0.06] dark:border-white/[0.06] relative transition-[width] duration-200`}
       role="navigation"
       aria-label="主导���"
       style={{
@@ -105,7 +105,7 @@ export function Sidebar() {
           <div className="w-7 h-7 bg-gradient-to-br from-[#6B7FED] to-[#5468E8] rounded-[8px] flex items-center justify-center shadow-[0_1px_3px_rgba(107,127,237,0.3)]">
             <Zap className="w-[15px] h-[15px] text-white" style={{ strokeWidth: 2.2 }} />
           </div>
-          {!collapsed && <span className="text-[14px] font-semibold text-gray-800 tracking-[-0.01em]">MagicBroom</span>}
+          {!collapsed && <span className="text-[14px] font-semibold text-gray-800 dark:text-gray-200 tracking-[-0.01em]">MagicBroom</span>}
         </div>
       </div>
 
@@ -125,7 +125,7 @@ export function Sidebar() {
         <button
           onClick={() => setCollapsed((c) => !c)}
           aria-label={collapsed ? '展开侧边栏' : '收起侧边栏'}
-          className={`mt-2 w-full flex items-center ${collapsed ? 'justify-center' : 'gap-3'} px-3 py-[9px] rounded-[10px] text-[13px] text-gray-400 hover:text-gray-600 hover:bg-black/[0.04] transition-all duration-200`}
+          className={`mt-2 w-full flex items-center ${collapsed ? 'justify-center' : 'gap-3'} px-3 py-[9px] rounded-[10px] text-[13px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-all duration-200`}
         >
           {collapsed ? <PanelLeft className="w-[18px] h-[18px]" /> : <PanelLeftClose className="w-[18px] h-[18px]" />}
           {!collapsed && <span>收起侧边栏</span>}

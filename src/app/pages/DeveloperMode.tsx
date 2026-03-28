@@ -1,9 +1,7 @@
 import { Smartphone, TabletSmartphone, Container, Globe, Code2, Beer, Gem, Cog, Zap, Coffee, Brackets, Feather, Puzzle, ChevronRight, Sparkles } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useMagicBroom } from '../hooks/useMagicBroom'
-
-const cardClass =
-  'bg-white/70 backdrop-blur-sm rounded-2xl border border-white/60 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)]'
+import { cardClass } from '../styles'
 
 function formatSize(bytes: number): string {
   if (bytes === 0) return '0 B'
