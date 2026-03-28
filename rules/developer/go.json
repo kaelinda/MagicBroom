@@ -1,0 +1,32 @@
+[
+  {
+    "id": "go-mod-cache",
+    "name": "Go 模块缓存",
+    "path": "~/go/pkg/mod",
+    "risk": "safe",
+    "size_estimate": "1-10 GB",
+    "impact": "删除后 go build 会重新下载依赖模块",
+    "conditions": ["path_exists:~/go/pkg/mod"],
+    "tags": ["go", "module-cache"]
+  },
+  {
+    "id": "go-build-cache",
+    "name": "Go 构建缓存",
+    "path": "~/Library/Caches/go-build",
+    "risk": "safe",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后首次编译会变慢，缓存会自动重建",
+    "conditions": ["path_exists:~/Library/Caches/go-build"],
+    "tags": ["go", "build-cache"]
+  },
+  {
+    "id": "golangci-lint-cache",
+    "name": "golangci-lint 缓存",
+    "path": "~/.cache/golangci-lint",
+    "risk": "safe",
+    "size_estimate": "100 MB - 1 GB",
+    "impact": "删除后 lint 检查首次运行会稍慢",
+    "conditions": ["path_exists:~/.cache/golangci-lint"],
+    "tags": ["go", "lint-cache"]
+  }
+]

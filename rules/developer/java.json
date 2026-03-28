@@ -1,0 +1,32 @@
+[
+  {
+    "id": "sdkman-java",
+    "name": "SDKMAN 安装的 JDK 版本",
+    "path": "~/.sdkman/candidates/java",
+    "risk": "warning",
+    "size_estimate": "2-15 GB",
+    "impact": "删除后需要通过 sdk install java 重新下载 JDK，建议仅删除不用的版本",
+    "conditions": ["path_exists:~/.sdkman/candidates/java"],
+    "tags": ["java", "sdkman", "runtime"]
+  },
+  {
+    "id": "sdkman-archives",
+    "name": "SDKMAN 下载归档",
+    "path": "~/.sdkman/archives",
+    "risk": "safe",
+    "size_estimate": "500 MB - 3 GB",
+    "impact": "删除后 SDKMAN 安装新版本会重新下载",
+    "conditions": ["path_exists:~/.sdkman/archives"],
+    "tags": ["java", "sdkman", "cache"]
+  },
+  {
+    "id": "gradle-jdks",
+    "name": "Gradle 自动下载的 JDK",
+    "path": "~/.gradle/jdks",
+    "risk": "safe",
+    "size_estimate": "1-5 GB",
+    "impact": "删除后 Gradle 构建时会自动重新下载所需 JDK",
+    "conditions": ["path_exists:~/.gradle/jdks"],
+    "tags": ["java", "gradle", "runtime"]
+  }
+]

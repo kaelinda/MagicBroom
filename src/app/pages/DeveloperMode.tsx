@@ -1,4 +1,4 @@
-import { Smartphone, TabletSmartphone, Container, Globe, Code2, Beer, Gem, ChevronRight, Sparkles } from 'lucide-react'
+import { Smartphone, TabletSmartphone, Container, Globe, Code2, Beer, Gem, Cog, Zap, Coffee, ChevronRight, Sparkles } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useMagicBroom } from '../hooks/useMagicBroom'
 
@@ -17,7 +17,10 @@ const environments = [
   { id: 'android', name: 'Android 开发', icon: TabletSmartphone, tags: ['android', 'gradle', 'maven', 'android-studio', 'sdk', 'emulator', 'avd', 'ndk'], description: 'Gradle、SDK、AVD 模拟器、Maven' },
   { id: 'docker', name: 'Docker 容器', icon: Container, tags: ['docker'], description: '镜像、容器、构建缓存' },
   { id: 'frontend', name: '前端 Node', icon: Globe, tags: ['frontend', 'npm', 'yarn', 'pnpm', 'nvm', 'fnm', 'bun'], description: 'npm、yarn、pnpm、NVM、fnm、Bun' },
-  { id: 'python', name: 'Python / AI', icon: Code2, tags: ['python', 'pip', 'conda', 'uv', 'pyenv'], description: 'pip、conda、uv、pyenv、虚拟环境' },
+  { id: 'python', name: 'Python / AI', icon: Code2, tags: ['python', 'pip', 'conda', 'uv', 'pyenv', 'ai', 'poetry'], description: 'pip、conda、uv、pyenv、HuggingFace' },
+  { id: 'rust', name: 'Rust 开发', icon: Cog, tags: ['rust', 'cargo', 'rustup'], description: 'Cargo、rustup 工具链和缓存' },
+  { id: 'go', name: 'Go 开发', icon: Zap, tags: ['go'], description: 'Go 模块缓存、构建缓存' },
+  { id: 'java', name: 'Java / JDK', icon: Coffee, tags: ['java', 'sdkman', 'gradle'], description: 'SDKMAN、Gradle JDK、Maven' },
   { id: 'ruby', name: 'Ruby 开发', icon: Gem, tags: ['ruby', 'gem', 'bundler', 'rvm', 'rbenv'], description: 'Gem、Bundler、RVM、rbenv' },
   { id: 'homebrew', name: 'Homebrew', icon: Beer, tags: ['homebrew', 'cask'], description: '包缓存、Cask 下载、旧版本' },
 ]

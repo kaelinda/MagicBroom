@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Sparkles, AlertCircle, FolderOpen } from 'lucide-react'
 import { useMagicBroom } from '../hooks/useMagicBroom'
+import { useToast } from '../context/ToastContext'
 import { RiskBadge } from '../components/RiskBadge'
 import { CleanConfirmDialog } from '../components/CleanConfirmDialog'
 import { CelebrationScreen } from '../components/CelebrationScreen'
@@ -18,10 +19,13 @@ function formatSize(bytes: number): string {
 
 const envConfig: Record<string, { name: string; tags: string[]; description: string }> = {
   ios: { name: 'iOS 开发环境', tags: ['ios', 'xcode', 'cocoapods', 'carthage', 'swift', 'simulator', 'preview-cache', 'playground'], description: 'Xcode、模拟器、SPM、CocoaPods、Carthage 缓存' },
-  android: { name: 'Android 开发环境', tags: ['android', 'gradle', 'maven', 'android-studio', 'sdk', 'emulator', 'avd', 'ndk', 'snapshot'], description: 'Gradle、Android SDK、AVD 模拟器、Maven 缓存' },
-  docker: { name: 'Docker 容器环境', tags: ['docker'], description: 'Docker 镜像和构建缓存' },
-  frontend: { name: '前端开发环境', tags: ['frontend', 'npm', 'yarn', 'pnpm', 'nvm', 'fnm', 'bun'], description: 'npm、yarn、pnpm、NVM、fnm、Bun 缓存和版本' },
-  python: { name: 'Python / AI 环境', tags: ['python', 'pip', 'conda', 'uv', 'pyenv'], description: 'pip、conda、uv、pyenv 包和虚拟环境' },
+  android: { name: 'Android 开发环境', tags: ['android', 'gradle', 'maven', 'android-studio', 'sdk', 'emulator', 'avd', 'ndk'], description: 'Gradle、Android SDK、AVD 模拟器、Maven 缓存' },
+  docker: { name: 'Docker 容器环境', tags: ['docker', 'volumes', 'image-cache'], description: 'Docker 镜像、数据卷和构建缓存' },
+  frontend: { name: '前端开发环境', tags: ['frontend', 'npm', 'yarn', 'pnpm', 'nvm', 'fnm', 'bun', 'playwright', 'browser-cache'], description: 'npm、yarn、pnpm、NVM、fnm、Bun、Playwright' },
+  python: { name: 'Python / AI 环境', tags: ['python', 'pip', 'conda', 'uv', 'pyenv', 'ai', 'model-cache', 'poetry'], description: 'pip、conda、uv、pyenv、HuggingFace 模型缓存' },
+  rust: { name: 'Rust 开发环境', tags: ['rust', 'cargo', 'rustup'], description: 'Cargo 注册表、rustup 工具链和下载缓存' },
+  go: { name: 'Go 开发环境', tags: ['go', 'module-cache', 'build-cache', 'lint-cache'], description: 'Go 模块缓存、构建缓存、golangci-lint' },
+  java: { name: 'Java / JDK 环境', tags: ['java', 'sdkman', 'gradle'], description: 'SDKMAN JDK 版本、Gradle JDK、Maven 仓库' },
   ruby: { name: 'Ruby 开发环境', tags: ['ruby', 'gem', 'bundler', 'rvm', 'rbenv'], description: 'Gem、Bundler、RVM、rbenv 缓存和版本' },
   homebrew: { name: 'Homebrew', tags: ['homebrew', 'cask'], description: 'Homebrew 包缓存、Cask 下载和旧版本' },
 }
@@ -29,7 +33,8 @@ const envConfig: Record<string, { name: string; tags: string[]; description: str
 export function EnvironmentDetail() {
   const { envId } = useParams()
   const navigate = useNavigate()
-  const { state, dispatch, executeCleaning } = useMagicBroom()
+  const { state, dispatch } = useMagicBroom()
+  const { addToast } = useToast()
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [showConfirm, setShowConfirm] = useState(false)
   const [cleanResult, setCleanResult] = useState<{ freed: number; count: number; failed: number } | null>(null)
@@ -70,8 +75,8 @@ export function EnvironmentDetail() {
       if (result) {
         setCleanResult({ freed: result.freed, count: result.succeeded.length, failed: result.failed.length })
       }
-    } catch {
-      // error handled by toast in future
+    } catch (err) {
+      addToast(`清理出错：${String(err)}`, 'error')
     }
   }
 

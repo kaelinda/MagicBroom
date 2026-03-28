@@ -1,0 +1,42 @@
+[
+  {
+    "id": "cargo-registry",
+    "name": "Cargo 注册表缓存",
+    "path": "~/.cargo/registry",
+    "risk": "safe",
+    "size_estimate": "1-10 GB",
+    "impact": "删除后 cargo build 会重新从 crates.io 下载依赖",
+    "conditions": ["path_exists:~/.cargo/registry"],
+    "tags": ["rust", "cargo", "package-cache"]
+  },
+  {
+    "id": "cargo-git",
+    "name": "Cargo Git 依赖克隆",
+    "path": "~/.cargo/git",
+    "risk": "safe",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后 Git 依赖会重新克隆",
+    "conditions": ["path_exists:~/.cargo/git"],
+    "tags": ["rust", "cargo", "package-cache"]
+  },
+  {
+    "id": "rustup-toolchains",
+    "name": "Rust 工具链版本",
+    "path": "~/.rustup/toolchains",
+    "risk": "warning",
+    "size_estimate": "1-10 GB",
+    "impact": "删除后需要 rustup install 重新下载工具链，所有已安装的编译器版本将丢失",
+    "conditions": ["path_exists:~/.rustup/toolchains"],
+    "tags": ["rust", "rustup", "runtime"]
+  },
+  {
+    "id": "rustup-downloads",
+    "name": "Rustup 下载缓存",
+    "path": "~/.rustup/downloads",
+    "risk": "safe",
+    "size_estimate": "200 MB - 2 GB",
+    "impact": "删除后 rustup update 会重新下载",
+    "conditions": ["path_exists:~/.rustup/downloads"],
+    "tags": ["rust", "rustup", "cache"]
+  }
+]

@@ -138,6 +138,30 @@ describe('JSON 规则文件验证', () => {
     }
   })
 
+  it('developer/rust.json 格式正确', async () => {
+    const rules = await loadAndValidate(join(rulesDir, 'developer/rust.json'))
+    expect(rules.length).toBeGreaterThan(0)
+    for (const rule of rules) {
+      expect(rule.tags.some((t: string) => ['rust', 'cargo', 'rustup'].includes(t))).toBe(true)
+    }
+  })
+
+  it('developer/go.json 格式正确', async () => {
+    const rules = await loadAndValidate(join(rulesDir, 'developer/go.json'))
+    expect(rules.length).toBeGreaterThan(0)
+    for (const rule of rules) {
+      expect(rule.tags.some((t: string) => ['go'].includes(t))).toBe(true)
+    }
+  })
+
+  it('developer/java.json 格式正确', async () => {
+    const rules = await loadAndValidate(join(rulesDir, 'developer/java.json'))
+    expect(rules.length).toBeGreaterThan(0)
+    for (const rule of rules) {
+      expect(rule.tags.some((t: string) => ['java', 'sdkman', 'gradle'].includes(t))).toBe(true)
+    }
+  })
+
   it('所有规则 ID 唯一', async () => {
     const allIds = new Set<string>()
     const files = [
@@ -149,6 +173,9 @@ describe('JSON 规则文件验证', () => {
       'developer/python.json',
       'developer/ruby.json',
       'developer/homebrew.json',
+      'developer/rust.json',
+      'developer/go.json',
+      'developer/java.json',
     ]
 
     for (const file of files) {
@@ -172,6 +199,9 @@ describe('JSON 规则文件验证', () => {
       'developer/python.json',
       'developer/ruby.json',
       'developer/homebrew.json',
+      'developer/rust.json',
+      'developer/go.json',
+      'developer/java.json',
     ]
 
     for (const file of files) {
