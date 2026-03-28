@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Bot, Sparkles, AlertCircle, FolderOpen, Ghost, Clock } from 'lucide-react'
+import { Bot, Sparkles, AlertCircle, FolderOpen, Ghost, Clock, ChevronDown, ChevronRight } from 'lucide-react'
 import { useMagicBroom } from '../hooks/useMagicBroom'
 import { useToast } from '../context/ToastContext'
 import { RiskBadge } from '../components/RiskBadge'
@@ -25,6 +25,8 @@ export function AgentMode() {
   const [showConfirm, setShowConfirm] = useState(false)
   const [cleanResult, setCleanResult] = useState<{ freed: number; count: number; failed: number } | null>(null)
   const [scanning, setScanning] = useState(false)
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
 
   const agentItems = state.results.filter(
     (r) => r.exists && r.tags.some((t) => t === 'agent')
@@ -172,67 +174,107 @@ export function AgentMode() {
           {groups.map((group) => {
             const GroupIcon = group.icon
             const groupSize = group.items.reduce((s, i) => s + i.size, 0)
+            const isCollapsed = collapsedGroups.has(group.key)
+            const isExpanded = expandedGroups.has(group.key)
+            const DEFAULT_VISIBLE = 4
+            const visibleItems = isCollapsed ? [] : isExpanded ? group.items : group.items.slice(0, DEFAULT_VISIBLE)
+            const hasMore = group.items.length > DEFAULT_VISIBLE
+
+            const toggleCollapse = () => {
+              const next = new Set(collapsedGroups)
+              if (next.has(group.key)) next.delete(group.key)
+              else next.add(group.key)
+              setCollapsedGroups(next)
+            }
+
+            const toggleExpand = () => {
+              const next = new Set(expandedGroups)
+              if (next.has(group.key)) next.delete(group.key)
+              else next.add(group.key)
+              setExpandedGroups(next)
+            }
+
             return (
               <div key={group.key} className={`${cardClass} overflow-hidden`}>
-                <div className="p-4 border-b border-gray-100/80 flex items-center justify-between">
+                <button
+                  onClick={toggleCollapse}
+                  className="w-full p-4 flex items-center justify-between hover:bg-gray-50/40 transition-colors"
+                >
                   <div className="flex items-center gap-2.5">
+                    {isCollapsed
+                      ? <ChevronRight className="w-4 h-4 text-gray-400" />
+                      : <ChevronDown className="w-4 h-4 text-gray-400" />
+                    }
                     <GroupIcon className={`w-4 h-4 ${group.color}`} />
                     <h2 className="text-[14px] font-semibold text-gray-900">{group.label}</h2>
                     <span className="text-[12px] text-gray-400">{group.items.length} 项</span>
                   </div>
                   <span className="text-[13px] font-semibold text-gray-700 tabular-nums">{formatSize(groupSize)}</span>
-                </div>
-                <div className="divide-y divide-gray-100/60">
-                  {group.items.map((item) => (
-                    <div key={item.id} className="p-5 hover:bg-violet-50/40 transition-colors duration-150">
-                      <div className="flex items-start gap-4">
-                        <label className="mt-1 relative flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={selectedItems.has(item.id)}
-                            onChange={() => toggleItem(item.id)}
-                            className="peer sr-only"
-                          />
-                          <div className="w-[18px] h-[18px] rounded-[5px] border-[1.5px] border-gray-300 peer-checked:border-violet-500 peer-checked:bg-violet-500 flex items-center justify-center transition-all">
-                            {selectedItems.has(item.id) && (
-                              <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                                <path d="M1 3.5L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                              </svg>
-                            )}
-                          </div>
-                        </label>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3 mb-1.5">
-                            <h3 className="text-[15px] font-semibold text-gray-900">{item.name}</h3>
-                            <RiskBadge level={item.risk} />
-                            <div className="ml-auto text-[16px] font-semibold text-gray-900 tabular-nums">{formatSize(item.size)}</div>
-                          </div>
-                          <div className="flex items-center gap-2 mb-2 min-w-0">
-                            <span className="text-[12px] font-mono text-gray-400 truncate flex-1 min-w-0">{item.path}</span>
-                            <button
-                              onClick={() => window.api?.shell.showInFinder(item.path)}
-                              className="ml-auto flex-shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-50/80 hover:bg-gray-100 text-[10px] text-gray-500 hover:text-violet-600 transition-colors border border-gray-100/60"
-                            >
-                              <FolderOpen className="w-3 h-3" />
-                              在 Finder 中显示
-                            </button>
-                          </div>
-                          {item.risk !== 'safe' && (
-                            <div className="bg-amber-50/50 border border-amber-100/60 rounded-xl p-3">
-                              <div className="flex items-start gap-2">
-                                <AlertCircle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-                                <div>
-                                  <div className="text-[11px] font-semibold text-amber-800 mb-0.5">删除影响</div>
-                                  <div className="text-[12px] text-amber-700 leading-relaxed">{item.impact}</div>
-                                </div>
+                </button>
+
+                {!isCollapsed && (
+                  <>
+                    <div className="divide-y divide-gray-100/60 border-t border-gray-100/80">
+                      {visibleItems.map((item) => (
+                        <div key={item.id} className="p-5 hover:bg-violet-50/40 transition-colors duration-150">
+                          <div className="flex items-start gap-4">
+                            <label className="mt-1 relative flex items-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={selectedItems.has(item.id)}
+                                onChange={() => toggleItem(item.id)}
+                                className="peer sr-only"
+                              />
+                              <div className="w-[18px] h-[18px] rounded-[5px] border-[1.5px] border-gray-300 peer-checked:border-violet-500 peer-checked:bg-violet-500 flex items-center justify-center transition-all">
+                                {selectedItems.has(item.id) && (
+                                  <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                                    <path d="M1 3.5L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                                  </svg>
+                                )}
                               </div>
+                            </label>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-3 mb-1.5">
+                                <h3 className="text-[15px] font-semibold text-gray-900">{item.name}</h3>
+                                <RiskBadge level={item.risk} />
+                                <div className="ml-auto text-[16px] font-semibold text-gray-900 tabular-nums">{formatSize(item.size)}</div>
+                              </div>
+                              <div className="flex items-center gap-2 mb-2 min-w-0">
+                                <span className="text-[12px] font-mono text-gray-400 truncate flex-1 min-w-0">{item.path}</span>
+                                <button
+                                  onClick={() => window.api?.shell.showInFinder(item.path)}
+                                  className="ml-auto flex-shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-50/80 hover:bg-gray-100 text-[10px] text-gray-500 hover:text-violet-600 transition-colors border border-gray-100/60"
+                                >
+                                  <FolderOpen className="w-3 h-3" />
+                                  在 Finder 中显示
+                                </button>
+                              </div>
+                              {item.risk !== 'safe' && (
+                                <div className="bg-amber-50/50 border border-amber-100/60 rounded-xl p-3">
+                                  <div className="flex items-start gap-2">
+                                    <AlertCircle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                                    <div>
+                                      <div className="text-[11px] font-semibold text-amber-800 mb-0.5">删除影响</div>
+                                      <div className="text-[12px] text-amber-700 leading-relaxed">{item.impact}</div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                          )}
+                          </div>
                         </div>
-                      </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                    {hasMore && (
+                      <button
+                        onClick={toggleExpand}
+                        className="w-full py-3 text-[12px] text-violet-500 hover:text-violet-700 hover:bg-violet-50/30 font-medium transition-colors border-t border-gray-100/80"
+                      >
+                        {isExpanded ? '收起' : `查看全部 ${group.items.length} 项`}
+                      </button>
+                    )}
+                  </>
+                )}
               </div>
             )
           })}
