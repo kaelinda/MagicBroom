@@ -183,14 +183,14 @@ export function ScanResults() {
                       <RiskBadge level={item.risk} />
                     </div>
                     <p className="text-[12px] text-gray-400 mb-1">{item.impact}</p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] text-gray-400 font-mono truncate">{item.path}</span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-[11px] text-gray-400 font-mono truncate flex-1 min-w-0">{item.path}</span>
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
                           window.api?.shell.showInFinder(item.path)
                         }}
-                        className="flex-shrink-0 flex items-center gap-1 text-[10px] text-[#6B7FED] hover:text-[#5468E8] transition-colors"
+                        className="ml-auto flex-shrink-0 flex items-center gap-1 text-[10px] text-[#6B7FED] hover:text-[#5468E8] transition-colors"
                         title="在 Finder 中显示"
                       >
                         <FolderOpen className="w-3 h-3" />

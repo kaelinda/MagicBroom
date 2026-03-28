@@ -207,11 +207,11 @@ export function AgentMode() {
                             <RiskBadge level={item.risk} />
                             <div className="ml-auto text-[16px] font-semibold text-gray-900 tabular-nums">{formatSize(item.size)}</div>
                           </div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-[12px] font-mono text-gray-400 truncate">{item.path}</span>
+                          <div className="flex items-center gap-2 mb-2 min-w-0">
+                            <span className="text-[12px] font-mono text-gray-400 truncate flex-1 min-w-0">{item.path}</span>
                             <button
                               onClick={() => window.api?.shell.showInFinder(item.path)}
-                              className="flex-shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-50/80 hover:bg-gray-100 text-[10px] text-gray-500 hover:text-violet-600 transition-colors border border-gray-100/60"
+                              className="ml-auto flex-shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-50/80 hover:bg-gray-100 text-[10px] text-gray-500 hover:text-violet-600 transition-colors border border-gray-100/60"
                             >
                               <FolderOpen className="w-3 h-3" />
                               在 Finder 中显示
