@@ -7,6 +7,7 @@ import { ScanResults } from './app/pages/ScanResults'
 import { DeveloperMode } from './app/pages/DeveloperMode'
 import { SpaceAnalysis } from './app/pages/SpaceAnalysis'
 import { EnvironmentDetail } from './app/pages/EnvironmentDetail'
+import { AgentMode } from './app/pages/AgentMode'
 import { Settings } from './app/pages/Settings'
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
               <Route path="space-analysis" element={<SpaceAnalysis />} />
               <Route path="developer" element={<DeveloperMode />} />
               <Route path="environment/:envId" element={<EnvironmentDetail />} />
+              <Route path="agent" element={<AgentMode />} />
               <Route path="settings" element={<Settings />} />
             </Route>
           </Routes>

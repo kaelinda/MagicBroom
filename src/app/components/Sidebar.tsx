@@ -1,11 +1,12 @@
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, PieChart, Trash2, Layers, Settings, Zap } from 'lucide-react'
+import { LayoutDashboard, PieChart, Trash2, Layers, Bot, Settings, Zap } from 'lucide-react'
 
 const mainMenuItems = [
   { path: '/', label: '控制台', icon: LayoutDashboard },
   { path: '/space-analysis', label: '空间分析', icon: PieChart },
   { path: '/scan-results', label: '快速清理', icon: Trash2 },
   { path: '/developer', label: '开发者模式', icon: Layers },
+  { path: '/agent', label: 'Agent 模式', icon: Bot },
 ]
 
 const bottomMenuItems = [

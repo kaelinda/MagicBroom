@@ -38,7 +38,7 @@ function getTagColor(tags: string[]): string {
 
 export function Dashboard() {
   const { state, startScan } = useMagicBroom()
-  const [scanMode, setScanMode] = useState<'daily' | 'developer'>('developer')
+  const [scanMode, setScanMode] = useState<'daily' | 'developer' | 'agent'>('developer')
   const hasData = state.status === 'complete' && state.results.length > 0
 
   // 引导式空状态
@@ -56,7 +56,7 @@ export function Dashboard() {
             开始第一次扫描，了解你的磁盘空间。
           </p>
           <div className="flex gap-2 mb-5 justify-center">
-            {([['developer', '开发者模式'], ['daily', '日常模式']] as const).map(([mode, label]) => (
+            {([['developer', '开发者模式'], ['daily', '日常模式'], ['agent', 'Agent 模式']] as const).map(([mode, label]) => (
               <button
                 key={mode}
                 onClick={() => setScanMode(mode)}

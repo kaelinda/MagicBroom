@@ -147,23 +147,23 @@ export class RulesEngine {
           }
         }
       }
-    } else if (mode === 'developer') {
-      const devDir = join(rulesDir, 'developer')
+    } else if (mode === 'developer' || mode === 'agent') {
+      const subDir = join(rulesDir, mode)
       try {
-        const files = await readdir(devDir)
+        const files = await readdir(subDir)
         for (const file of files) {
           if (!file.endsWith('.json')) continue
-          const fileRules = await loadJsonFile<RuleDefinition[]>(join(devDir, file))
+          const fileRules = await loadJsonFile<RuleDefinition[]>(join(subDir, file))
           if (fileRules && Array.isArray(fileRules)) {
             for (const rule of fileRules) {
-              if (validateRule(rule, `developer/${file}`)) {
+              if (validateRule(rule, `${mode}/${file}`)) {
                 rules.push(rule)
               }
             }
           }
         }
       } catch {
-        console.warn(`[规则引擎] 无法读取开发者规则目录: ${devDir}`)
+        console.warn(`[规则引擎] 无法读取规则目录: ${subDir}`)
       }
     }
 

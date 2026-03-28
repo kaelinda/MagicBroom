@@ -36,7 +36,7 @@ export function useMagicBroom() {
   }, [dispatch, addToast])
 
   const startScan = useCallback(
-    async (mode: 'daily' | 'developer') => {
+    async (mode: 'daily' | 'developer' | 'agent') => {
       dispatch({ type: 'START_SCAN' })
       try {
         await window.api?.scan.start(mode)

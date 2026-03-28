@@ -162,6 +162,14 @@ describe('JSON 规则文件验证', () => {
     }
   })
 
+  it('agent/ai-tools.json 格式正确', async () => {
+    const rules = await loadAndValidate(join(rulesDir, 'agent/ai-tools.json'))
+    expect(rules.length).toBeGreaterThan(0)
+    for (const rule of rules) {
+      expect(rule.tags.includes('agent')).toBe(true)
+    }
+  })
+
   it('所有规则 ID 唯一', async () => {
     const allIds = new Set<string>()
     const files = [
@@ -176,6 +184,7 @@ describe('JSON 规则文件验证', () => {
       'developer/rust.json',
       'developer/go.json',
       'developer/java.json',
+      'agent/ai-tools.json',
     ]
 
     for (const file of files) {
@@ -202,6 +211,7 @@ describe('JSON 规则文件验证', () => {
       'developer/rust.json',
       'developer/go.json',
       'developer/java.json',
+      'agent/ai-tools.json',
     ]
 
     for (const file of files) {

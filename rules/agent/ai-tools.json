@@ -1,0 +1,112 @@
+[
+  {
+    "id": "claude-code-cache",
+    "name": "Claude Code 工具缓存",
+    "path": "~/.claude/.cache",
+    "risk": "safe",
+    "size_estimate": "100 MB - 2 GB",
+    "impact": "删除后 Claude Code 会重建缓存，不影响对话历史",
+    "conditions": ["path_exists:~/.claude/.cache"],
+    "tags": ["agent", "claude-code", "cache"]
+  },
+  {
+    "id": "claude-code-projects",
+    "name": "Claude Code 会话历史",
+    "path": "~/.claude/projects",
+    "risk": "warning",
+    "size_estimate": "200 MB - 5 GB",
+    "impact": "删除后所有项目的 Claude Code 对话记录将不可恢复，请确认不再需要",
+    "conditions": ["path_exists:~/.claude/projects"],
+    "tags": ["agent", "claude-code", "history"]
+  },
+  {
+    "id": "cursor-cache",
+    "name": "Cursor 缓存与配置",
+    "path": "~/.cursor",
+    "risk": "warning",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后 Cursor 的全局配置、扩展缓存和会话数据将丢失",
+    "conditions": ["path_exists:~/.cursor"],
+    "tags": ["agent", "cursor", "cache"]
+  },
+  {
+    "id": "codex-records",
+    "name": "OpenAI Codex 记录",
+    "path": "~/.codex",
+    "risk": "safe",
+    "size_estimate": "50 MB - 1 GB",
+    "impact": "删除后 Codex CLI 的本地记录将清除",
+    "conditions": ["path_exists:~/.codex"],
+    "tags": ["agent", "codex", "cache"]
+  },
+  {
+    "id": "github-copilot-cache",
+    "name": "GitHub Copilot 缓存",
+    "path": "~/Library/Application Support/GitHub Copilot",
+    "risk": "safe",
+    "size_estimate": "100 MB - 1 GB",
+    "impact": "删除后 Copilot 会重新下载语言模型和缓存",
+    "conditions": ["path_exists:~/Library/Application Support/GitHub Copilot"],
+    "tags": ["agent", "copilot", "cache"]
+  },
+  {
+    "id": "continue-cache",
+    "name": "Continue 缓存",
+    "path": "~/.continue",
+    "risk": "safe",
+    "size_estimate": "100 MB - 2 GB",
+    "impact": "删除后 Continue 的本地配置和对话缓存将清除",
+    "conditions": ["path_exists:~/.continue"],
+    "tags": ["agent", "continue", "cache"]
+  },
+  {
+    "id": "codeium-cache",
+    "name": "Codeium 缓存",
+    "path": "~/.codeium",
+    "risk": "safe",
+    "size_estimate": "200 MB - 3 GB",
+    "impact": "删除后 Codeium 会重新下载语言服务器和模型",
+    "conditions": ["path_exists:~/.codeium"],
+    "tags": ["agent", "codeium", "cache"]
+  },
+  {
+    "id": "aider-cache",
+    "name": "Aider 缓存",
+    "path": "~/.aider",
+    "risk": "safe",
+    "size_estimate": "50 MB - 500 MB",
+    "impact": "删除后 Aider 的本地配置和对话缓存将清除",
+    "conditions": ["path_exists:~/.aider"],
+    "tags": ["agent", "aider", "cache"]
+  },
+  {
+    "id": "ollama-models",
+    "name": "Ollama 本地模型",
+    "path": "~/.ollama/models",
+    "risk": "warning",
+    "size_estimate": "5-100 GB",
+    "impact": "删除后所有已下载的本地 LLM 模型将丢失，需要 ollama pull 重新下载",
+    "conditions": ["path_exists:~/.ollama/models"],
+    "tags": ["agent", "ollama", "model-cache"]
+  },
+  {
+    "id": "lmstudio-models",
+    "name": "LM Studio 模型",
+    "path": "~/.cache/lm-studio/models",
+    "risk": "warning",
+    "size_estimate": "5-100 GB",
+    "impact": "删除后所有已下载的 LM Studio 模型将丢失",
+    "conditions": ["path_exists:~/.cache/lm-studio"],
+    "tags": ["agent", "lm-studio", "model-cache"]
+  },
+  {
+    "id": "tabby-data",
+    "name": "Tabby 补全服务数据",
+    "path": "~/.tabby",
+    "risk": "safe",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后 Tabby 代码补全服务需要重新配置和下载模型",
+    "conditions": ["path_exists:~/.tabby"],
+    "tags": ["agent", "tabby", "cache"]
+  }
+]
