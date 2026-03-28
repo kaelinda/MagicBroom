@@ -263,7 +263,7 @@ export function Dashboard() {
           </div>
           <div className="space-y-2">
             {topItems.map((item) => (
-              <div key={item.id} className="flex items-center gap-4 p-3.5 rounded-xl border border-gray-100/60 hover:border-gray-200 hover:bg-gray-50/50 transition-all duration-200">
+              <div key={item.id} className="flex items-center gap-4 p-3.5 rounded-xl border border-gray-100/60 hover:border-indigo-100 hover:bg-indigo-50/40 transition-all duration-150">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
                     <span className="text-[13px] font-medium text-gray-900">{item.name}</span>

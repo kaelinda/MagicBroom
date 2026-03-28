@@ -160,7 +160,7 @@ export function ScanResults() {
         ) : (
           <div className="divide-y divide-gray-100/60">
             {filteredResults.map((item) => (
-              <div key={item.id} className="p-4 hover:bg-gray-50/50 transition-all duration-150">
+              <div key={item.id} className="p-4 hover:bg-indigo-50/40 transition-colors duration-150">
                 <div className="flex items-start gap-3">
                   <label className="mt-1 relative flex items-center cursor-pointer">
                     <input

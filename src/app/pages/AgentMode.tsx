@@ -184,7 +184,7 @@ export function AgentMode() {
                 </div>
                 <div className="divide-y divide-gray-100/60">
                   {group.items.map((item) => (
-                    <div key={item.id} className="p-5 hover:bg-gray-50/30 transition-colors">
+                    <div key={item.id} className="p-5 hover:bg-violet-50/40 transition-colors duration-150">
                       <div className="flex items-start gap-4">
                         <label className="mt-1 relative flex items-center cursor-pointer">
                           <input
