@@ -28,8 +28,8 @@ export function ScanResults() {
     return (
       <div className="p-8 max-w-[1400px] mx-auto">
         <div className={`${cardClass} p-12 text-center`}>
-          <Info className="w-8 h-8 text-gray-300 mx-auto mb-4" />
-          <h2 className="text-[16px] font-medium text-gray-900 mb-1">尚未扫描</h2>
+          <Info className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+          <h2 className="text-[16px] font-medium text-gray-900 dark:text-gray-100 mb-1">尚未扫描</h2>
           <p className="text-[13px] text-gray-400">返回控制台开始第一次扫描</p>
         </div>
       </div>
@@ -40,8 +40,8 @@ export function ScanResults() {
     return (
       <div className="p-8 max-w-[1400px] mx-auto">
         <div className={`${cardClass} p-8`}>
-          <h2 className="text-[16px] font-semibold text-gray-900 mb-4">扫描中...</h2>
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden mb-3">
+          <h2 className="text-[16px] font-semibold text-gray-900 dark:text-gray-100 mb-4">扫描中...</h2>
+          <div className="h-2 bg-gray-200 dark:bg-white/[0.1] rounded-full overflow-hidden mb-3">
             <div
               className="h-full bg-gradient-to-r from-[#6B7FED] to-[#5468E8] rounded-full transition-all duration-300"
               style={{ width: `${Math.max(state.progress * 100, 5)}%` }}
@@ -53,7 +53,6 @@ export function ScanResults() {
     )
   }
 
-  // 庆祝画面
   if (cleanResult) {
     return (
       <CelebrationScreen
@@ -90,8 +89,8 @@ export function ScanResults() {
   return (
     <div className="p-8 max-w-[1400px] mx-auto">
       <div className="mb-6">
-        <h1 className="text-[22px] font-semibold text-gray-900 tracking-[-0.02em] mb-1">快速清理</h1>
-        <p className="text-[13px] text-gray-500">扫描并清理可释放的磁盘空间</p>
+        <h1 className="text-[22px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em] mb-1">快速清理</h1>
+        <p className="text-[13px] text-gray-500 dark:text-gray-400">扫描并清理可释放的磁盘空间</p>
       </div>
 
       {/* Summary */}
@@ -100,24 +99,24 @@ export function ScanResults() {
           <div className="flex items-center gap-8">
             <div>
               <div className="text-[12px] text-gray-400 mb-0.5">可释放总量</div>
-              <div className="text-[24px] font-semibold text-gray-900 tracking-[-0.02em]">{formatSize(state.totalBytes)}</div>
+              <div className="text-[24px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em]">{formatSize(state.totalBytes)}</div>
             </div>
-            <div className="h-10 w-px bg-gray-100" />
+            <div className="h-10 w-px bg-gray-100 dark:bg-white/[0.08]" />
             <div>
               <div className="text-[12px] text-gray-400 mb-0.5">已选清理量</div>
               <div className="text-[24px] font-semibold text-[#6B7FED] tracking-[-0.02em]">{formatSize(selectedSize)}</div>
             </div>
-            <div className="h-10 w-px bg-gray-100" />
+            <div className="h-10 w-px bg-gray-100 dark:bg-white/[0.08]" />
             <div>
               <div className="text-[12px] text-gray-400 mb-0.5">已选项目</div>
-              <div className="text-[24px] font-semibold text-gray-900 tracking-[-0.02em]">{state.selectedItems.size} 项</div>
+              <div className="text-[24px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em]">{state.selectedItems.size} 项</div>
             </div>
           </div>
           <button
             disabled={state.selectedItems.size === 0}
             data-clean-trigger
             onClick={() => setShowConfirm(true)}
-            className="h-[42px] px-6 bg-gradient-to-b from-emerald-500 to-emerald-600 text-white rounded-xl flex items-center gap-2 text-[13px] font-medium shadow-[0_2px_8px_rgba(16,185,129,0.3)] disabled:from-gray-200 disabled:to-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed transition-all"
+            className="h-[42px] px-6 bg-gradient-to-b from-emerald-500 to-emerald-600 text-white rounded-xl flex items-center gap-2 text-[13px] font-medium shadow-[0_2px_8px_rgba(16,185,129,0.3)] disabled:from-gray-200 disabled:to-gray-200 dark:disabled:from-gray-700 dark:disabled:to-gray-700 disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed transition-all"
           >
             <Sparkles className="w-4 h-4" />
             执行清理
@@ -137,7 +136,7 @@ export function ScanResults() {
                 className={`px-3 py-[6px] rounded-lg text-[12px] transition-all duration-200 ${
                   filter === value
                     ? 'bg-[#6B7FED] text-white font-medium shadow-[0_1px_4px_rgba(107,127,237,0.3)]'
-                    : 'text-gray-500 hover:bg-gray-100/60'
+                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100/60 dark:hover:bg-white/[0.06]'
                 }`}
               >
                 {label}
@@ -149,19 +148,19 @@ export function ScanResults() {
 
       {/* Results */}
       <div className={`${cardClass} overflow-hidden`}>
-        <div className="p-4 border-b border-gray-100/80 flex items-center justify-between">
-          <h2 className="text-[14px] font-semibold text-gray-900">清理项目</h2>
+        <div className="p-4 border-b border-gray-100/80 dark:border-white/[0.06] flex items-center justify-between">
+          <h2 className="text-[14px] font-semibold text-gray-900 dark:text-gray-100">清理项目</h2>
           <span className="text-[12px] text-gray-400">{filteredResults.length} 项</span>
         </div>
         {filteredResults.length === 0 ? (
           <div className="p-12 text-center">
-            <Info className="w-6 h-6 text-gray-300 mx-auto mb-2" />
+            <Info className="w-6 h-6 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
             <p className="text-[13px] text-gray-400">没有匹配的项目</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100/60">
+          <div className="divide-y divide-gray-100/60 dark:divide-white/[0.06]">
             {filteredResults.map((item) => (
-              <div key={item.id} className="p-4 hover:bg-indigo-50/40 transition-colors duration-150">
+              <div key={item.id} className="p-4 hover:bg-indigo-50/40 dark:hover:bg-indigo-500/[0.06] transition-colors duration-150">
                 <div className="flex items-start gap-3">
                   <label className="mt-1 relative flex items-center cursor-pointer">
                     <input
@@ -170,7 +169,7 @@ export function ScanResults() {
                       onChange={() => dispatch({ type: 'TOGGLE_ITEM', id: item.id })}
                       className="peer sr-only"
                     />
-                    <div className="w-[18px] h-[18px] rounded-[5px] border-[1.5px] border-gray-300 peer-checked:border-[#6B7FED] peer-checked:bg-[#6B7FED] flex items-center justify-center transition-all">
+                    <div className="w-[18px] h-[18px] rounded-[5px] border-[1.5px] border-gray-300 dark:border-gray-600 peer-checked:border-[#6B7FED] peer-checked:bg-[#6B7FED] flex items-center justify-center transition-all">
                       {state.selectedItems.has(item.id) && (
                         <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
                           <path d="M1 3.5L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -180,7 +179,7 @@ export function ScanResults() {
                   </label>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <h3 className="text-[13px] font-medium text-gray-900">{item.name}</h3>
+                      <h3 className="text-[13px] font-medium text-gray-900 dark:text-gray-100">{item.name}</h3>
                       <RiskBadge level={item.risk} />
                     </div>
                     <p className="text-[12px] text-gray-400 mb-1">{item.impact}</p>
@@ -206,7 +205,7 @@ export function ScanResults() {
                             if (res?.success) addToast('命令执行成功', 'success')
                             else addToast(`命令失败：${res?.output || '未知错误'}`, 'error')
                           }}
-                          className="flex-shrink-0 flex items-center gap-1 text-[10px] text-emerald-600 hover:text-emerald-700 transition-colors"
+                          className="flex-shrink-0 flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
                           title={`运行 ${item.clean_command}`}
                         >
                           <Terminal className="w-3 h-3" />
@@ -215,7 +214,7 @@ export function ScanResults() {
                       )}
                     </div>
                   </div>
-                  <div className="text-[14px] font-semibold text-gray-900 tabular-nums">{formatSize(item.size)}</div>
+                  <div className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 tabular-nums">{formatSize(item.size)}</div>
                 </div>
               </div>
             ))}
@@ -223,7 +222,6 @@ export function ScanResults() {
         )}
       </div>
 
-      {/* Confirm dialog */}
       {showConfirm && (
         <CleanConfirmDialog
           items={selectedItems}

@@ -95,7 +95,7 @@ export function EnvironmentDetail() {
     <div className="p-8 max-w-[1400px] mx-auto">
       <Link
         to="/developer"
-        className="inline-flex items-center gap-1.5 text-[12px] text-gray-400 hover:text-gray-700 mb-5 transition-colors"
+        className="inline-flex items-center gap-1.5 text-[12px] text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 mb-5 transition-colors"
       >
         <ArrowLeft className="w-3.5 h-3.5" />
         返回开发者模式
@@ -103,17 +103,17 @@ export function EnvironmentDetail() {
 
       {/* Header */}
       <div className={`${cardClass} p-6 mb-5`}>
-        <h1 className="text-[22px] font-semibold text-gray-900 tracking-[-0.02em] mb-1">{config.name}</h1>
+        <h1 className="text-[22px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em] mb-1">{config.name}</h1>
         <p className="text-[13px] text-gray-400 mb-4">{config.description}</p>
         <div className="flex items-center gap-6">
           <div>
             <div className="text-[11px] text-gray-400 mb-0.5">总占用空间</div>
-            <div className="text-[22px] font-semibold text-gray-900 tracking-[-0.02em]">{formatSize(totalSize)}</div>
+            <div className="text-[22px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em]">{formatSize(totalSize)}</div>
           </div>
-          <div className="w-px h-10 bg-gray-100" />
+          <div className="w-px h-10 bg-gray-100 dark:bg-white/[0.08]" />
           <div>
             <div className="text-[11px] text-gray-400 mb-0.5">清理项目</div>
-            <div className="text-[22px] font-semibold text-gray-900 tracking-[-0.02em]">{envItems.length}</div>
+            <div className="text-[22px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em]">{envItems.length}</div>
           </div>
         </div>
       </div>
@@ -121,12 +121,12 @@ export function EnvironmentDetail() {
       {/* Action bar */}
       <div className={`${cardClass} p-4 mb-5`}>
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-5 text-[12px] text-gray-500">
+          <div className="flex items-center gap-5 text-[12px] text-gray-500 dark:text-gray-400">
             <span>
-              已选择 <span className="font-semibold text-gray-900">{selectedItems.size}</span> / {envItems.length} 项
+              已选择 <span className="font-semibold text-gray-900 dark:text-gray-100">{selectedItems.size}</span> / {envItems.length} 项
             </span>
             <span>
-              可清理 <span className="font-semibold text-emerald-600">{formatSize(selectedSize)}</span>
+              可清理 <span className="font-semibold text-emerald-600 dark:text-emerald-400">{formatSize(selectedSize)}</span>
             </span>
             <button
               onClick={() => setSelectedItems(new Set(envItems.map((i) => i.id)))}
@@ -136,7 +136,7 @@ export function EnvironmentDetail() {
             </button>
             <button
               onClick={() => setSelectedItems(new Set())}
-              className="text-gray-400 hover:text-gray-600 font-medium transition-colors"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 font-medium transition-colors"
             >
               取消全选
             </button>
@@ -145,7 +145,7 @@ export function EnvironmentDetail() {
             disabled={selectedItems.size === 0}
             data-clean-trigger
             onClick={() => setShowConfirm(true)}
-            className="h-[36px] px-4 bg-gradient-to-b from-emerald-500 to-emerald-600 text-white rounded-xl flex items-center gap-2 text-[12px] font-medium shadow-[0_2px_6px_rgba(16,185,129,0.3)] disabled:from-gray-200 disabled:to-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed transition-all"
+            className="h-[36px] px-4 bg-gradient-to-b from-emerald-500 to-emerald-600 text-white rounded-xl flex items-center gap-2 text-[12px] font-medium shadow-[0_2px_6px_rgba(16,185,129,0.3)] disabled:from-gray-200 disabled:to-gray-200 dark:disabled:from-gray-700 dark:disabled:to-gray-700 disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed transition-all"
           >
             <Sparkles className="w-3.5 h-3.5" />
             清理该环境
@@ -155,8 +155,8 @@ export function EnvironmentDetail() {
 
       {/* Items */}
       <div className={`${cardClass} overflow-hidden`}>
-        <div className="p-4 border-b border-gray-100/80 flex items-center justify-between">
-          <h2 className="text-[14px] font-semibold text-gray-900">可清理项目</h2>
+        <div className="p-4 border-b border-gray-100/80 dark:border-white/[0.06] flex items-center justify-between">
+          <h2 className="text-[14px] font-semibold text-gray-900 dark:text-gray-100">可清理项目</h2>
           <div className="flex items-center gap-1">
             <ArrowUpDown className="w-3.5 h-3.5 text-gray-400" />
             {(['default', 'risk', 'size'] as const).map((mode) => (
@@ -166,7 +166,7 @@ export function EnvironmentDetail() {
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors ${
                   sortBy === mode
                     ? 'bg-[#6B7FED]/10 text-[#6B7FED]'
-                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                    : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/[0.06]'
                 }`}
               >
                 {{ default: '默认', risk: '按风险', size: '按大小' }[mode]}
@@ -174,9 +174,9 @@ export function EnvironmentDetail() {
             ))}
           </div>
         </div>
-        <div className="divide-y divide-gray-100/60">
+        <div className="divide-y divide-gray-100/60 dark:divide-white/[0.06]">
           {envItems.map((item) => (
-            <div key={item.id} className="p-5 hover:bg-indigo-50/40 transition-colors duration-150">
+            <div key={item.id} className="p-5 hover:bg-indigo-50/40 dark:hover:bg-indigo-500/[0.06] transition-colors duration-150">
               <div className="flex items-start gap-4">
                 <label className="mt-1 relative flex items-center cursor-pointer">
                   <input
@@ -185,7 +185,7 @@ export function EnvironmentDetail() {
                     onChange={() => toggleItem(item.id)}
                     className="peer sr-only"
                   />
-                  <div className="w-[18px] h-[18px] rounded-[5px] border-[1.5px] border-gray-300 peer-checked:border-[#6B7FED] peer-checked:bg-[#6B7FED] flex items-center justify-center transition-all">
+                  <div className="w-[18px] h-[18px] rounded-[5px] border-[1.5px] border-gray-300 dark:border-gray-600 peer-checked:border-[#6B7FED] peer-checked:bg-[#6B7FED] flex items-center justify-center transition-all">
                     {selectedItems.has(item.id) && (
                       <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
                         <path d="M1 3.5L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -195,24 +195,24 @@ export function EnvironmentDetail() {
                 </label>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-1.5">
-                    <h3 className="text-[15px] font-semibold text-gray-900">{item.name}</h3>
+                    <h3 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100">{item.name}</h3>
                     <RiskBadge level={item.risk} />
-                    <div className="ml-auto text-[16px] font-semibold text-gray-900 tabular-nums">{formatSize(item.size)}</div>
+                    <div className="ml-auto text-[16px] font-semibold text-gray-900 dark:text-gray-100 tabular-nums">{formatSize(item.size)}</div>
                   </div>
                   <div className="flex items-center gap-2 mb-2 min-w-0">
                     <span className="text-[12px] font-mono text-gray-400 truncate flex-1 min-w-0">{item.path}</span>
                     <button
                       onClick={() => window.api?.shell.showInFinder(item.path)}
-                      className="ml-auto flex-shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-50/80 hover:bg-gray-100 text-[10px] text-gray-500 hover:text-[#6B7FED] transition-colors border border-gray-100/60"
+                      className="ml-auto flex-shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-50/80 dark:bg-white/[0.06] hover:bg-gray-100 dark:hover:bg-white/[0.1] text-[10px] text-gray-500 dark:text-gray-400 hover:text-[#6B7FED] transition-colors border border-gray-100/60 dark:border-white/[0.08]"
                     >
                       <FolderOpen className="w-3 h-3" />
                       在 Finder 中显示
                     </button>
                   </div>
                   {item.clean_command && (
-                    <div className="mb-2 flex items-center gap-2 px-3 py-2 bg-emerald-50/60 border border-emerald-100/60 rounded-xl">
-                      <Terminal className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
-                      <code className="text-[11px] text-emerald-700 font-mono flex-1 truncate">{item.clean_command}</code>
+                    <div className="mb-2 flex items-center gap-2 px-3 py-2 bg-emerald-50/60 dark:bg-emerald-500/[0.08] border border-emerald-100/60 dark:border-emerald-500/20 rounded-xl">
+                      <Terminal className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                      <code className="text-[11px] text-emerald-700 dark:text-emerald-300 font-mono flex-1 truncate">{item.clean_command}</code>
                       <button
                         onClick={async () => {
                           addToast(`正在执行 ${item.clean_command}...`, 'info')
@@ -229,12 +229,12 @@ export function EnvironmentDetail() {
                       </button>
                     </div>
                   )}
-                  <div className="bg-amber-50/50 border border-amber-100/60 rounded-xl p-3">
+                  <div className="bg-amber-50/50 dark:bg-amber-500/[0.08] border border-amber-100/60 dark:border-amber-500/20 rounded-xl p-3">
                     <div className="flex items-start gap-2">
                       <AlertCircle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
                       <div>
-                        <div className="text-[11px] font-semibold text-amber-800 mb-0.5">删除影响</div>
-                        <div className="text-[12px] text-amber-700 leading-relaxed">{item.impact}</div>
+                        <div className="text-[11px] font-semibold text-amber-800 dark:text-amber-400 mb-0.5">删除影响</div>
+                        <div className="text-[12px] text-amber-700 dark:text-amber-300/80 leading-relaxed">{item.impact}</div>
                       </div>
                     </div>
                   </div>
