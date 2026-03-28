@@ -58,40 +58,40 @@
 
 ## 二、现有环境缺失的重要路径
 
-### iOS（当前 15 条，建议补 4 条）
-- [ ] `~/Library/Developer/CoreSimulator/Profiles/Runtimes` — 模拟器运行时（warning，5-30 GB，**高价值**）
-- [ ] `~/Library/Developer/Xcode/DerivedData/ModuleCache.noindex` — 模块缓存（safe，500 MB - 3 GB）
-- [ ] `~/Library/Developer/Xcode/DerivedData/Index.noindex` — 索引数据（safe，500 MB - 2 GB）
-- [ ] `~/Library/Caches/com.apple.dt.Xcode` — Xcode 自身缓存（safe，200 MB - 2 GB）
+### iOS ✅ 全部补全
+- [x] `~/Library/Developer/CoreSimulator/Profiles/Runtimes` — 模拟器运行时
+- [x] `~/Library/Developer/Xcode/DerivedData/ModuleCache.noindex` — 模块缓存
+- [x] `~/Library/Developer/Xcode/DerivedData/Index.noindex` — 索引数据
+- [x] `~/Library/Caches/com.apple.dt.Xcode` — Xcode 自身缓存
 
-### Android（当前 13 条，建议补 3 条）
-- [ ] `~/.gradle/jdks` — Gradle 自动下载的 JDK（safe，1-5 GB）
-- [ ] `~/.gradle/native` — 原生构建缓存（safe，200 MB - 2 GB）
-- [ ] `~/Library/Android/sdk/cmake` — CMake 工具（safe，500 MB - 2 GB）
-- [ ] **修复**：Android Studio 版本号硬编码（`2024.3`）→ 应动态匹配或用通配
+### Android ✅ 全部补全
+- [x] `~/.gradle/jdks` — Gradle 自动下载的 JDK（在 java.json）
+- [x] `~/.gradle/native` — 原生构建缓存
+- [x] `~/Library/Android/sdk/cmake` — CMake 工具
+- [x] **修复**：Android Studio 版本号通配匹配
 
-### Docker（当前 2 条，建议补 3 条）
-- [ ] `~/Library/Containers/com.docker.docker/Data/docker/volumes` — 数据卷（danger，1-50 GB）
-- [ ] `~/Library/Containers/com.docker.docker/Data/docker/image` — 镜像层缓存（warning，2-30 GB）
-- [ ] `~/.docker/buildx` — BuildX 构建器缓存（safe，500 MB - 5 GB）
+### Docker ✅ 全部补全
+- [x] `~/Library/Containers/com.docker.docker/Data/docker/volumes` — 数据卷
+- [x] `~/Library/Containers/com.docker.docker/Data/docker/image` — 镜像层缓存
+- [x] `~/.docker/buildx` — BuildX 构建器缓存
 
-### Frontend（当前 7 条，建议补 3 条）
-- [ ] `~/.yarn/berry/cache` — Yarn Berry (v2+) 缓存（safe，500 MB - 5 GB）
-- [ ] `~/.npm/_npx` — npx 执行缓存（safe，100 MB - 1 GB）
-- [ ] `~/Library/Caches/ms-playwright` — Playwright 浏览器二进制（safe，1-5 GB）
+### Frontend ✅ 全部补全
+- [x] `~/.yarn/berry/cache` — Yarn Berry (v2+) 缓存
+- [x] `~/.npm/_npx` — npx 执行缓存
+- [x] `~/Library/Caches/ms-playwright` — Playwright 浏览器二进制
 
-### Python（当前 8 条，建议补 4 条）
-- [ ] `~/anaconda3/pkgs` — Anaconda 包缓存（safe，1-10 GB）
-- [ ] `~/anaconda3/envs` — Anaconda 环境（warning，2-20 GB）
-- [ ] `~/Library/Caches/pypoetry` — Poetry 缓存（safe，200 MB - 3 GB）
-- [ ] `~/.cache/huggingface` — HuggingFace 模型缓存（warning，5-100 GB，**极高价值**）
+### Python ✅ 全部补全
+- [x] `~/anaconda3/pkgs` — Anaconda 包缓存
+- [x] `~/anaconda3/envs` — Anaconda 环境
+- [x] `~/Library/Caches/pypoetry` — Poetry 缓存
+- [x] `~/.cache/huggingface` — HuggingFace 模型缓存
 
-### Ruby（当前 10 条，OK）
-- [ ] `~/.cache/ruby-build` — ruby-build 下载缓存（safe，100 MB - 500 MB）
+### Ruby ✅ 补全
+- [x] `~/.cache/ruby-build` — ruby-build 下载缓存
 
-### Homebrew（当前 5 条，建议补 2 条）
-- [ ] `/usr/local/Cellar` — Intel Mac 安装目录（warning，同 /opt/homebrew/Cellar）
-- [ ] `/opt/homebrew/Caskroom` — Cask 安装目录（warning，1-10 GB）
+### Homebrew ✅ 全部补全
+- [x] `/usr/local/Cellar` — Intel Mac 安装目录
+- [x] `/opt/homebrew/Caskroom` — Cask 安装目录
 
 ---
 

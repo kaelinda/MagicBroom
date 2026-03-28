@@ -169,5 +169,25 @@
     "impact": "删除后 Xcode 启动和索引会稍慢，缓存会自动重建",
     "conditions": ["app:com.apple.dt.Xcode"],
     "tags": ["ios", "xcode", "cache"]
+  },
+  {
+    "id": "xcode-module-cache",
+    "name": "Xcode 模块缓存",
+    "path": "~/Library/Developer/Xcode/DerivedData/ModuleCache.noindex",
+    "risk": "safe",
+    "size_estimate": "500 MB - 3 GB",
+    "impact": "删除后 Xcode 编译时会重建模块缓存，首次编译稍慢",
+    "conditions": ["app:com.apple.dt.Xcode"],
+    "tags": ["ios", "xcode", "cache"]
+  },
+  {
+    "id": "xcode-index-data",
+    "name": "Xcode 索引数据",
+    "path": "~/Library/Developer/Xcode/DerivedData/Index.noindex",
+    "risk": "safe",
+    "size_estimate": "500 MB - 2 GB",
+    "impact": "删除后 Xcode 会重建代码索引，首次打开项目时符号跳转较慢",
+    "conditions": ["app:com.apple.dt.Xcode"],
+    "tags": ["ios", "xcode", "cache"]
   }
 ]

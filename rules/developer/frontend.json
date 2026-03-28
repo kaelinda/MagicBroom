@@ -88,5 +88,15 @@
     "impact": "删除后需要 npx playwright install 重新下载浏览器",
     "conditions": ["path_exists:~/Library/Caches/ms-playwright"],
     "tags": ["frontend", "playwright", "browser-cache"]
+  },
+  {
+    "id": "npx-cache",
+    "name": "npx 执行缓存",
+    "path": "~/.npm/_npx",
+    "risk": "safe",
+    "size_estimate": "100 MB - 1 GB",
+    "impact": "删除后 npx 首次执行包时会重新下载",
+    "conditions": ["path_exists:~/.npm/_npx"],
+    "tags": ["frontend", "npm", "cache"]
   }
 ]

@@ -58,5 +58,15 @@
     "impact": "编译中断后的残留临时文件，安全删除",
     "conditions": ["path_exists:/tmp/homebrew"],
     "tags": ["homebrew", "temp"]
+  },
+  {
+    "id": "homebrew-caskroom",
+    "name": "Homebrew Cask 安装目录",
+    "path": "/opt/homebrew/Caskroom",
+    "risk": "warning",
+    "size_estimate": "1-10 GB",
+    "impact": "此为 Cask 应用安装目录，建议使用 brew uninstall --cask 卸载不用的应用",
+    "conditions": ["path_exists:/opt/homebrew/Caskroom"],
+    "tags": ["homebrew", "cask"]
   }
 ]

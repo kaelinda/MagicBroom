@@ -118,5 +118,25 @@
     "impact": "删除后 Gradle/Maven 会重新从远程仓库下载依赖",
     "conditions": ["path_exists:~/.m2/repository"],
     "tags": ["android", "maven", "package-cache"]
+  },
+  {
+    "id": "gradle-native-cache",
+    "name": "Gradle Native 构建缓存",
+    "path": "~/.gradle/native",
+    "risk": "safe",
+    "size_estimate": "200 MB - 2 GB",
+    "impact": "删除后 Gradle 的原生构建缓存会自动重建",
+    "conditions": ["path_exists:~/.gradle/native"],
+    "tags": ["android", "gradle", "build-cache"]
+  },
+  {
+    "id": "android-sdk-cmake",
+    "name": "Android SDK CMake",
+    "path": "~/Library/Android/sdk/cmake",
+    "risk": "safe",
+    "size_estimate": "500 MB - 2 GB",
+    "impact": "删除后 NDK 项目编译需要通过 SDK Manager 重新下载 CMake",
+    "conditions": ["path_exists:~/Library/Android/sdk/cmake"],
+    "tags": ["android", "sdk", "build-tools"]
   }
 ]

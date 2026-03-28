@@ -98,5 +98,15 @@
     "impact": "删除后 rbenv install 会重新下载源码",
     "conditions": ["path_exists:~/.rbenv/cache"],
     "tags": ["ruby", "rbenv", "cache"]
+  },
+  {
+    "id": "ruby-build-cache",
+    "name": "ruby-build 下载缓存",
+    "path": "~/.cache/ruby-build",
+    "risk": "safe",
+    "size_estimate": "100 MB - 500 MB",
+    "impact": "删除后 ruby-build 会重新下载 Ruby 源码包",
+    "conditions": ["path_exists:~/.cache/ruby-build"],
+    "tags": ["ruby", "cache"]
   }
 ]
