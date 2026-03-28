@@ -1,2 +1,13 @@
 @import "tailwindcss";
 @import "./theme.css";
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

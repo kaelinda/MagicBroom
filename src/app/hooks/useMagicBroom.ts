@@ -1,9 +1,11 @@
 import { useCallback, useEffect } from 'react'
 import { useScan, type ScanItem } from '../context/ScanContext'
+import { useToast } from '../context/ToastContext'
 
 /** 连接 Electron IPC 的扫描/清理 hook */
 export function useMagicBroom() {
   const { state, dispatch } = useScan()
+  const { addToast } = useToast()
 
   // 注册 IPC 事件监听（带清理）
   useEffect(() => {
@@ -23,6 +25,7 @@ export function useMagicBroom() {
     const offError = api.scan.onError((data: unknown) => {
       const d = data as { error: string }
       dispatch({ type: 'SCAN_ERROR', error: d.error })
+      addToast(`扫描失败：${d.error}`, 'error')
     })
 
     return () => {
@@ -30,7 +33,7 @@ export function useMagicBroom() {
       offComplete()
       offError()
     }
-  }, [dispatch])
+  }, [dispatch, addToast])
 
   const startScan = useCallback(
     async (mode: 'daily' | 'developer') => {
@@ -39,9 +42,10 @@ export function useMagicBroom() {
         await window.api?.scan.start(mode)
       } catch (err) {
         dispatch({ type: 'SCAN_ERROR', error: String(err) })
+        addToast(`扫描启动失败：${String(err)}`, 'error')
       }
     },
-    [dispatch],
+    [dispatch, addToast],
   )
 
   const executeCleaning = useCallback(async () => {
@@ -53,11 +57,16 @@ export function useMagicBroom() {
 
     try {
       const result = await window.api?.clean.execute(paths)
+      if (result && result.failed.length > 0) {
+        const failCount = result.failed.length
+        addToast(`${failCount} 个项目清理失败，请检查权限`, 'warning')
+      }
       return result ?? null
     } catch (err) {
+      addToast(`清理出错：${String(err)}`, 'error')
       return { freed: 0, succeeded: [] as string[], failed: [{ path: '', error: String(err) }] }
     }
-  }, [state.results, state.selectedItems])
+  }, [state.results, state.selectedItems, addToast])
 
   const dryRun = useCallback(async () => {
     const paths = state.results
