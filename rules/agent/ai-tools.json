@@ -5,29 +5,59 @@
     "path": "~/.claude/.cache",
     "risk": "safe",
     "size_estimate": "100 MB - 2 GB",
-    "impact": "删除后 Claude Code 会重建缓存，不影响对话历史",
+    "impact": "删除后 Claude Code 会重建缓存，不影响对话历史和配置",
     "conditions": ["path_exists:~/.claude/.cache"],
     "tags": ["agent", "claude-code", "cache"]
   },
   {
-    "id": "cursor-cache",
-    "name": "Cursor 缓存与配置",
-    "path": "~/.cursor",
-    "risk": "warning",
-    "size_estimate": "500 MB - 5 GB",
-    "impact": "删除后 Cursor 的全局配置、扩展缓存和会话数据将丢失",
-    "conditions": ["path_exists:~/.cursor"],
+    "id": "cursor-extensions-cache",
+    "name": "Cursor 扩展缓存",
+    "path": "~/Library/Application Support/Cursor/Cache",
+    "risk": "safe",
+    "size_estimate": "200 MB - 2 GB",
+    "impact": "删除后 Cursor 会重建扩展缓存，不影响配置和对话",
+    "conditions": ["path_exists:~/Library/Application Support/Cursor/Cache"],
     "tags": ["agent", "cursor", "cache"]
   },
   {
-    "id": "codex-records",
-    "name": "OpenAI Codex 记录",
-    "path": "~/.codex",
+    "id": "cursor-cached-data",
+    "name": "Cursor 缓存数据",
+    "path": "~/Library/Application Support/Cursor/CachedData",
     "risk": "safe",
-    "size_estimate": "50 MB - 1 GB",
-    "impact": "删除后 Codex CLI 的本地记录将清除",
-    "conditions": ["path_exists:~/.codex"],
+    "size_estimate": "200 MB - 2 GB",
+    "impact": "删除后 Cursor 会重建缓存，不影响配置和对话",
+    "conditions": ["path_exists:~/Library/Application Support/Cursor/CachedData"],
+    "tags": ["agent", "cursor", "cache"]
+  },
+  {
+    "id": "cursor-home",
+    "name": "Cursor 配置与会话",
+    "path": "~/.cursor",
+    "risk": "warning",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "包含用户创建的 plans、全局配置和会话数据，删除后不可恢复",
+    "conditions": ["path_exists:~/.cursor"],
+    "tags": ["agent", "cursor", "config"]
+  },
+  {
+    "id": "codex-cache",
+    "name": "Codex CLI 缓存",
+    "path": "~/.codex/cache",
+    "risk": "safe",
+    "size_estimate": "50 MB - 500 MB",
+    "impact": "删除后 Codex CLI 会重建工具缓存",
+    "conditions": ["path_exists:~/.codex/cache"],
     "tags": ["agent", "codex", "cache"]
+  },
+  {
+    "id": "codex-sessions",
+    "name": "Codex CLI 会话记录",
+    "path": "~/.codex/archived_sessions",
+    "risk": "warning",
+    "size_estimate": "50 MB - 1 GB",
+    "impact": "删除后 Codex CLI 的历史对话记录将不可恢复",
+    "conditions": ["path_exists:~/.codex/archived_sessions"],
+    "tags": ["agent", "codex", "history"]
   },
   {
     "id": "github-copilot-cache",
@@ -41,33 +71,33 @@
   },
   {
     "id": "continue-cache",
-    "name": "Continue 缓存",
+    "name": "Continue 配置与缓存",
     "path": "~/.continue",
-    "risk": "safe",
+    "risk": "warning",
     "size_estimate": "100 MB - 2 GB",
-    "impact": "删除后 Continue 的本地配置和对话缓存将清除",
+    "impact": "包含 Continue 的配置和对话缓存，删除后需重新设置",
     "conditions": ["path_exists:~/.continue"],
-    "tags": ["agent", "continue", "cache"]
+    "tags": ["agent", "continue", "config"]
   },
   {
-    "id": "codeium-cache",
-    "name": "Codeium 缓存",
+    "id": "codeium-windsurf-cache",
+    "name": "Codeium / Windsurf 缓存",
     "path": "~/.codeium",
-    "risk": "safe",
+    "risk": "warning",
     "size_estimate": "200 MB - 3 GB",
-    "impact": "删除后 Codeium 会重新下载语言服务器和模型",
+    "impact": "包含 Codeium/Windsurf 的语言服务器、模型和配置，删除后需重新登录和下载",
     "conditions": ["path_exists:~/.codeium"],
     "tags": ["agent", "codeium", "cache"]
   },
   {
     "id": "aider-cache",
-    "name": "Aider 缓存",
+    "name": "Aider 配置与缓存",
     "path": "~/.aider",
-    "risk": "safe",
+    "risk": "warning",
     "size_estimate": "50 MB - 500 MB",
-    "impact": "删除后 Aider 的本地配置和对话缓存将清除",
+    "impact": "包含 Aider 的配置和对话缓存，删除后需重新配置",
     "conditions": ["path_exists:~/.aider"],
-    "tags": ["agent", "aider", "cache"]
+    "tags": ["agent", "aider", "config"]
   },
   {
     "id": "ollama-models",
@@ -91,12 +121,32 @@
   },
   {
     "id": "tabby-data",
-    "name": "Tabby 补全服务数据",
+    "name": "Tabby 补全服务",
     "path": "~/.tabby",
-    "risk": "safe",
+    "risk": "warning",
     "size_estimate": "500 MB - 5 GB",
-    "impact": "删除后 Tabby 代码补全服务需要重新配置和下载模型",
+    "impact": "包含 Tabby 的模型和配置，删除后需重新配置和下载",
     "conditions": ["path_exists:~/.tabby"],
-    "tags": ["agent", "tabby", "cache"]
+    "tags": ["agent", "tabby", "config"]
+  },
+  {
+    "id": "gemini-cli",
+    "name": "Gemini CLI 数据",
+    "path": "~/.gemini",
+    "risk": "warning",
+    "size_estimate": "50 MB - 1 GB",
+    "impact": "包含 Gemini CLI 的配置、MCP 设置和会话数据，删除后需重新配置",
+    "conditions": ["path_exists:~/.gemini"],
+    "tags": ["agent", "gemini", "config"]
+  },
+  {
+    "id": "tabnine-data",
+    "name": "Tabnine 数据",
+    "path": "~/.tabnine",
+    "risk": "warning",
+    "size_estimate": "500 MB - 3 GB",
+    "impact": "包含 Tabnine 的模型、配置和缓存，删除后需重新登录和下载",
+    "conditions": ["path_exists:~/.tabnine"],
+    "tags": ["agent", "tabnine", "config"]
   }
 ]

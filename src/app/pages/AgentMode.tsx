@@ -46,6 +46,7 @@ export function AgentMode() {
 
   const handleScan = async () => {
     setScanning(true)
+    setSelectedItems(new Set())
     await startScan('agent')
     setScanning(false)
   }
@@ -115,7 +116,7 @@ export function AgentMode() {
       {hasData && (
         <div className="grid grid-cols-3 gap-4 mb-5">
           <div className={`${cardClass} p-5`}>
-            <div className="text-[12px] text-gray-400 mb-1">已识别工具</div>
+            <div className="text-[12px] text-gray-400 mb-1">可清理项</div>
             <div className="text-[28px] font-semibold text-gray-900 tracking-[-0.02em]">{agentItems.length}</div>
           </div>
           <div className={`${cardClass} p-5`}>
@@ -159,7 +160,7 @@ export function AgentMode() {
               className="h-[36px] px-4 bg-gradient-to-b from-violet-500 to-purple-600 text-white rounded-xl flex items-center gap-2 text-[12px] font-medium shadow-[0_2px_6px_rgba(139,92,246,0.3)] disabled:from-gray-200 disabled:to-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed transition-all"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              清理 Agent 缓存
+              清理选中项
             </button>
           </div>
         </div>

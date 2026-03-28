@@ -120,11 +120,30 @@ export async function expandWildcardRules(rules: RuleDefinition[]): Promise<Rule
 }
 
 /**
+ * 从 .jsonl 文件第一行中提取 cwd 字段，作为项目的真实路径。
+ * 比从目录名解码更可靠（目录名中 `-` 与路径分隔符不可区分）。
+ */
+async function extractCwdFromJsonl(filePath: string): Promise<string | null> {
+  try {
+    const content = await readFile(filePath, 'utf-8')
+    // 逐行查找带 cwd 的 JSON 行（通常在前几行）
+    for (const line of content.split('\n').slice(0, 20)) {
+      if (!line.includes('"cwd"')) continue
+      try {
+        const parsed = JSON.parse(line)
+        if (parsed.cwd && typeof parsed.cwd === 'string') return parsed.cwd
+      } catch { /* 跳过非法 JSON 行 */ }
+    }
+  } catch { /* 文件读取失败 */ }
+  return null
+}
+
+/**
  * 动态扫描 ~/.claude/projects/ 目录，按状态分类：
- * - 孤儿会话：项目目录已不存在（safe，可直接删除）
+ * - 孤儿会话：项目目录已不存在（warning，建议确认后删除）
  * - 陈旧会话：最近修改超过 30 天（warning，可能不再需要）
  *
- * 目录名格式：-Users-nowcoder-Documents-xxx → /Users/nowcoder/Documents/xxx
+ * 通过读取 .jsonl 中的 cwd 字段判定真实项目路径，避免目录名解码歧义。
  */
 async function generateClaudeProjectRules(): Promise<RuleDefinition[]> {
   const projectsDir = join(homedir(), '.claude', 'projects')
@@ -152,43 +171,46 @@ async function generateClaudeProjectRules(): Promise<RuleDefinition[]> {
     }
     if (!info.isDirectory()) continue
 
-    // 解码目录名：-Users-nowcoder-xxx → /Users/nowcoder/xxx
-    const decodedPath = '/' + entry.replace(/^-/, '').replace(/-/g, '/')
-
-    // 检查项目目录是否存在
-    let projectExists = false
-    try {
-      await stat(decodedPath)
-      projectExists = true
-    } catch {
-      // 项目目录不存在
-    }
-
-    // 获取最近 .jsonl 文件的修改时间
+    // 扫描 .jsonl 获取 cwd 和最近修改时间
+    let projectCwd: string | null = null
     let latestMtime = 0
     try {
       const files = await readdir(entryPath)
       for (const f of files) {
         if (!f.endsWith('.jsonl')) continue
+        const fPath = join(entryPath, f)
         try {
-          const fInfo = await stat(join(entryPath, f))
+          const fInfo = await stat(fPath)
           if (fInfo.mtimeMs > latestMtime) latestMtime = fInfo.mtimeMs
+          // 从最近的 jsonl 提取 cwd（只需找到一个即可）
+          if (!projectCwd) {
+            projectCwd = await extractCwdFromJsonl(fPath)
+          }
         } catch { /* skip */ }
       }
     } catch { /* skip */ }
 
-    // 提取项目短名
-    const shortName = basename(decodedPath)
+    // 检查项目目录是否存在
+    let projectExists = false
+    if (projectCwd) {
+      try {
+        await stat(projectCwd)
+        projectExists = true
+      } catch { /* 项目目录不存在 */ }
+    }
+
+    const shortName = projectCwd ? basename(projectCwd) : entry
     const tilded = '~/.claude/projects/' + entry
 
     if (!projectExists) {
+      const displayPath = projectCwd || '(无法识别的项目)'
       rules.push({
         id: `claude-orphan-${entry.toLowerCase().slice(0, 40)}`,
         name: `孤儿会话：${shortName}`,
         path: tilded,
-        risk: 'safe',
+        risk: 'warning',
         size_estimate: '10 MB - 500 MB',
-        impact: `项目目录 ${decodedPath} 已不存在，会话记录可安全删除`,
+        impact: `项目目录 ${displayPath} 已不存在，删除后该项目的对话记录不可恢复`,
         tags: ['agent', 'claude-code', 'orphan'],
       })
     } else if (latestMtime > 0 && now - latestMtime > STALE_MS) {
