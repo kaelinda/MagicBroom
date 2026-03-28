@@ -1,4 +1,5 @@
 import { ipcMain, BrowserWindow, shell, dialog } from 'electron'
+import { spawn } from 'child_process'
 import { Scanner } from './scanner'
 import { Cleaner } from './cleaner'
 import { RulesEngine } from './rules-engine'
@@ -97,5 +98,42 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('updater:get-version', async () => {
     return getAppVersion()
+  })
+
+  // 命令型清理：执行推荐的清理命令
+  ipcMain.handle('clean:run-command', async (_event, args: { command: string }) => {
+    // 白名单：只允许执行已知的安全清理命令
+    const ALLOWED_COMMANDS = [
+      'brew cleanup',
+      'brew cleanup --prune=all',
+      'docker system prune -f',
+      'docker system prune --volumes -f',
+      'xcrun simctl delete unavailable',
+    ]
+    const cmd = args.command.trim()
+    if (!ALLOWED_COMMANDS.includes(cmd)) {
+      return { success: false, output: `不允许执行的命令: ${cmd}` }
+    }
+
+    return new Promise<{ success: boolean; output: string }>((resolve) => {
+      const proc = spawn('/bin/zsh', ['-lc', cmd], {
+        timeout: 60_000,
+        stdio: ['ignore', 'pipe', 'pipe'],
+      })
+
+      let stdout = ''
+      let stderr = ''
+      proc.stdout.on('data', (chunk: Buffer) => { stdout += chunk.toString() })
+      proc.stderr.on('data', (chunk: Buffer) => { stderr += chunk.toString() })
+
+      proc.on('close', (code) => {
+        const output = (stdout + stderr).trim().slice(0, 2000) // 限制输出长度
+        resolve({ success: code === 0, output: output || '命令执行完成' })
+      })
+
+      proc.on('error', (err) => {
+        resolve({ success: false, output: err.message })
+      })
+    })
   })
 }

@@ -109,10 +109,10 @@
 - [x] Conda 安装位置假设 `~/miniconda3` → 新增 `~/anaconda3` 变体规则
 - [x] Homebrew 路径假设 `/opt/homebrew` → 新增 Intel Mac `/usr/local/Cellar` 规则
 
-### 3.3 命令型清理（v2 特性）
-- [ ] Homebrew 应建议运行 `brew cleanup` 而非直接删 Cellar
-- [ ] Docker 应建议 `docker system prune` 而非直接删文件
-- [ ] iOS Simulator 应建议 `xcrun simctl delete unavailable`
+### 3.3 命令型清理（v2 特性） ✅ 已完成
+- [x] Homebrew: `brew cleanup` / `brew cleanup --prune=all`
+- [x] Docker: `docker system prune -f` / `docker system prune --volumes -f`
+- [x] iOS Simulator: `xcrun simctl delete unavailable`
 
 ---
 
@@ -136,5 +136,5 @@
 | **P1** | ~~路径动态化（Android Studio 版本、Conda 路径、Homebrew Intel）~~ | ✅ 已完成 |
 | **P1** | ~~新增 .NET/Flutter/JetBrains 环境~~ | ✅ 已完成 |
 | **P1** | ~~EnvironmentDetail 全选/反选 + 风险排序~~ | ✅ 已完成 |
-| **P2** | 命令型清理建议（brew cleanup、docker prune）| 3h |
+| **P2** | ~~命令型清理建议（brew cleanup、docker prune）~~ | ✅ 已完成 |
 | **P2** | ~~上次扫描时间显示~~ | ✅ 已完成 |

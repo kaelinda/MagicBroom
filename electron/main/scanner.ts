@@ -216,6 +216,7 @@ async function scanRule(rule: RuleDefinition): Promise<RuleResult> {
     risk: rule.risk,
     impact: rule.impact,
     tags: rule.tags,
+    ...(rule.clean_command ? { clean_command: rule.clean_command } : {}),
   }
 }
 

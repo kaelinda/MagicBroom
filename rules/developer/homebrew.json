@@ -7,7 +7,8 @@
     "size_estimate": "500 MB - 5 GB",
     "impact": "删除后 brew install 会重新从网络下载，不影响已安装的包",
     "conditions": ["path_exists:~/Library/Caches/Homebrew"],
-    "tags": ["homebrew", "cache"]
+    "tags": ["homebrew", "cache"],
+    "clean_command": "brew cleanup --prune=all"
   },
   {
     "id": "homebrew-cellar-arm",
@@ -15,9 +16,10 @@
     "path": "/opt/homebrew/Cellar",
     "risk": "warning",
     "size_estimate": "2-15 GB",
-    "impact": "此为 Homebrew ��装目录，建议使用 brew cleanup 清理旧版本���非直接删除",
+    "impact": "此为 Homebrew 安装目录，建议使用 brew cleanup 清理旧版本而非直接删除",
     "conditions": ["path_exists:/opt/homebrew/Cellar"],
-    "tags": ["homebrew", "packages"]
+    "tags": ["homebrew", "packages"],
+    "clean_command": "brew cleanup"
   },
   {
     "id": "homebrew-cellar-intel",
@@ -25,9 +27,10 @@
     "path": "/usr/local/Cellar",
     "risk": "warning",
     "size_estimate": "2-15 GB",
-    "impact": "此为 Homebrew 安装目录，建议使用 brew cleanup 清理旧版本而��直接删除",
+    "impact": "此为 Homebrew 安装目录，建议使用 brew cleanup 清理旧版本而非直接删除",
     "conditions": ["path_exists:/usr/local/Cellar"],
-    "tags": ["homebrew", "packages"]
+    "tags": ["homebrew", "packages"],
+    "clean_command": "brew cleanup"
   },
   {
     "id": "homebrew-cask-cache",

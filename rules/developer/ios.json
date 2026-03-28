@@ -158,7 +158,8 @@
     "size_estimate": "5-30 GB",
     "impact": "删除后需在 Xcode → Settings → Platforms 重新下载，建议用 xcrun simctl delete unavailable 清理未使用的",
     "conditions": ["app:com.apple.dt.Xcode"],
-    "tags": ["ios", "simulator"]
+    "tags": ["ios", "simulator"],
+    "clean_command": "xcrun simctl delete unavailable"
   },
   {
     "id": "xcode-caches",

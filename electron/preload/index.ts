@@ -29,6 +29,8 @@ contextBridge.exposeInMainWorld('api', {
       ipcRenderer.invoke('clean:dry-run', { items }),
     execute: (items: string[]) =>
       ipcRenderer.invoke('clean:execute', { items }),
+    runCommand: (command: string) =>
+      ipcRenderer.invoke('clean:run-command', { command }),
     onProgress: (callback: (data: unknown) => void) =>
       createListener('clean:progress', callback),
   },

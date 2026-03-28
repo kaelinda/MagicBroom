@@ -12,6 +12,8 @@ export interface RuleDefinition {
   conditions?: string[]
   tags: string[]
   version_hint?: string
+  /** 推荐的清理命令（比直接删文件更安全） */
+  clean_command?: string
 }
 
 export interface RuleResult {
@@ -23,6 +25,7 @@ export interface RuleResult {
   risk: RiskLevel
   impact: string
   tags: string[]
+  clean_command?: string
 }
 
 export interface DryRunItem {

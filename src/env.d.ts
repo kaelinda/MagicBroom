@@ -11,6 +11,7 @@ interface MagicBroomAPI {
   clean: {
     dryRun: (items: string[]) => Promise<{ wouldFree: number; items: unknown[] }>
     execute: (items: string[]) => Promise<{ freed: number; succeeded: string[]; failed: unknown[] }>
+    runCommand: (command: string) => Promise<{ success: boolean; output: string }>
     onProgress: (callback: (data: { item: string; freed: number }) => void) => () => void
   }
   rules: {

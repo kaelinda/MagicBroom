@@ -11,6 +11,7 @@ export interface ScanItem {
   risk: RiskLevel
   impact: string
   tags: string[]
+  clean_command?: string
 }
 
 type ScanStatus = 'idle' | 'scanning' | 'complete' | 'error'

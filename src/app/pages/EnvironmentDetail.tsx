@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Sparkles, AlertCircle, FolderOpen, ArrowUpDown } from 'lucide-react'
+import { ArrowLeft, Sparkles, AlertCircle, FolderOpen, ArrowUpDown, Terminal } from 'lucide-react'
 import { useMagicBroom } from '../hooks/useMagicBroom'
 import { useToast } from '../context/ToastContext'
 import { RiskBadge } from '../components/RiskBadge'
@@ -210,6 +210,26 @@ export function EnvironmentDetail() {
                       在 Finder 中显示
                     </button>
                   </div>
+                  {item.clean_command && (
+                    <div className="mb-2 flex items-center gap-2 px-3 py-2 bg-emerald-50/60 border border-emerald-100/60 rounded-xl">
+                      <Terminal className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+                      <code className="text-[11px] text-emerald-700 font-mono flex-1 truncate">{item.clean_command}</code>
+                      <button
+                        onClick={async () => {
+                          addToast(`正在执行 ${item.clean_command}...`, 'info')
+                          const res = await window.api?.clean.runCommand(item.clean_command!)
+                          if (res?.success) {
+                            addToast(`命令执行成功`, 'success')
+                          } else {
+                            addToast(`命令失败：${res?.output || '未知错误'}`, 'error')
+                          }
+                        }}
+                        className="flex-shrink-0 px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-medium transition-colors"
+                      >
+                        运行命令
+                      </button>
+                    </div>
+                  )}
                   <div className="bg-amber-50/50 border border-amber-100/60 rounded-xl p-3">
                     <div className="flex items-start gap-2">
                       <AlertCircle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />

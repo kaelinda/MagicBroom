@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useMagicBroom } from '../hooks/useMagicBroom'
+import { useToast } from '../context/ToastContext'
 import { RiskBadge } from '../components/RiskBadge'
 import { CleanConfirmDialog } from '../components/CleanConfirmDialog'
 import { CelebrationScreen } from '../components/CelebrationScreen'
-import { Sparkles, Info, Filter, FolderOpen } from 'lucide-react'
+import { Sparkles, Info, Filter, FolderOpen, Terminal } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import type { RiskLevel } from '../context/ScanContext'
 
@@ -19,6 +20,7 @@ function formatSize(bytes: number): string {
 
 export function ScanResults() {
   const { state, dispatch, executeCleaning } = useMagicBroom()
+  const { addToast } = useToast()
   const navigate = useNavigate()
   const [filter, setFilter] = useState<'all' | RiskLevel>('all')
   const [showConfirm, setShowConfirm] = useState(false)
@@ -196,6 +198,22 @@ export function ScanResults() {
                         <FolderOpen className="w-3 h-3" />
                         Finder
                       </button>
+                      {item.clean_command && (
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            addToast(`正在执行 ${item.clean_command}...`, 'info')
+                            const res = await window.api?.clean.runCommand(item.clean_command!)
+                            if (res?.success) addToast('命令执行成功', 'success')
+                            else addToast(`命令失败：${res?.output || '未知错误'}`, 'error')
+                          }}
+                          className="flex-shrink-0 flex items-center gap-1 text-[10px] text-emerald-600 hover:text-emerald-700 transition-colors"
+                          title={`运行 ${item.clean_command}`}
+                        >
+                          <Terminal className="w-3 h-3" />
+                          运行命令
+                        </button>
+                      )}
                     </div>
                   </div>
                   <div className="text-[14px] font-semibold text-gray-900 tabular-nums">{formatSize(item.size)}</div>
