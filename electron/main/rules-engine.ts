@@ -1,8 +1,11 @@
-import { readFile, readdir } from 'fs/promises'
+import { readFile, readdir, stat } from 'fs/promises'
 import { join, resolve, basename } from 'path'
 import { homedir } from 'os'
 import { app } from 'electron'
 import type { RuleDefinition, ScanMode } from './types'
+
+const STALE_DAYS = 30
+const STALE_MS = STALE_DAYS * 24 * 60 * 60 * 1000
 
 function getRulesDir(): string {
   if (app.isPackaged) {
@@ -116,6 +119,96 @@ export async function expandWildcardRules(rules: RuleDefinition[]): Promise<Rule
   return result
 }
 
+/**
+ * 动态扫描 ~/.claude/projects/ 目录，按状态分类：
+ * - 孤儿会话：项目目录已不存在（safe，可直接删除）
+ * - 陈旧会话：最近修改超过 30 天（warning，可能不再需要）
+ *
+ * 目录名格式：-Users-nowcoder-Documents-xxx → /Users/nowcoder/Documents/xxx
+ */
+async function generateClaudeProjectRules(): Promise<RuleDefinition[]> {
+  const projectsDir = join(homedir(), '.claude', 'projects')
+  const rules: RuleDefinition[] = []
+
+  let entries: string[]
+  try {
+    entries = await readdir(projectsDir)
+  } catch {
+    return rules
+  }
+
+  const now = Date.now()
+
+  for (const entry of entries) {
+    if (entry === '.' || entry === '..' || entry === '-') continue
+
+    const entryPath = join(projectsDir, entry)
+
+    let info
+    try {
+      info = await stat(entryPath)
+    } catch {
+      continue
+    }
+    if (!info.isDirectory()) continue
+
+    // 解码目录名：-Users-nowcoder-xxx → /Users/nowcoder/xxx
+    const decodedPath = '/' + entry.replace(/^-/, '').replace(/-/g, '/')
+
+    // 检查项目目录是否存在
+    let projectExists = false
+    try {
+      await stat(decodedPath)
+      projectExists = true
+    } catch {
+      // 项目目录不存在
+    }
+
+    // 获取最近 .jsonl 文件的修改时间
+    let latestMtime = 0
+    try {
+      const files = await readdir(entryPath)
+      for (const f of files) {
+        if (!f.endsWith('.jsonl')) continue
+        try {
+          const fInfo = await stat(join(entryPath, f))
+          if (fInfo.mtimeMs > latestMtime) latestMtime = fInfo.mtimeMs
+        } catch { /* skip */ }
+      }
+    } catch { /* skip */ }
+
+    // 提取项目短名
+    const shortName = basename(decodedPath)
+    const tilded = '~/.claude/projects/' + entry
+
+    if (!projectExists) {
+      rules.push({
+        id: `claude-orphan-${entry.toLowerCase().slice(0, 40)}`,
+        name: `孤儿会话：${shortName}`,
+        path: tilded,
+        risk: 'safe',
+        size_estimate: '10 MB - 500 MB',
+        impact: `项目目录 ${decodedPath} 已不存在，会话记录可安全删除`,
+        tags: ['agent', 'claude-code', 'orphan'],
+      })
+    } else if (latestMtime > 0 && now - latestMtime > STALE_MS) {
+      const daysAgo = Math.floor((now - latestMtime) / (24 * 60 * 60 * 1000))
+      rules.push({
+        id: `claude-stale-${entry.toLowerCase().slice(0, 40)}`,
+        name: `陈旧会话：${shortName}（${daysAgo} 天未活跃）`,
+        path: tilded,
+        risk: 'warning',
+        size_estimate: '10 MB - 500 MB',
+        impact: `最后活跃于 ${daysAgo} 天前，删除后该项目的 Claude Code 对话记录不可恢复`,
+        tags: ['agent', 'claude-code', 'stale'],
+      })
+    }
+    // 活跃会话（<30天且项目存在）不生成规则 — 不建议清理
+  }
+
+  return rules
+}
+
 export class RulesEngine {
   private cache = new Map<ScanMode, RuleDefinition[]>()
 
@@ -128,6 +221,12 @@ export class RulesEngine {
     } else {
       rawRules = await this.loadRawRules(mode)
       this.cache.set(mode, rawRules)
+    }
+
+    // Agent 模式：追加 Claude Code 项目动态规则
+    if (mode === 'agent') {
+      const claudeRules = await generateClaudeProjectRules()
+      rawRules = [...rawRules, ...claudeRules]
     }
 
     // 展开通配符路径

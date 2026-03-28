@@ -10,16 +10,6 @@
     "tags": ["agent", "claude-code", "cache"]
   },
   {
-    "id": "claude-code-projects",
-    "name": "Claude Code 会话历史",
-    "path": "~/.claude/projects",
-    "risk": "warning",
-    "size_estimate": "200 MB - 5 GB",
-    "impact": "删除后所有项目的 Claude Code 对话记录将不可恢复，请确认不再需要",
-    "conditions": ["path_exists:~/.claude/projects"],
-    "tags": ["agent", "claude-code", "history"]
-  },
-  {
     "id": "cursor-cache",
     "name": "Cursor 缓存与配置",
     "path": "~/.cursor",
