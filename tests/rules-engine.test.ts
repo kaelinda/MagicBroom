@@ -162,6 +162,30 @@ describe('JSON 规则文件验证', () => {
     }
   })
 
+  it('developer/dotnet.json 格式正确', async () => {
+    const rules = await loadAndValidate(join(rulesDir, 'developer/dotnet.json'))
+    expect(rules.length).toBeGreaterThan(0)
+    for (const rule of rules) {
+      expect(rule.tags.some((t: string) => ['dotnet', 'nuget'].includes(t))).toBe(true)
+    }
+  })
+
+  it('developer/flutter.json 格式正确', async () => {
+    const rules = await loadAndValidate(join(rulesDir, 'developer/flutter.json'))
+    expect(rules.length).toBeGreaterThan(0)
+    for (const rule of rules) {
+      expect(rule.tags.some((t: string) => ['flutter', 'dart'].includes(t))).toBe(true)
+    }
+  })
+
+  it('developer/jetbrains.json 格式正确', async () => {
+    const rules = await loadAndValidate(join(rulesDir, 'developer/jetbrains.json'))
+    expect(rules.length).toBeGreaterThan(0)
+    for (const rule of rules) {
+      expect(rule.tags.some((t: string) => ['jetbrains'].includes(t))).toBe(true)
+    }
+  })
+
   it('agent/ai-tools.json 格式正确', async () => {
     const rules = await loadAndValidate(join(rulesDir, 'agent/ai-tools.json'))
     expect(rules.length).toBeGreaterThan(0)
@@ -184,6 +208,9 @@ describe('JSON 规则文件验证', () => {
       'developer/rust.json',
       'developer/go.json',
       'developer/java.json',
+      'developer/dotnet.json',
+      'developer/flutter.json',
+      'developer/jetbrains.json',
       'agent/ai-tools.json',
     ]
 
@@ -211,6 +238,9 @@ describe('JSON 规则文件验证', () => {
       'developer/rust.json',
       'developer/go.json',
       'developer/java.json',
+      'developer/dotnet.json',
+      'developer/flutter.json',
+      'developer/jetbrains.json',
       'agent/ai-tools.json',
     ]
 

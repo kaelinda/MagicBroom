@@ -27,6 +27,9 @@ const envConfig: Record<string, { name: string; tags: string[]; description: str
   go: { name: 'Go 开发环境', tags: ['go', 'module-cache', 'build-cache', 'lint-cache'], description: 'Go 模块缓存、构建缓存、golangci-lint' },
   java: { name: 'Java / JDK 环境', tags: ['java', 'sdkman', 'gradle'], description: 'SDKMAN JDK 版本、Gradle JDK、Maven 仓库' },
   ruby: { name: 'Ruby 开发环境', tags: ['ruby', 'gem', 'bundler', 'rvm', 'rbenv'], description: 'Gem、Bundler、RVM、rbenv 缓存和版本' },
+  dotnet: { name: '.NET 开发环境', tags: ['dotnet', 'nuget'], description: 'NuGet 包缓存、.NET SDK 运行时' },
+  flutter: { name: 'Flutter / Dart 环境', tags: ['flutter', 'dart'], description: 'Flutter SDK 缓存、Dart 包缓存、分析服务器' },
+  jetbrains: { name: 'JetBrains IDE', tags: ['jetbrains', 'ide-cache'], description: 'IDEA/WebStorm/PyCharm 缓存、插件、日志' },
   homebrew: { name: 'Homebrew', tags: ['homebrew', 'cask'], description: 'Homebrew 包缓存、Cask 下载和旧版本' },
 }
 

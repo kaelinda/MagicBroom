@@ -1,4 +1,4 @@
-import { Smartphone, TabletSmartphone, Container, Globe, Code2, Beer, Gem, Cog, Zap, Coffee, ChevronRight, Sparkles } from 'lucide-react'
+import { Smartphone, TabletSmartphone, Container, Globe, Code2, Beer, Gem, Cog, Zap, Coffee, Brackets, Feather, Puzzle, ChevronRight, Sparkles } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useMagicBroom } from '../hooks/useMagicBroom'
 
@@ -22,6 +22,9 @@ const environments = [
   { id: 'go', name: 'Go 开发', icon: Zap, tags: ['go'], description: 'Go 模块缓存、构建缓存' },
   { id: 'java', name: 'Java / JDK', icon: Coffee, tags: ['java', 'sdkman', 'gradle'], description: 'SDKMAN、Gradle JDK、Maven' },
   { id: 'ruby', name: 'Ruby 开发', icon: Gem, tags: ['ruby', 'gem', 'bundler', 'rvm', 'rbenv'], description: 'Gem、Bundler、RVM、rbenv' },
+  { id: 'dotnet', name: '.NET 开发', icon: Brackets, tags: ['dotnet', 'nuget'], description: 'NuGet 包缓存、.NET SDK' },
+  { id: 'flutter', name: 'Flutter / Dart', icon: Feather, tags: ['flutter', 'dart'], description: 'Flutter SDK、Dart 包缓存' },
+  { id: 'jetbrains', name: 'JetBrains IDE', icon: Puzzle, tags: ['jetbrains'], description: 'IDEA/WebStorm/PyCharm 缓存和插件' },
   { id: 'homebrew', name: 'Homebrew', icon: Beer, tags: ['homebrew', 'cask'], description: '包缓存、Cask 下载、旧版本' },
 ]
 

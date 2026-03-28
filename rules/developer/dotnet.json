@@ -1,0 +1,32 @@
+[
+  {
+    "id": "nuget-packages",
+    "name": "NuGet 包缓存",
+    "path": "~/.nuget/packages",
+    "risk": "safe",
+    "size_estimate": "1-10 GB",
+    "impact": "删除后 dotnet restore 会重新从 nuget.org 下载依赖",
+    "conditions": ["path_exists:~/.nuget/packages"],
+    "tags": ["dotnet", "nuget", "package-cache"]
+  },
+  {
+    "id": "nuget-http-cache",
+    "name": "NuGet HTTP 缓存",
+    "path": "~/Library/Caches/NuGet",
+    "risk": "safe",
+    "size_estimate": "200 MB - 2 GB",
+    "impact": "删除后 NuGet 包下载会稍慢，缓存自动重建",
+    "conditions": ["path_exists:~/Library/Caches/NuGet"],
+    "tags": ["dotnet", "nuget", "cache"]
+  },
+  {
+    "id": "dotnet-sdk",
+    "name": ".NET SDK 运行时",
+    "path": "~/.dotnet",
+    "risk": "warning",
+    "size_estimate": "1-5 GB",
+    "impact": "删除后需要重新安装 .NET SDK，所有全局工具也会丢失",
+    "conditions": ["path_exists:~/.dotnet"],
+    "tags": ["dotnet", "sdk", "runtime"]
+  }
+]

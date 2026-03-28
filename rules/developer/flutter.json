@@ -1,0 +1,32 @@
+[
+  {
+    "id": "flutter-sdk-cache",
+    "name": "Flutter SDK 缓存",
+    "path": "~/flutter/bin/cache",
+    "risk": "safe",
+    "size_estimate": "2-5 GB",
+    "impact": "删除后 flutter doctor 会重新下载 SDK 组件",
+    "conditions": ["path_exists:~/flutter/bin/cache"],
+    "tags": ["flutter", "dart", "cache"]
+  },
+  {
+    "id": "pub-cache",
+    "name": "Dart 包缓存",
+    "path": "~/.pub-cache",
+    "risk": "safe",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后 flutter pub get 会重新从 pub.dev 下载依赖",
+    "conditions": ["path_exists:~/.pub-cache"],
+    "tags": ["flutter", "dart", "package-cache"]
+  },
+  {
+    "id": "dart-server-cache",
+    "name": "Dart 分析服务器缓存",
+    "path": "~/.dartServer",
+    "risk": "safe",
+    "size_estimate": "200 MB - 1 GB",
+    "impact": "删除后 IDE 的 Dart 分析会重新初始化",
+    "conditions": ["path_exists:~/.dartServer"],
+    "tags": ["flutter", "dart", "cache"]
+  }
+]

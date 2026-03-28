@@ -1,0 +1,32 @@
+[
+  {
+    "id": "jetbrains-caches",
+    "name": "JetBrains IDE 缓存",
+    "path": "~/Library/Caches/JetBrains",
+    "risk": "safe",
+    "size_estimate": "2-20 GB",
+    "impact": "删除后所有 JetBrains IDE（IDEA/WebStorm/PyCharm 等）首次启动需重建索引",
+    "conditions": ["path_exists:~/Library/Caches/JetBrains"],
+    "tags": ["jetbrains", "ide-cache"]
+  },
+  {
+    "id": "jetbrains-plugins",
+    "name": "JetBrains 插件和配置",
+    "path": "~/Library/Application Support/JetBrains",
+    "risk": "warning",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后已安装的插件、IDE 配置和本地历史将丢失，需重新配置",
+    "conditions": ["path_exists:~/Library/Application Support/JetBrains"],
+    "tags": ["jetbrains", "config"]
+  },
+  {
+    "id": "jetbrains-logs",
+    "name": "JetBrains IDE 日志",
+    "path": "~/Library/Logs/JetBrains",
+    "risk": "safe",
+    "size_estimate": "100 MB - 1 GB",
+    "impact": "删除后无法查看历史 IDE 日志，不影响正常使用",
+    "conditions": ["path_exists:~/Library/Logs/JetBrains"],
+    "tags": ["jetbrains", "logs"]
+  }
+]
