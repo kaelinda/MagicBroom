@@ -68,5 +68,25 @@
     "impact": "删除后 bun install 会重新下载依赖",
     "conditions": ["path_exists:~/.bun"],
     "tags": ["frontend", "bun", "package-cache"]
+  },
+  {
+    "id": "yarn-berry-cache",
+    "name": "Yarn Berry (v2+) 缓存",
+    "path": "~/.yarn/berry/cache",
+    "risk": "safe",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后 Yarn Berry 项目安装依赖需重新下载",
+    "conditions": ["path_exists:~/.yarn/berry/cache"],
+    "tags": ["frontend", "yarn", "package-cache"]
+  },
+  {
+    "id": "playwright-browsers",
+    "name": "Playwright 浏览器二进制",
+    "path": "~/Library/Caches/ms-playwright",
+    "risk": "safe",
+    "size_estimate": "1-5 GB",
+    "impact": "删除后需要 npx playwright install 重新下载浏览器",
+    "conditions": ["path_exists:~/Library/Caches/ms-playwright"],
+    "tags": ["frontend", "playwright", "browser-cache"]
   }
 ]

@@ -18,5 +18,35 @@
     "impact": "删除后重新构建镜像会更慢，但不影响已有镜像",
     "conditions": ["app:com.docker.docker"],
     "tags": ["docker", "build-cache"]
+  },
+  {
+    "id": "docker-volumes",
+    "name": "Docker 数据卷",
+    "path": "~/Library/Containers/com.docker.docker/Data/docker/volumes",
+    "risk": "danger",
+    "size_estimate": "1-50 GB",
+    "impact": "删除后所有 Docker 数据卷将丢失，数据库等持久化数据不可恢复！建议先用 docker volume prune",
+    "conditions": ["app:com.docker.docker"],
+    "tags": ["docker", "volumes"]
+  },
+  {
+    "id": "docker-image-cache",
+    "name": "Docker 镜像层缓存",
+    "path": "~/Library/Containers/com.docker.docker/Data/docker/image",
+    "risk": "warning",
+    "size_estimate": "2-30 GB",
+    "impact": "删除后所有已拉取的镜像层缓存将丢失，需重新 docker pull",
+    "conditions": ["app:com.docker.docker"],
+    "tags": ["docker", "image-cache"]
+  },
+  {
+    "id": "docker-buildx-cache",
+    "name": "Docker BuildX 缓存",
+    "path": "~/.docker/buildx",
+    "risk": "safe",
+    "size_estimate": "500 MB - 5 GB",
+    "impact": "删除后 BuildX 多平台构建器缓存将重建",
+    "conditions": ["path_exists:~/.docker/buildx"],
+    "tags": ["docker", "build-cache"]
   }
 ]

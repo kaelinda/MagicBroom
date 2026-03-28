@@ -98,5 +98,25 @@
     "impact": "删除后 pyenv install 会重新下载 Python 源码包",
     "conditions": ["path_exists:~/.pyenv/cache"],
     "tags": ["python", "pyenv", "cache"]
+  },
+  {
+    "id": "huggingface-cache",
+    "name": "HuggingFace 模型缓存",
+    "path": "~/.cache/huggingface",
+    "risk": "warning",
+    "size_estimate": "5-100 GB",
+    "impact": "删除后需要重新下载所有 HuggingFace 模型和数据集，耗时可能很长",
+    "conditions": ["path_exists:~/.cache/huggingface"],
+    "tags": ["python", "ai", "model-cache"]
+  },
+  {
+    "id": "poetry-cache",
+    "name": "Poetry 缓存",
+    "path": "~/Library/Caches/pypoetry",
+    "risk": "safe",
+    "size_estimate": "200 MB - 3 GB",
+    "impact": "删除后 poetry install 会重新下载依赖包",
+    "conditions": ["path_exists:~/Library/Caches/pypoetry"],
+    "tags": ["python", "poetry", "package-cache"]
   }
 ]

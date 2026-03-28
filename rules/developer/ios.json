@@ -149,5 +149,25 @@
     "impact": "删除后 Playground 历史运行数据将丢失",
     "conditions": ["app:com.apple.dt.Xcode"],
     "tags": ["ios", "xcode", "playground"]
+  },
+  {
+    "id": "simulator-runtimes",
+    "name": "模拟器运行时",
+    "path": "~/Library/Developer/CoreSimulator/Profiles/Runtimes",
+    "risk": "warning",
+    "size_estimate": "5-30 GB",
+    "impact": "删除后需在 Xcode → Settings → Platforms 重新下载，建议用 xcrun simctl delete unavailable 清理未使用的",
+    "conditions": ["app:com.apple.dt.Xcode"],
+    "tags": ["ios", "simulator"]
+  },
+  {
+    "id": "xcode-caches",
+    "name": "Xcode 应用缓存",
+    "path": "~/Library/Caches/com.apple.dt.Xcode",
+    "risk": "safe",
+    "size_estimate": "200 MB - 2 GB",
+    "impact": "删除后 Xcode 启动和索引会稍慢，缓存会自动重建",
+    "conditions": ["app:com.apple.dt.Xcode"],
+    "tags": ["ios", "xcode", "cache"]
   }
 ]
