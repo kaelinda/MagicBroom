@@ -95,26 +95,29 @@ export function DeveloperMode() {
             const stats = getEnvStats(env.tags)
             const Icon = env.icon
             const detected = hasData && stats.count > 0
+            const canNavigate = detected
 
-            return (
-              <Link
-                key={env.id}
-                to={`/environment/${env.id}`}
-                className="border border-gray-100/80 rounded-2xl p-5 hover:border-[#6B7FED]/30 hover:shadow-[0_4px_16px_rgba(107,127,237,0.08)] transition-all duration-200 group bg-white/40"
+            const card = (
+              <div
+                className={`border rounded-2xl p-5 transition-all duration-200 group ${
+                  canNavigate
+                    ? 'border-gray-100/80 bg-white/40 hover:border-[#6B7FED]/30 hover:shadow-[0_4px_16px_rgba(107,127,237,0.08)] cursor-pointer'
+                    : 'border-gray-100/60 bg-gray-50/30 opacity-70 cursor-default'
+                }`}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-50 to-indigo-50/50 rounded-xl flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-[#6B7FED]" />
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${canNavigate ? 'bg-gradient-to-br from-blue-50 to-indigo-50/50' : 'bg-gray-100/60'}`}>
+                      <Icon className={`w-5 h-5 ${canNavigate ? 'text-[#6B7FED]' : 'text-gray-400'}`} />
                     </div>
                     <div>
-                      <h3 className="text-[15px] font-semibold text-gray-900 mb-0.5 group-hover:text-[#6B7FED] transition-colors">
+                      <h3 className={`text-[15px] font-semibold mb-0.5 transition-colors ${canNavigate ? 'text-gray-900 group-hover:text-[#6B7FED]' : 'text-gray-500'}`}>
                         {env.name}
                       </h3>
                       <p className="text-[11px] text-gray-400">{env.description}</p>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-[#6B7FED] transition-colors mt-1" />
+                  {canNavigate && <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-[#6B7FED] transition-colors mt-1" />}
                 </div>
 
                 {detected ? (
@@ -130,10 +133,16 @@ export function DeveloperMode() {
                   </div>
                 ) : (
                   <div className="p-3 bg-gray-50/40 rounded-xl text-center">
-                    <p className="text-[12px] text-gray-400">{hasData ? '未检测到此环境' : '扫描后显示数据'}</p>
+                    <p className="text-[12px] text-gray-400">{hasData ? '未检测到此环境' : '请先扫描开发环境'}</p>
                   </div>
                 )}
-              </Link>
+              </div>
+            )
+
+            return canNavigate ? (
+              <Link key={env.id} to={`/environment/${env.id}`}>{card}</Link>
+            ) : (
+              <div key={env.id}>{card}</div>
             )
           })}
         </div>
