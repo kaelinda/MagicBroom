@@ -97,17 +97,17 @@
 
 ## 三、Scanner 引擎问题
 
-### 3.1 规则路径重叠（重复计数）
-- [ ] `xcode-derived-data` 覆盖了 `spm-repositories`（DerivedData/SourcePackages 是子目录）
-- [ ] `xcode-derived-data` 覆盖了 `xcode-logs`（DerivedData/Logs 是子目录）
-- [ ] `android-avd` 与 `android-emulator-snapshots` 指向相同路径 `~/.android/avd`
-- [ ] `homebrew-cache` 覆盖了 `homebrew-cask-cache`（Cask 是 Homebrew Caches 子目录）
-- **解决方案**：Scanner 扫描前去重 — 如果规则 A 是规则 B 的子目录，跳过规则 A 的独立计算
+### 3.1 规则路径重叠（重复计数） ✅ 已修复
+- [x] `xcode-derived-data` 覆盖了 `spm-repositories`（DerivedData/SourcePackages 是子目录）
+- [x] `xcode-derived-data` 覆盖了 `xcode-logs`（DerivedData/Logs 是子目录）
+- [x] `android-avd` 与 `android-emulator-snapshots` 指向相同路径 `~/.android/avd`
+- [x] `homebrew-cache` 覆盖了 `homebrew-cask-cache`（Cask 是 Homebrew Caches 子目录）
+- **解决方案**：Scanner 新增 `deduplicateOverlaps()` 后处理，从父路径减去子路径大小；移除 android-emulator-snapshots 重复规则
 
-### 3.2 路径动态化
-- [ ] Android Studio 版本号硬编码 `2024.3` → 应改为通配匹配（遍历 `~/Library/Caches/Google/` 找 AndroidStudio*）
-- [ ] Conda 安装位置假设 `~/miniconda3` → 也可能在 `~/anaconda3`、`/opt/anaconda3`
-- [ ] Homebrew 路径假设 `/opt/homebrew` → Intel Mac 在 `/usr/local`
+### 3.2 路径动态化 ✅ 已修复
+- [x] Android Studio 版本号硬编码 `2024.3` → 改为通配匹配 `AndroidStudio*`（RulesEngine 自动展开）
+- [x] Conda 安装位置假设 `~/miniconda3` → 新增 `~/anaconda3` 变体规则
+- [x] Homebrew 路径假设 `/opt/homebrew` → 新增 Intel Mac `/usr/local/Cellar` 规则
 
 ### 3.3 命令型清理（v2 特性）
 - [ ] Homebrew 应建议运行 `brew cleanup` 而非直接删 Cellar
@@ -119,10 +119,10 @@
 ## 四、UI/UX 问题
 
 - [ ] 环境卡片没有扫描数据时不可点击（应提示"先扫描"而非进入空详情页）
-- [ ] EnvironmentDetail 页面缺少"全选"和"反选"按钮
+- [x] EnvironmentDetail 页面缺少"全选"和"反选"按钮 ✅
 - [ ] 缺少按风险等级排序/分组的能力
 - [ ] 清理完成后应自动刷新 DeveloperMode 页面的统计数据
-- [ ] 缺少"上次扫描时间"显示
+- [x] 缺少"上次扫描时间"显示 ✅
 
 ---
 
@@ -130,11 +130,11 @@
 
 | 优先级 | 任务 | 预估工作量 |
 |--------|------|-----------|
-| **P0** | 修复规则路径重叠（重复计数） | 2h |
-| **P0** | 新增 Rust/Go/Java 环境 + 规则 | 1h |
-| **P0** | 补全 HuggingFace 模型缓存、Docker volumes、Simulator Runtimes | 30min |
-| **P1** | 路径动态化（Android Studio 版本、Conda 路径、Homebrew Intel） | 2h |
+| **P0** | ~~修复规则路径重叠（重复计数）~~ | ✅ 已完成 |
+| **P0** | ~~新增 Rust/Go/Java 环境 + 规则~~ | ✅ 已完成 |
+| **P0** | ~~补全 HuggingFace 模型缓存、Docker volumes、Simulator Runtimes~~ | ✅ 已完成 |
+| **P1** | ~~路径动态化（Android Studio 版本、Conda 路径、Homebrew Intel）~~ | ✅ 已完成 |
 | **P1** | 新增 .NET/Flutter/JetBrains 环境 | 1h |
-| **P1** | EnvironmentDetail 全选/反选 + 风险排序 | 1h |
+| **P1** | ~~EnvironmentDetail 全选/反选~~ + 风险排序 | 全选 ✅ / 排序待做 |
 | **P2** | 命令型清理建议（brew cleanup、docker prune）| 3h |
-| **P2** | 上次扫描时间显示 | 30min |
+| **P2** | ~~上次扫描时间显示~~ | ✅ 已完成 |
