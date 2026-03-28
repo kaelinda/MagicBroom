@@ -110,16 +110,6 @@
     "tags": ["android", "android-studio", "logs"]
   },
   {
-    "id": "android-emulator-snapshots",
-    "name": "模拟器快照",
-    "path": "~/.android/avd",
-    "risk": "safe",
-    "size_estimate": "500 MB - 5 GB",
-    "impact": "删除后模拟器快速启动（Quick Boot）将失效，首次启动变慢",
-    "conditions": ["path_exists:~/.android/avd"],
-    "tags": ["android", "emulator", "snapshot"]
-  },
-  {
     "id": "maven-local-repo",
     "name": "Maven 本地仓库",
     "path": "~/.m2/repository",

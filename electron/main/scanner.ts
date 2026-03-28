@@ -219,6 +219,56 @@ async function scanRule(rule: RuleDefinition): Promise<RuleResult> {
   }
 }
 
+/**
+ * 去重处理：当规则路径存在父子包含关系时，
+ * 从父路径的大小中减去子路径的大小，避免 du 重复计算。
+ *
+ * 例：DerivedData(20GB) 包含 SourcePackages(3GB) 和 Logs(1GB)，
+ * 去重后 DerivedData 显示 16GB，三项总和仍为 20GB。
+ */
+export function deduplicateOverlaps(results: RuleResult[]): void {
+  const existing = results.filter((r) => r.exists && r.size > 0)
+
+  // 1. 精确重复路径：保留首个，后续归零
+  const seen = new Set<string>()
+  for (const r of existing) {
+    if (seen.has(r.path)) {
+      r.size = 0
+    } else {
+      seen.add(r.path)
+    }
+  }
+
+  // 2. 父子包含关系：从父路径减去直接子路径大小
+  const active = existing.filter((r) => r.size > 0)
+  const activePaths = active.map((r) => r.path)
+
+  for (const parent of active) {
+    const children = active.filter(
+      (r) => r !== parent && r.path.startsWith(parent.path + '/')
+    )
+
+    let deduction = 0
+    for (const child of children) {
+      // 只减去"直接子路径"——跳过中间还有其他规则路径的情况
+      const isDirect = !activePaths.some(
+        (p) =>
+          p !== parent.path &&
+          p !== child.path &&
+          child.path.startsWith(p + '/') &&
+          p.startsWith(parent.path + '/')
+      )
+      if (isDirect) {
+        deduction += child.size
+      }
+    }
+
+    if (deduction > 0) {
+      parent.size = Math.max(0, parent.size - deduction)
+    }
+  }
+}
+
 export class Scanner {
   async scan(rules: RuleDefinition[], callbacks: ScanCallbacks, excludedPaths: string[] = []): Promise<void> {
     // 过滤排除路径：展开 ~ 后比较
@@ -265,6 +315,10 @@ export class Scanner {
       }
 
       flushBatch() // 最后一批
+
+      // 去重：消除父子路径重叠导致的重复计数
+      deduplicateOverlaps(results)
+
       const totalBytes = results.reduce((sum, r) => sum + r.size, 0)
       callbacks.onComplete(results, totalBytes)
     } catch (error) {
