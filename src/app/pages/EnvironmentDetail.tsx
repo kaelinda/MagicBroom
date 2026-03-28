@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Sparkles, AlertCircle, FolderOpen } from 'lucide-react'
+import { ArrowLeft, Sparkles, AlertCircle, FolderOpen, ArrowUpDown } from 'lucide-react'
 import { useMagicBroom } from '../hooks/useMagicBroom'
 import { useToast } from '../context/ToastContext'
 import { RiskBadge } from '../components/RiskBadge'
@@ -41,9 +41,19 @@ export function EnvironmentDetail() {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [showConfirm, setShowConfirm] = useState(false)
   const [cleanResult, setCleanResult] = useState<{ freed: number; count: number; failed: number } | null>(null)
+  const [sortBy, setSortBy] = useState<'default' | 'risk' | 'size'>('default')
 
   const config = envConfig[envId || ''] || { name: '未知环境', tags: [], description: '' }
-  const envItems = state.results.filter((r) => r.exists && r.tags.some((t) => config.tags.includes(t)))
+  const envItemsRaw = state.results.filter((r) => r.exists && r.tags.some((t) => config.tags.includes(t)))
+
+  const riskOrder = { danger: 0, warning: 1, safe: 2 } as const
+  const envItems = useMemo(() => {
+    const items = [...envItemsRaw]
+    if (sortBy === 'risk') items.sort((a, b) => riskOrder[a.risk] - riskOrder[b.risk])
+    else if (sortBy === 'size') items.sort((a, b) => b.size - a.size)
+    return items
+  }, [envItemsRaw, sortBy])
+
   const totalSize = envItems.reduce((sum, r) => sum + r.size, 0)
 
   const toggleItem = (id: string) => {
@@ -146,8 +156,24 @@ export function EnvironmentDetail() {
 
       {/* Items */}
       <div className={`${cardClass} overflow-hidden`}>
-        <div className="p-4 border-b border-gray-100/80">
+        <div className="p-4 border-b border-gray-100/80 flex items-center justify-between">
           <h2 className="text-[14px] font-semibold text-gray-900">可清理项目</h2>
+          <div className="flex items-center gap-1">
+            <ArrowUpDown className="w-3.5 h-3.5 text-gray-400" />
+            {(['default', 'risk', 'size'] as const).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => setSortBy(mode)}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors ${
+                  sortBy === mode
+                    ? 'bg-[#6B7FED]/10 text-[#6B7FED]'
+                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                {{ default: '默认', risk: '按风险', size: '按大小' }[mode]}
+              </button>
+            ))}
+          </div>
         </div>
         <div className="divide-y divide-gray-100/60">
           {envItems.map((item) => (
