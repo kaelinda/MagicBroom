@@ -188,7 +188,7 @@ export function Dashboard() {
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex items-center justify-center flex-col">
-                <div className="text-[24px] font-semibold text-gray-900 tracking-[-0.02em]">
+                <div className="text-[24px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em]">
                   {formatSize(state.totalBytes)}
                 </div>
                 <div className="text-[11px] text-gray-400">可释放</div>
@@ -199,15 +199,15 @@ export function Dashboard() {
                 <div key={i} className="flex items-center gap-3">
                   <div className="w-[10px] h-[10px] rounded-[3px] flex-shrink-0" style={{ backgroundColor: item.color }} />
                   <div className="flex-1 flex items-center justify-between">
-                    <span className="text-[13px] text-gray-700">{item.name}</span>
-                    <span className="text-[13px] font-semibold text-gray-900 tabular-nums">{formatSize(item.value)}</span>
+                    <span className="text-[13px] text-gray-700 dark:text-gray-300">{item.name}</span>
+                    <span className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 tabular-nums">{formatSize(item.value)}</span>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="flex gap-3 mt-5 pt-5 border-t border-gray-100/80">
+          <div className="flex gap-3 mt-5 pt-5 border-t border-gray-100/80 dark:border-white/[0.06]">
             <Link
               to="/scan-results"
               className="flex-1 h-[42px] bg-gradient-to-b from-[#6B7FED] to-[#5468E8] hover:from-[#7485EE] hover:to-[#5D75E9] text-white rounded-xl flex items-center justify-center gap-2 transition-all text-[13px] font-medium shadow-[0_2px_8px_rgba(107,127,237,0.3),inset_0_1px_0_rgba(255,255,255,0.15)]"
@@ -229,19 +229,19 @@ export function Dashboard() {
         <div className="col-span-4 space-y-4">
           <div className={`${cardClass} p-5`}>
             <div className="text-[12px] text-gray-400 mb-1">可释放总量</div>
-            <div className="text-[30px] font-semibold text-emerald-600 tracking-[-0.02em]">{formatSize(state.totalBytes)}</div>
+            <div className="text-[30px] font-semibold text-emerald-600 dark:text-emerald-400 tracking-[-0.02em]">{formatSize(state.totalBytes)}</div>
             <div className="text-[11px] text-gray-400 mt-0.5">{existingResults.length} 个可清理项</div>
           </div>
           <div className={`${cardClass} p-5`}>
             <div className="text-[12px] text-gray-400 mb-1">安全项目</div>
-            <div className="text-[24px] font-semibold text-gray-900 tracking-[-0.02em]">
+            <div className="text-[24px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em]">
               {existingResults.filter((r) => r.risk === 'safe').length}
             </div>
             <div className="text-[11px] text-gray-400 mt-0.5">可放心清理</div>
           </div>
           <div className={`${cardClass} p-5`}>
             <div className="text-[12px] text-gray-400 mb-1">需注意项目</div>
-            <div className="text-[24px] font-semibold text-amber-600 tracking-[-0.02em]">
+            <div className="text-[24px] font-semibold text-amber-600 dark:text-amber-400 tracking-[-0.02em]">
               {existingResults.filter((r) => r.risk !== 'safe').length}
             </div>
             <div className="text-[11px] text-gray-400 mt-0.5">建议查看影响说明</div>
@@ -253,7 +253,7 @@ export function Dashboard() {
       <div className="grid grid-cols-12 gap-5">
         <div className={`col-span-8 ${cardClass} p-6`}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[15px] font-semibold text-gray-900">占用最多</h2>
+            <h2 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100">占用最多</h2>
             <Link to="/scan-results" className="text-[12px] text-[#6B7FED] hover:text-[#5468E8] flex items-center gap-0.5 font-medium">
               查看全部
               <ChevronRight className="w-3.5 h-3.5" />
@@ -261,29 +261,29 @@ export function Dashboard() {
           </div>
           <div className="space-y-2">
             {topItems.map((item) => (
-              <div key={item.id} className="flex items-center gap-4 p-3.5 rounded-xl border border-gray-100/60 hover:border-indigo-100 hover:bg-indigo-50/40 transition-all duration-150">
+              <div key={item.id} className="flex items-center gap-4 p-3.5 rounded-xl border border-gray-100/60 dark:border-white/[0.08] hover:border-indigo-100 dark:hover:border-indigo-500/20 hover:bg-indigo-50/40 dark:hover:bg-indigo-500/[0.06] transition-all duration-150">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-[13px] font-medium text-gray-900">{item.name}</span>
+                    <span className="text-[13px] font-medium text-gray-900 dark:text-gray-100">{item.name}</span>
                     <RiskBadge level={item.risk} />
                   </div>
                   <div className="text-[12px] text-gray-400 truncate font-mono">{item.path}</div>
                 </div>
-                <div className="text-[14px] font-semibold text-gray-900 tabular-nums">{formatSize(item.size)}</div>
+                <div className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 tabular-nums">{formatSize(item.size)}</div>
               </div>
             ))}
           </div>
         </div>
 
         <div className="col-span-4 space-y-4">
-          <Link to="/scan-results" className={`${cardClass} p-5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] transition-all group block`}>
+          <Link to="/scan-results" className={`${cardClass} p-5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] transition-all group block`}>
             <TrendingUp className="w-6 h-6 text-[#6B7FED] mb-3" />
-            <div className="text-[13px] font-semibold text-gray-900 mb-0.5 group-hover:text-[#6B7FED] transition-colors">快速清理</div>
+            <div className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 mb-0.5 group-hover:text-[#6B7FED] transition-colors">快速清理</div>
             <div className="text-[12px] text-gray-400">选择并清理可释放的空间</div>
           </Link>
-          <Link to="/developer" className={`${cardClass} p-5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] transition-all group block`}>
+          <Link to="/developer" className={`${cardClass} p-5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] transition-all group block`}>
             <HardDrive className="w-6 h-6 text-emerald-500 mb-3" />
-            <div className="text-[13px] font-semibold text-gray-900 mb-0.5 group-hover:text-[#6B7FED] transition-colors">开发者模式</div>
+            <div className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 mb-0.5 group-hover:text-[#6B7FED] transition-colors">开发者模式</div>
             <div className="text-[12px] text-gray-400">按环境分类深度治理</div>
           </Link>
         </div>
