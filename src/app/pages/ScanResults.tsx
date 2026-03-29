@@ -183,14 +183,17 @@ export function ScanResults() {
                       <RiskBadge level={item.risk} />
                     </div>
                     <p className="text-[12px] text-gray-400 mb-1">{item.impact}</p>
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-[11px] text-gray-400 font-mono truncate flex-1 min-w-0">{item.path}</span>
+                    <div className="text-[11px] text-gray-400 font-mono truncate">{item.path}</div>
+                  </div>
+                  <div className="flex-shrink-0 flex flex-col items-end gap-1.5 ml-4">
+                    <div className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 tabular-nums">{formatSize(item.size)}</div>
+                    <div className="flex items-center gap-2">
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
                           window.api?.shell.showInFinder(item.path)
                         }}
-                        className="ml-auto flex-shrink-0 flex items-center gap-1 text-[10px] text-[#6B7FED] hover:text-[#5468E8] transition-colors"
+                        className="flex items-center gap-1 text-[10px] text-[#6B7FED] hover:text-[#5468E8] transition-colors"
                         title="在 Finder 中显示"
                       >
                         <FolderOpen className="w-3 h-3" />
@@ -205,16 +208,15 @@ export function ScanResults() {
                             if (res?.success) addToast('命令执行成功', 'success')
                             else addToast(`命令失败：${res?.output || '未知错误'}`, 'error')
                           }}
-                          className="flex-shrink-0 flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+                          className="flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
                           title={`运行 ${item.clean_command}`}
                         >
                           <Terminal className="w-3 h-3" />
-                          运行命令
+                          命令
                         </button>
                       )}
                     </div>
                   </div>
-                  <div className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 tabular-nums">{formatSize(item.size)}</div>
                 </div>
               </div>
             ))}
