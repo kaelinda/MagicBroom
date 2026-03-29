@@ -1,8 +1,8 @@
 @import "tailwindcss";
 @import "./theme.css";
 
-/* dark: 变体同时支持 .dark 类 和 prefers-color-scheme: dark（排除 .light 类强制浅色） */
-@custom-variant dark (&:where(.dark, .dark *)), (&:where(:not(.light, .light *)):is(@media (prefers-color-scheme: dark) *));
+/* dark: 变体统一用 .dark 类（由 JS 控制：手动切换或跟随系统） */
+@custom-variant dark (&:where(.dark, .dark *));
 
 @keyframes slideIn {
   from {

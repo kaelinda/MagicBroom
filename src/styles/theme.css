@@ -29,31 +29,7 @@
   --page-gradient: linear-gradient(135deg, #f5f7fa 0%, #eef1f5 50%, #f0f2f6 100%);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    --background: #1C1C1E;
-    --foreground: #F5F5F7;
-    --card: #2C2C2E;
-    --card-foreground: #F5F5F7;
-    --secondary: #1E2340;
-    --secondary-foreground: #8B9CF7;
-    --muted: #38383A;
-    --muted-foreground: #98989D;
-    --accent: #3A3A3C;
-    --accent-foreground: #F5F5F7;
-    --border: rgba(255, 255, 255, 0.1);
-    --safe-foreground: #6EE7B7;
-    --warning-foreground: #FCD34D;
-    --danger-foreground: #FCA5A5;
-
-    --sidebar-bg: rgba(28, 28, 30, 0.85);
-    --topbar-bg: rgba(28, 28, 30, 0.7);
-    --page-gradient: linear-gradient(135deg, #1C1C1E 0%, #2C2C2E 50%, #1C1C1E 100%);
-
-    color-scheme: dark;
-  }
-}
-
+/* 暗色变量统一由 .dark 类控制（JS 负责跟随系统 / 手动切换） */
 .dark {
   --background: #1C1C1E;
   --foreground: #F5F5F7;

@@ -5,6 +5,7 @@ import {
   Sun, Moon, Monitor,
 } from 'lucide-react'
 import { cardClass } from '../styles'
+import { applyTheme } from '../../App'
 
 type SettingsTab = 'general' | 'scan' | 'notification' | 'about'
 
@@ -84,13 +85,7 @@ export function Settings() {
   const [notifyScheduled, setNotifyScheduled] = useState(true)
   const [theme, setTheme] = useState<'system' | 'light' | 'dark'>('system')
 
-  // 应用主题到 DOM
-  useEffect(() => {
-    const root = document.documentElement
-    root.classList.remove('dark', 'light')
-    if (theme === 'dark') root.classList.add('dark')
-    else if (theme === 'light') root.classList.add('light')
-  }, [theme])
+  useEffect(() => { applyTheme(theme) }, [theme])
 
   useEffect(() => {
     window.api?.settings.get().then((s: any) => {
