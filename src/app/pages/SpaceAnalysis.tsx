@@ -104,6 +104,8 @@ export function SpaceAnalysis() {
                     <Tooltip
                       formatter={(value: number) => formatSize(value)}
                       contentStyle={{ borderRadius: 12, border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--foreground)', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', fontSize: 12 }}
+                      labelStyle={{ color: 'var(--foreground)' }}
+                      cursor={{ fill: 'var(--accent)' }}
                     />
                     <Bar dataKey="value" fill="#6B7FED" radius={[0, 6, 6, 0]} />
                   </BarChart>
