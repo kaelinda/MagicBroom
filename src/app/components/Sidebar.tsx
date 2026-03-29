@@ -1,14 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, PieChart, Trash2, Layers, Bot, Settings, Zap, PanelLeftClose, PanelLeft } from 'lucide-react'
+import { LayoutDashboard, Sparkles, Settings, Zap, PanelLeftClose, PanelLeft } from 'lucide-react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 const mainMenuItems = [
-  { path: '/', label: '控制台', icon: LayoutDashboard },
-  { path: '/space-analysis', label: '空间分析', icon: PieChart },
-  { path: '/scan-results', label: '快速清理', icon: Trash2 },
-  { path: '/developer', label: '开发者模式', icon: Layers },
-  { path: '/agent', label: 'Agent 模式', icon: Bot },
+  { path: '/', label: '首页', icon: LayoutDashboard },
+  { path: '/clean', label: '清理', icon: Sparkles },
 ]
 
 const bottomMenuItems = [

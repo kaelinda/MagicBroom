@@ -1,14 +1,12 @@
 import { useEffect } from 'react'
-import { HashRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ScanProvider } from './app/context/ScanContext'
 import { ToastProvider } from './app/context/ToastContext'
 import { AppLayout } from './app/components/AppLayout'
 import { Dashboard } from './app/pages/Dashboard'
-import { ScanResults } from './app/pages/ScanResults'
-import { DeveloperMode } from './app/pages/DeveloperMode'
+import { CleanPage } from './app/pages/CleanPage'
 import { SpaceAnalysis } from './app/pages/SpaceAnalysis'
 import { EnvironmentDetail } from './app/pages/EnvironmentDetail'
-import { AgentMode } from './app/pages/AgentMode'
 import { Settings } from './app/pages/Settings'
 
 /** 应用主题：dark/light 直接设 class，system 跟随系统偏好 */
@@ -52,12 +50,14 @@ export default function App() {
           <Routes>
             <Route element={<AppLayout />}>
               <Route index element={<Dashboard />} />
-              <Route path="scan-results" element={<ScanResults />} />
+              <Route path="clean" element={<CleanPage />} />
               <Route path="space-analysis" element={<SpaceAnalysis />} />
-              <Route path="developer" element={<DeveloperMode />} />
               <Route path="environment/:envId" element={<EnvironmentDetail />} />
-              <Route path="agent" element={<AgentMode />} />
               <Route path="settings" element={<Settings />} />
+              {/* 旧路由重定向 */}
+              <Route path="scan-results" element={<Navigate to="/clean" replace />} />
+              <Route path="developer" element={<Navigate to="/clean" replace />} />
+              <Route path="agent" element={<Navigate to="/clean" replace />} />
             </Route>
           </Routes>
         </HashRouter>

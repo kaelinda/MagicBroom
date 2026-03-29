@@ -235,24 +235,36 @@ export class RulesEngine {
   private cache = new Map<ScanMode, RuleDefinition[]>()
 
   async loadRules(mode: ScanMode): Promise<RuleDefinition[]> {
-    // 缓存命中：缓存的是原始规则，通配符每次展开（目录可能变化）
     let rawRules: RuleDefinition[]
 
-    if (this.cache.has(mode)) {
-      rawRules = this.cache.get(mode)!
-    } else {
-      rawRules = await this.loadRawRules(mode)
-      this.cache.set(mode, rawRules)
-    }
-
-    // Agent 模式：追加 Claude Code 项目动态规则
-    if (mode === 'agent') {
+    if (mode === 'smart') {
+      // Smart 模式：合并 developer + agent（不含 daily，保持开发者工具定位）
+      const [devRules, agentRules] = await Promise.all([
+        this.getCachedRawRules('developer'),
+        this.getCachedRawRules('agent'),
+      ])
       const claudeRules = await generateClaudeProjectRules()
-      rawRules = [...rawRules, ...claudeRules]
+      rawRules = [...devRules, ...agentRules, ...claudeRules]
+    } else {
+      // 缓存命中：缓存的是原始规则，通配符每次展开（目录可能变化）
+      rawRules = await this.getCachedRawRules(mode)
+
+      // Agent 模式：追加 Claude Code 项目动态规则
+      if (mode === 'agent') {
+        const claudeRules = await generateClaudeProjectRules()
+        rawRules = [...rawRules, ...claudeRules]
+      }
     }
 
     // 展开通配符路径
     return expandWildcardRules(rawRules)
+  }
+
+  private async getCachedRawRules(mode: ScanMode): Promise<RuleDefinition[]> {
+    if (this.cache.has(mode)) return this.cache.get(mode)!
+    const rules = await this.loadRawRules(mode)
+    this.cache.set(mode, rules)
+    return rules
   }
 
   private async loadRawRules(mode: ScanMode): Promise<RuleDefinition[]> {

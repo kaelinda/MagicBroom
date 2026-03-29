@@ -1,17 +1,10 @@
-import { useState } from 'react'
 import { HardDrive, Zap, TrendingUp, ChevronRight, Activity, Clock } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
 import { useMagicBroom } from '../hooks/useMagicBroom'
 import { RiskBadge } from '../components/RiskBadge'
 import { cardClass } from '../styles'
-
-function formatSize(bytes: number): string {
-  if (bytes === 0) return '0 B'
-  const units = ['B', 'KB', 'MB', 'GB', 'TB']
-  const i = Math.floor(Math.log(bytes) / Math.log(1024))
-  return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
-}
+import { formatSize } from '../utils'
 
 function formatScanTime(timestamp: number): string {
   const diff = Date.now() - timestamp
@@ -45,8 +38,6 @@ function getTagColor(tags: string[]): string {
 
 export function Dashboard() {
   const { state, startScan } = useMagicBroom()
-  const [scanMode, setScanMode] = useState<'daily' | 'developer' | 'agent'>('developer')
-  const hasData = state.status === 'complete' && state.results.length > 0
 
   // 引导式空状态
   if (state.status === 'idle') {
@@ -60,29 +51,14 @@ export function Dashboard() {
           <p className="text-[14px] text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
             专为 Mac 开发者设计的磁盘清理工具。
             <br />
-            开始第一次扫描，了解你的磁盘空间。
+            智能扫描开发环境与 AI 工具缓存。
           </p>
-          <div className="flex gap-2 mb-5 justify-center">
-            {([['developer', '开发者模式'], ['daily', '日常模式'], ['agent', 'Agent 模式']] as const).map(([mode, label]) => (
-              <button
-                key={mode}
-                onClick={() => setScanMode(mode)}
-                className={`px-4 py-2 rounded-xl text-[12px] font-medium transition-all ${
-                  scanMode === mode
-                    ? 'bg-[#6B7FED] text-white shadow-[0_1px_4px_rgba(107,127,237,0.3)]'
-                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100/60 dark:hover:bg-white/[0.06] border border-gray-200/60 dark:border-white/[0.1]'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
           <button
-            onClick={() => startScan(scanMode)}
+            onClick={() => startScan('smart')}
             className="inline-flex items-center gap-2 h-[44px] px-6 bg-gradient-to-b from-[#6B7FED] to-[#5468E8] text-white rounded-xl text-[14px] font-medium shadow-[0_2px_8px_rgba(107,127,237,0.3),inset_0_1px_0_rgba(255,255,255,0.15)] hover:shadow-[0_4px_12px_rgba(107,127,237,0.4)] transition-all"
           >
             <Zap className="w-5 h-5" />
-            开始扫描
+            Smart Scan
           </button>
         </div>
       </div>
@@ -209,14 +185,14 @@ export function Dashboard() {
 
           <div className="flex gap-3 mt-5 pt-5 border-t border-gray-100/80 dark:border-white/[0.06]">
             <Link
-              to="/scan-results"
+              to="/clean"
               className="flex-1 h-[42px] bg-gradient-to-b from-[#6B7FED] to-[#5468E8] hover:from-[#7485EE] hover:to-[#5D75E9] text-white rounded-xl flex items-center justify-center gap-2 transition-all text-[13px] font-medium shadow-[0_2px_8px_rgba(107,127,237,0.3),inset_0_1px_0_rgba(255,255,255,0.15)]"
             >
               <HardDrive className="w-4 h-4" />
               快速清理
             </Link>
             <button
-              onClick={() => startScan('developer')}
+              onClick={() => startScan('smart')}
               className="flex-1 h-[42px] bg-gradient-to-b from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl flex items-center justify-center gap-2 transition-all text-[13px] font-medium shadow-[0_2px_8px_rgba(16,185,129,0.3),inset_0_1px_0_rgba(255,255,255,0.15)]"
             >
               <Zap className="w-4 h-4" />
@@ -254,7 +230,7 @@ export function Dashboard() {
         <div className={`col-span-8 ${cardClass} p-6`}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100">占用最多</h2>
-            <Link to="/scan-results" className="text-[12px] text-[#6B7FED] hover:text-[#5468E8] flex items-center gap-0.5 font-medium">
+            <Link to="/clean" className="text-[12px] text-[#6B7FED] hover:text-[#5468E8] flex items-center gap-0.5 font-medium">
               查看全部
               <ChevronRight className="w-3.5 h-3.5" />
             </Link>
@@ -276,15 +252,15 @@ export function Dashboard() {
         </div>
 
         <div className="col-span-4 space-y-4">
-          <Link to="/scan-results" className={`${cardClass} p-5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] transition-all group block`}>
+          <Link to="/clean" className={`${cardClass} p-5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] transition-all group block`}>
             <TrendingUp className="w-6 h-6 text-[#6B7FED] mb-3" />
             <div className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 mb-0.5 group-hover:text-[#6B7FED] transition-colors">快速清理</div>
             <div className="text-[12px] text-gray-400">选择并清理可释放的空间</div>
           </Link>
-          <Link to="/developer" className={`${cardClass} p-5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] transition-all group block`}>
+          <Link to="/clean" className={`${cardClass} p-5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] transition-all group block`}>
             <HardDrive className="w-6 h-6 text-emerald-500 mb-3" />
-            <div className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 mb-0.5 group-hover:text-[#6B7FED] transition-colors">开发者模式</div>
-            <div className="text-[12px] text-gray-400">按环境分类深度治理</div>
+            <div className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 mb-0.5 group-hover:text-[#6B7FED] transition-colors">清理详情</div>
+            <div className="text-[12px] text-gray-400">按环境和类型查看清理项</div>
           </Link>
         </div>
       </div>

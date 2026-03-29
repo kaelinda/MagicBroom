@@ -31,11 +31,11 @@ export function Topbar() {
           <Bell className="w-[17px] h-[17px] text-gray-500" style={{ strokeWidth: 1.8 }} />
         </button>
         <Link
-          to="/scan-results"
+          to="/clean"
           className="flex items-center gap-1.5 h-[34px] px-3.5 bg-gradient-to-b from-[#6B7FED] to-[#5468E8] text-white rounded-[9px] text-[12px] font-medium shadow-[0_1px_3px_rgba(107,127,237,0.3),inset_0_1px_0_rgba(255,255,255,0.15)] hover:shadow-[0_2px_6px_rgba(107,127,237,0.4)] transition-all duration-200"
         >
           <Sparkles className="w-[14px] h-[14px]" style={{ strokeWidth: 2 }} />
-          快速扫描
+          清理
         </Link>
       </div>
     </header>

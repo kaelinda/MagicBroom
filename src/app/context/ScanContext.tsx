@@ -33,6 +33,7 @@ type ScanAction =
   | { type: 'SCAN_ERROR'; error: string }
   | { type: 'TOGGLE_ITEM'; id: string }
   | { type: 'SELECT_ALL' }
+  | { type: 'SELECT_SAFE'; visibleIds?: Set<string> }
   | { type: 'DESELECT_ALL' }
   | { type: 'RESET' }
 
@@ -78,6 +79,12 @@ function scanReducer(state: ScanState, action: ScanAction): ScanState {
         ...state,
         selectedItems: new Set(state.results.filter((r) => r.exists).map((r) => r.id)),
       }
+    case 'SELECT_SAFE': {
+      const safeIds = state.results
+        .filter((r) => r.exists && r.risk === 'safe' && (!action.visibleIds || action.visibleIds.has(r.id)))
+        .map((r) => r.id)
+      return { ...state, selectedItems: new Set([...state.selectedItems, ...safeIds]) }
+    }
     case 'DESELECT_ALL':
       return { ...state, selectedItems: new Set() }
     case 'RESET':
