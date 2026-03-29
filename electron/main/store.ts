@@ -11,6 +11,7 @@ export interface AppSettings {
   notifyComplete: boolean
   notifyLowSpace: boolean
   notifyScheduled: boolean
+  theme: 'system' | 'light' | 'dark'
 }
 
 const defaults: AppSettings = {
@@ -28,6 +29,7 @@ const defaults: AppSettings = {
   notifyComplete: true,
   notifyLowSpace: true,
   notifyScheduled: true,
+  theme: 'system',
 }
 
 const store = new Store<AppSettings>({ defaults })

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { HashRouter, Routes, Route } from 'react-router-dom'
 import { ScanProvider } from './app/context/ScanContext'
 import { ToastProvider } from './app/context/ToastContext'
@@ -10,7 +11,21 @@ import { EnvironmentDetail } from './app/pages/EnvironmentDetail'
 import { AgentMode } from './app/pages/AgentMode'
 import { Settings } from './app/pages/Settings'
 
+function applyTheme(theme: string) {
+  const root = document.documentElement
+  root.classList.remove('dark', 'light')
+  if (theme === 'dark') root.classList.add('dark')
+  else if (theme === 'light') root.classList.add('light')
+}
+
 export default function App() {
+  // 启动时立即从持久化设置加载主题
+  useEffect(() => {
+    window.api?.settings.get().then((s: any) => {
+      if (s?.theme) applyTheme(s.theme)
+    }).catch(() => {})
+  }, [])
+
   return (
     <ToastProvider>
       <ScanProvider>

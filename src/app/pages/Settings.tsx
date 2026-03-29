@@ -84,18 +84,12 @@ export function Settings() {
   const [notifyScheduled, setNotifyScheduled] = useState(true)
   const [theme, setTheme] = useState<'system' | 'light' | 'dark'>('system')
 
-  // 应用主题
+  // 应用主题到 DOM
   useEffect(() => {
     const root = document.documentElement
-    if (theme === 'dark') {
-      root.classList.add('dark')
-      root.classList.remove('light')
-    } else if (theme === 'light') {
-      root.classList.add('light')
-      root.classList.remove('dark')
-    } else {
-      root.classList.remove('dark', 'light')
-    }
+    root.classList.remove('dark', 'light')
+    if (theme === 'dark') root.classList.add('dark')
+    else if (theme === 'light') root.classList.add('light')
   }, [theme])
 
   useEffect(() => {
@@ -111,6 +105,7 @@ export function Settings() {
         setNotifyComplete(s.notifyComplete ?? true)
         setNotifyLowSpace(s.notifyLowSpace ?? true)
         setNotifyScheduled(s.notifyScheduled ?? true)
+        if (s.theme) setTheme(s.theme)
       }
     }).catch(() => {})
   }, [])
@@ -174,7 +169,7 @@ export function Settings() {
                       return (
                         <button
                           key={opt.id}
-                          onClick={() => setTheme(opt.id)}
+                          onClick={() => { setTheme(opt.id); persist('theme', opt.id) }}
                           className={`flex items-center gap-1.5 px-3 py-[6px] rounded-lg text-[11px] font-medium transition-all ${
                             active
                               ? 'bg-[#6B7FED] text-white shadow-[0_1px_4px_rgba(107,127,237,0.3)]'
