@@ -229,12 +229,14 @@ export function CleanPage() {
   // "AI & 会话"视图：orphan/stale/tools 分组
   const renderAgentView = () => {
     const agentItems = filteredResults.filter((r) => r.tags.some((t) => t === 'agent'))
-    const orphans = agentItems.filter((i) => i.tags.includes('orphan'))
+    const orphanUnknown = agentItems.filter((i) => i.tags.includes('orphan-unknown'))
+    const orphanDeleted = agentItems.filter((i) => i.tags.includes('orphan-deleted'))
     const stale = agentItems.filter((i) => i.tags.includes('stale'))
     const tools = agentItems.filter((i) => !i.tags.includes('orphan') && !i.tags.includes('stale'))
 
     const groups = [
-      { key: 'orphan', label: '孤儿会话（项目目录已不存在）', icon: Ghost, items: orphans, color: 'text-red-500' },
+      { key: 'orphan-unknown', label: '残留会话（无法识别原始项目）', icon: Ghost, items: orphanUnknown, color: 'text-red-500' },
+      { key: 'orphan-deleted', label: '孤儿会话（项目目录已删除）', icon: Ghost, items: orphanDeleted, color: 'text-orange-500' },
       { key: 'stale', label: '陈旧会话（超过 30 天未活跃）', icon: Clock, items: stale, color: 'text-amber-500' },
       { key: 'tools', label: 'AI 工具缓存', icon: Bot, items: tools, color: 'text-violet-500' },
     ].filter((g) => g.items.length > 0)

@@ -202,16 +202,33 @@ async function generateClaudeProjectRules(): Promise<RuleDefinition[]> {
     const shortName = projectCwd ? basename(projectCwd) : entry
     const tilded = '~/.claude/projects/' + entry
 
-    if (!projectExists) {
-      const displayPath = projectCwd || '(无法识别的项目)'
+    if (!projectExists && !projectCwd) {
+      // 无法识别：连项目路径都解析不出来，最可能是残留垃圾
+      const daysInfo = latestMtime > 0
+        ? `${Math.floor((now - latestMtime) / (24 * 60 * 60 * 1000))} 天未活跃`
+        : '活跃时间未知'
       rules.push({
         id: `claude-orphan-${entry.toLowerCase().slice(0, 40)}`,
-        name: `孤儿会话：${shortName}`,
+        name: `残留会话：${shortName}（${daysInfo}）`,
+        path: tilded,
+        risk: 'safe',
+        size_estimate: '10 MB - 500 MB',
+        impact: `无法识别原始项目路径，可能是已删除项目的残留数据，删除后对话记录不可恢复`,
+        tags: ['agent', 'claude-code', 'orphan', 'orphan-unknown'],
+      })
+    } else if (!projectExists && projectCwd) {
+      // 项目已删除：知道原始路径但目录已不存在
+      const daysInfo = latestMtime > 0
+        ? `${Math.floor((now - latestMtime) / (24 * 60 * 60 * 1000))} 天未活跃`
+        : '活跃时间未知'
+      rules.push({
+        id: `claude-orphan-${entry.toLowerCase().slice(0, 40)}`,
+        name: `孤儿会话：${shortName}（${daysInfo}，项目已删除）`,
         path: tilded,
         risk: 'warning',
         size_estimate: '10 MB - 500 MB',
-        impact: `项目目录 ${displayPath} 已不存在，删除后该项目的对话记录不可恢复`,
-        tags: ['agent', 'claude-code', 'orphan'],
+        impact: `项目目录 ${projectCwd} 已不存在，删除后该项目的对话记录不可恢复`,
+        tags: ['agent', 'claude-code', 'orphan', 'orphan-deleted'],
       })
     } else if (latestMtime > 0 && now - latestMtime > STALE_MS) {
       const daysAgo = Math.floor((now - latestMtime) / (24 * 60 * 60 * 1000))
