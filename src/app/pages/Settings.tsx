@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import {
   Settings as SettingsIcon, HardDrive, Bell, Info,
   Trash2, RotateCcw, FolderOpen, XCircle, ExternalLink, Plus, Shield,
+  Sun, Moon, Monitor,
 } from 'lucide-react'
 import { cardClass } from '../styles'
 
@@ -81,6 +82,21 @@ export function Settings() {
   const [notifyComplete, setNotifyComplete] = useState(true)
   const [notifyLowSpace, setNotifyLowSpace] = useState(true)
   const [notifyScheduled, setNotifyScheduled] = useState(true)
+  const [theme, setTheme] = useState<'system' | 'light' | 'dark'>('system')
+
+  // 应用主题
+  useEffect(() => {
+    const root = document.documentElement
+    if (theme === 'dark') {
+      root.classList.add('dark')
+      root.classList.remove('light')
+    } else if (theme === 'light') {
+      root.classList.add('light')
+      root.classList.remove('dark')
+    } else {
+      root.classList.remove('dark', 'light')
+    }
+  }, [theme])
 
   useEffect(() => {
     window.api?.settings.get().then((s: any) => {
@@ -145,6 +161,34 @@ export function Settings() {
         <div className="flex-1 min-w-0">
           {activeTab === 'general' && (
             <>
+              <SectionCard title="外观">
+                <SettingRow label="主题模式" desc="切换浅色、暗色或跟随系统">
+                  <div className="flex gap-1">
+                    {([
+                      { id: 'system' as const, icon: Monitor, label: '跟随系统' },
+                      { id: 'light' as const, icon: Sun, label: '浅色' },
+                      { id: 'dark' as const, icon: Moon, label: '暗色' },
+                    ]).map((opt) => {
+                      const Icon = opt.icon
+                      const active = theme === opt.id
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() => setTheme(opt.id)}
+                          className={`flex items-center gap-1.5 px-3 py-[6px] rounded-lg text-[11px] font-medium transition-all ${
+                            active
+                              ? 'bg-[#6B7FED] text-white shadow-[0_1px_4px_rgba(107,127,237,0.3)]'
+                              : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100/60 dark:hover:bg-white/[0.06] border border-gray-200/60 dark:border-white/[0.1]'
+                          }`}
+                        >
+                          <Icon className="w-3.5 h-3.5" />
+                          {opt.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </SettingRow>
+              </SectionCard>
               <SectionCard title="启动与运行">
                 <SettingRow label="开机自动启动" desc="登录 macOS 后自动启动">
                   <Toggle enabled={autoStart} onChange={() => { setAutoStart(!autoStart); persist('autoStart', !autoStart) }} />

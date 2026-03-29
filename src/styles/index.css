@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "./theme.css";
 
+/* dark: 变体同时支持 .dark 类 和 prefers-color-scheme: dark（排除 .light 类强制浅色） */
+@custom-variant dark (&:where(.dark, .dark *)), (&:where(:not(.light, .light *)):is(@media (prefers-color-scheme: dark) *));
+
 @keyframes slideIn {
   from {
     opacity: 0;
