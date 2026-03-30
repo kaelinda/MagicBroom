@@ -20,8 +20,8 @@ export function registerIpcHandlers(): void {
     const jobId = `scan-${Date.now()}`
     const rules = await rulesEngine.loadRules(args.mode)
 
-    // 获取排除路径——Agent 模式不排除 AI 工具路径（用户明确选择扫描它们）
-    const excludedPaths = args.mode === 'agent' ? [] : getExcludedPaths()
+    // Smart 和 Agent 模式不排除 AI 工具路径（默认排除列表含 ~/.claude 等路径）
+    const excludedPaths = (args.mode === 'agent' || args.mode === 'smart') ? [] : getExcludedPaths()
 
     scanner.scan(rules, {
       onProgress: (items, progress) => {

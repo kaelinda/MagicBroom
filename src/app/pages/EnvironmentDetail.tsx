@@ -94,11 +94,11 @@ export function EnvironmentDetail() {
   return (
     <div className="p-8 max-w-[1400px] mx-auto">
       <Link
-        to="/developer"
+        to="/clean"
         className="inline-flex items-center gap-1.5 text-[12px] text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 mb-5 transition-colors"
       >
         <ArrowLeft className="w-3.5 h-3.5" />
-        返回开发者模式
+        返回清理
       </Link>
 
       {/* Header */}

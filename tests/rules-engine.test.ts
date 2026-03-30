@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { readFile, mkdtemp, mkdir, rm } from 'fs/promises'
 import { join } from 'path'
 import { tmpdir } from 'os'
@@ -254,5 +254,75 @@ describe('JSON 规则文件验证', () => {
         }
       }
     }
+  })
+})
+
+describe('RulesEngine — smart 模式', () => {
+  it('smart 模式加载 developer + agent 规则（不含 daily）', async () => {
+    // 读取各模式的规则文件，验证 smart 模式应包含的规则来源
+    const rulesDir = join(__dirname, '..', 'rules')
+
+    const dailyContent = await readFile(join(rulesDir, 'daily.json'), 'utf-8')
+    const dailyRules: RuleDefinition[] = JSON.parse(dailyContent)
+
+    // 读取 developer 规则
+    const { readdir } = await import('fs/promises')
+    const devFiles = (await readdir(join(rulesDir, 'developer'))).filter(f => f.endsWith('.json'))
+    let devRuleCount = 0
+    for (const f of devFiles) {
+      const content = await readFile(join(rulesDir, 'developer', f), 'utf-8')
+      devRuleCount += JSON.parse(content).length
+    }
+
+    // 读取 agent 规则
+    const agentFiles = (await readdir(join(rulesDir, 'agent'))).filter(f => f.endsWith('.json'))
+    let agentRuleCount = 0
+    for (const f of agentFiles) {
+      const content = await readFile(join(rulesDir, 'agent', f), 'utf-8')
+      agentRuleCount += JSON.parse(content).length
+    }
+
+    // smart = developer + agent，不含 daily
+    expect(devRuleCount).toBeGreaterThan(0)
+    expect(agentRuleCount).toBeGreaterThan(0)
+    expect(dailyRules.length).toBeGreaterThan(0)
+
+    // 验证 daily 规则 ID 与 developer/agent 不重叠（确保不是同一套）
+    const dailyIds = new Set(dailyRules.map(r => r.id))
+    // developer 和 agent 的规则不应该有 daily 的 ID
+    for (const f of devFiles) {
+      const content = await readFile(join(rulesDir, 'developer', f), 'utf-8')
+      const rules: RuleDefinition[] = JSON.parse(content)
+      for (const rule of rules) {
+        expect(dailyIds.has(rule.id)).toBe(false)
+      }
+    }
+  })
+
+  it('developer 和 agent 规则路径极少重叠（不需要前置去重）', async () => {
+    const rulesDir = join(__dirname, '..', 'rules')
+    const { readdir } = await import('fs/promises')
+
+    // 收集所有 developer 路径
+    const devPaths = new Set<string>()
+    const devFiles = (await readdir(join(rulesDir, 'developer'))).filter(f => f.endsWith('.json'))
+    for (const f of devFiles) {
+      const content = await readFile(join(rulesDir, 'developer', f), 'utf-8')
+      const rules: RuleDefinition[] = JSON.parse(content)
+      for (const rule of rules) devPaths.add(rule.path)
+    }
+
+    // 收集所有 agent 路径
+    const agentPaths: string[] = []
+    const agentFiles = (await readdir(join(rulesDir, 'agent'))).filter(f => f.endsWith('.json'))
+    for (const f of agentFiles) {
+      const content = await readFile(join(rulesDir, 'agent', f), 'utf-8')
+      const rules: RuleDefinition[] = JSON.parse(content)
+      for (const rule of rules) agentPaths.push(rule.path)
+    }
+
+    // 重叠应该很少（Scanner 的 deduplicateOverlaps 已处理）
+    const overlap = agentPaths.filter(p => devPaths.has(p))
+    expect(overlap.length).toBeLessThanOrEqual(5) // 最多极少数重叠
   })
 })

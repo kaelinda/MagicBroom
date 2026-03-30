@@ -1,4 +1,4 @@
-export type ScanMode = 'daily' | 'developer' | 'agent'
+export type ScanMode = 'daily' | 'developer' | 'agent' | 'smart'
 
 export type RiskLevel = 'safe' | 'warning' | 'danger'
 
