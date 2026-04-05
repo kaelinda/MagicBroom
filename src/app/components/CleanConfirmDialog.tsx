@@ -1,5 +1,5 @@
 import { AlertTriangle, Trash2, Shield } from 'lucide-react'
-import type { ScanItem } from '../context/ScanContext'
+import type { RiskLevel } from '../context/ScanContext'
 
 function formatSize(bytes: number): string {
   if (bytes === 0) return '0 B'
@@ -9,7 +9,7 @@ function formatSize(bytes: number): string {
 }
 
 interface CleanConfirmDialogProps {
-  items: ScanItem[]
+  items: Array<{ name: string; risk: RiskLevel }>
   totalSize: number
   onConfirm: () => void
   onCancel: () => void

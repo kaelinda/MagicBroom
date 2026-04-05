@@ -43,11 +43,16 @@ contextBridge.exposeInMainWorld('api', {
       ipcRenderer.invoke('shell:show-in-finder', { path }),
     selectDirectory: () =>
       ipcRenderer.invoke('shell:select-directory'),
+    openExternal: (url: string) =>
+      ipcRenderer.invoke('shell:open-external', { url }),
+    listDirectoryChildren: (path: string) =>
+      ipcRenderer.invoke('shell:list-directory-children', { path }),
   },
   settings: {
     get: () => ipcRenderer.invoke('settings:get'),
     update: (settings: Record<string, unknown>) =>
       ipcRenderer.invoke('settings:update', settings),
+    reset: () => ipcRenderer.invoke('settings:reset'),
   },
   schedule: {
     list: () => ipcRenderer.invoke('schedule:list'),

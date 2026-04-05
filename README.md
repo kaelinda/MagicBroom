@@ -42,7 +42,36 @@
 - **Apple Silicon Mac** (M1/M2/M3/M4) → `magicbroom-x.x.x-arm64.dmg`
 - **Intel Mac** → `magicbroom-x.x.x-x64.dmg`
 
-首次打开需右键 → 打开（ad-hoc 签名，未经 Apple 公证）。
+当前版本未做 Apple Developer ID 签名和公证，首次打开时 macOS 可能会提示“无法验证开发者”。
+
+### macOS 未签名应用如何打开
+
+如果你下载的是 Releases 里的 `.dmg`，推荐按下面的顺序操作：
+
+1. 打开 `.dmg`，将 `MagicBroom.app` 拖到“应用程序”目录。
+2. 不要直接双击，先在“应用程序”里找到 `MagicBroom.app`。
+3. 右键应用，选择“打开”。
+4. 系统弹窗里再次点击“打开”。
+
+如果你已经双击过一次并被 Gatekeeper 拦截，可以这样处理：
+
+1. 打开“系统设置” → “隐私与安全性”。
+2. 滚动到页面底部，找到“已阻止使用 MagicBroom”之类的提示。
+3. 点击“仍要打开”。
+4. 再次启动应用，并在弹窗中确认“打开”。
+
+如果你更习惯终端，也可以手动去掉隔离属性：
+
+```bash
+xattr -dr com.apple.quarantine /Applications/MagicBroom.app
+```
+
+然后重新打开应用即可。
+
+说明：
+
+- 这是因为应用当前没有经过 Apple 公证，不代表应用本身一定有问题。
+- 只建议对你确认来源可信的应用执行以上操作。
 
 ### 从源码构建
 

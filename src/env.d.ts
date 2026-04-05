@@ -27,6 +27,7 @@ interface MagicBroomAPI {
   settings: {
     get: () => Promise<Record<string, unknown>>
     update: (settings: Record<string, unknown>) => Promise<Record<string, unknown>>
+    reset: () => Promise<Record<string, unknown>>
   }
   updater: {
     check: () => Promise<void>
@@ -36,6 +37,8 @@ interface MagicBroomAPI {
   shell: {
     showInFinder: (path: string) => Promise<void>
     selectDirectory: () => Promise<string | null>
+    openExternal: (url: string) => Promise<void>
+    listDirectoryChildren: (path: string) => Promise<Array<{ name: string; path: string; size: number }>>
   }
   tray: {
     getConfig: () => Promise<{ minimizeToTray: boolean; showDiskUsage: boolean }>

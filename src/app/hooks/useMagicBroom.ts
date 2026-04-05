@@ -48,8 +48,8 @@ export function useMagicBroom() {
     [dispatch, addToast],
   )
 
-  const executeCleaning = useCallback(async () => {
-    const paths = state.results
+  const executeCleaning = useCallback(async (overridePaths?: string[]) => {
+    const paths = overridePaths ?? state.results
       .filter((r) => state.selectedItems.has(r.id) && r.exists)
       .map((r) => r.path)
 
@@ -57,6 +57,9 @@ export function useMagicBroom() {
 
     try {
       const result = await window.api?.clean.execute(paths)
+      if (result && result.succeeded.length > 0) {
+        dispatch({ type: 'CLEAN_COMPLETE', succeededPaths: result.succeeded })
+      }
       if (result && result.failed.length > 0) {
         const failCount = result.failed.length
         addToast(`${failCount} 个项目清理失败，请检查权限`, 'warning')
@@ -66,7 +69,7 @@ export function useMagicBroom() {
       addToast(`清理出错：${String(err)}`, 'error')
       return { freed: 0, succeeded: [] as string[], failed: [{ path: '', error: String(err) }] }
     }
-  }, [state.results, state.selectedItems, addToast])
+  }, [state.results, state.selectedItems, addToast, dispatch])
 
   const dryRun = useCallback(async () => {
     const paths = state.results

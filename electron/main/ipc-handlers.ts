@@ -5,8 +5,9 @@ import { Cleaner } from './cleaner'
 import { RulesEngine } from './rules-engine'
 import { updateTrayConfig, getTrayConfig } from './tray'
 import { checkForUpdates, getAppVersion } from './updater'
-import { getSettings, updateSettings, getExcludedPaths } from './store'
+import { getSettings, updateSettings, getExcludedPaths, resetSettings } from './store'
 import { scheduledTaskManager } from './scheduled-task-manager'
+import { listImmediateChildDirectories } from './directory-children'
 import type { ScanMode } from './types'
 
 const scanner = new Scanner()
@@ -73,6 +74,14 @@ export function registerIpcHandlers(): void {
     return result.filePaths[0]
   })
 
+  ipcMain.handle('shell:open-external', async (_event, args: { url: string }) => {
+    await shell.openExternal(args.url)
+  })
+
+  ipcMain.handle('shell:list-directory-children', async (_event, args: { path: string }) => {
+    return listImmediateChildDirectories(args.path)
+  })
+
   // 设置持久化
   ipcMain.handle('settings:get', async () => {
     return getSettings()
@@ -80,6 +89,10 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('settings:update', async (_event, args: Record<string, unknown>) => {
     return updateSettings(args as any)
+  })
+
+  ipcMain.handle('settings:reset', async () => {
+    return resetSettings()
   })
 
   // 托盘设置

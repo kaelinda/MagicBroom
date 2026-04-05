@@ -6,6 +6,9 @@ import {
 } from 'lucide-react'
 import { cardClass } from '../styles'
 import { applyTheme } from '../../App'
+import { aboutSupportLinks } from '../settings-meta'
+import { useScan } from '../context/ScanContext'
+import { useToast } from '../context/ToastContext'
 
 type SettingsTab = 'general' | 'scan' | 'notification' | 'about'
 
@@ -72,6 +75,8 @@ const tabs: { id: SettingsTab; label: string; icon: React.ElementType }[] = [
 ]
 
 export function Settings() {
+  const { dispatch } = useScan()
+  const { addToast } = useToast()
   const [activeTab, setActiveTab] = useState<SettingsTab>('general')
   const [autoStart, setAutoStart] = useState(true)
   const [minimizeToTray, setMinimizeToTray] = useState(true)
@@ -84,26 +89,30 @@ export function Settings() {
   const [notifyLowSpace, setNotifyLowSpace] = useState(true)
   const [notifyScheduled, setNotifyScheduled] = useState(true)
   const [theme, setTheme] = useState<'system' | 'light' | 'dark'>('system')
+  const [version, setVersion] = useState('...')
 
   useEffect(() => { applyTheme(theme) }, [theme])
 
+  const applySettings = useCallback((s: Record<string, unknown>) => {
+    setAutoStart((s.autoStart as boolean | undefined) ?? true)
+    setMinimizeToTray((s.minimizeToTray as boolean | undefined) ?? true)
+    setAutoUpdate((s.autoUpdate as boolean | undefined) ?? true)
+    setSkipSystemFiles((s.skipSystemFiles as boolean | undefined) ?? true)
+    setConfirmBeforeDelete((s.confirmBeforeDelete as boolean | undefined) ?? true)
+    setMoveToTrash((s.moveToTrash as boolean | undefined) ?? true)
+    setExcluded((s.excludedPaths as string[] | undefined) ?? [])
+    setNotifyComplete((s.notifyComplete as boolean | undefined) ?? true)
+    setNotifyLowSpace((s.notifyLowSpace as boolean | undefined) ?? true)
+    setNotifyScheduled((s.notifyScheduled as boolean | undefined) ?? true)
+    setTheme((s.theme as 'system' | 'light' | 'dark' | undefined) ?? 'system')
+  }, [])
+
   useEffect(() => {
     window.api?.settings.get().then((s: any) => {
-      if (s) {
-        setAutoStart(s.autoStart ?? true)
-        setMinimizeToTray(s.minimizeToTray ?? true)
-        setAutoUpdate(s.autoUpdate ?? true)
-        setSkipSystemFiles(s.skipSystemFiles ?? true)
-        setConfirmBeforeDelete(s.confirmBeforeDelete ?? true)
-        setMoveToTrash(s.moveToTrash ?? true)
-        setExcluded(s.excludedPaths ?? [])
-        setNotifyComplete(s.notifyComplete ?? true)
-        setNotifyLowSpace(s.notifyLowSpace ?? true)
-        setNotifyScheduled(s.notifyScheduled ?? true)
-        if (s.theme) setTheme(s.theme)
-      }
+      if (s) applySettings(s)
     }).catch(() => {})
-  }, [])
+    window.api?.updater.getVersion().then((v) => setVersion(v)).catch(() => setVersion('0.6.0'))
+  }, [applySettings])
 
   const persist = useCallback((key: string, value: unknown) => {
     window.api?.settings.update({ [key]: value })
@@ -116,6 +125,35 @@ export function Settings() {
       return next
     })
   }, [])
+
+  const openExternalLink = useCallback(async (url: string) => {
+    try {
+      await window.api?.shell.openExternal(url)
+    } catch {
+      window.open(url, '_blank', 'noopener,noreferrer')
+    }
+  }, [])
+
+  const clearAppCache = useCallback(() => {
+    dispatch({ type: 'RESET' })
+    addToast('已清除本次扫描结果缓存', 'success')
+  }, [addToast, dispatch])
+
+  const resetAllSettings = useCallback(async () => {
+    const confirmed = window.confirm('确定要恢复默认设置吗？这不会删除任何文件。')
+    if (!confirmed) return
+
+    try {
+      const settings = await window.api?.settings.reset()
+      if (settings) {
+        applySettings(settings)
+        applyTheme((settings.theme as 'system' | 'light' | 'dark' | undefined) ?? 'system')
+      }
+      addToast('设置已恢复默认值', 'success')
+    } catch (error) {
+      addToast(`重置设置失败：${String(error)}`, 'error')
+    }
+  }, [addToast, applySettings])
 
   return (
     <div className="p-8 max-w-[1400px] mx-auto">
@@ -200,12 +238,12 @@ export function Settings() {
               </SectionCard>
               <SectionCard title="数据管理">
                 <SettingRow label="清除应用缓存" desc="不影响扫描结果">
-                  <button className="px-3.5 py-[7px] rounded-lg border border-gray-200/60 dark:border-white/[0.1] text-[12px] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/[0.06] transition-colors flex items-center gap-1.5">
+                  <button onClick={clearAppCache} className="px-3.5 py-[7px] rounded-lg border border-gray-200/60 dark:border-white/[0.1] text-[12px] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/[0.06] transition-colors flex items-center gap-1.5">
                     <Trash2 className="w-3 h-3" />清除
                   </button>
                 </SettingRow>
                 <SettingRow label="重置所有设置" desc="恢复默认值">
-                  <button className="px-3.5 py-[7px] rounded-lg border border-red-200/60 dark:border-red-500/20 text-[12px] text-red-500 hover:bg-red-50 dark:hover:bg-red-500/[0.08] transition-colors flex items-center gap-1.5">
+                  <button onClick={() => void resetAllSettings()} className="px-3.5 py-[7px] rounded-lg border border-red-200/60 dark:border-red-500/20 text-[12px] text-red-500 hover:bg-red-50 dark:hover:bg-red-500/[0.08] transition-colors flex items-center gap-1.5">
                     <RotateCcw className="w-3 h-3" />重置
                   </button>
                 </SettingRow>
@@ -310,7 +348,7 @@ export function Settings() {
                   <div>
                     <div className="text-[17px] font-semibold text-gray-900 dark:text-gray-100 mb-0.5">MagicBroom</div>
                     <div className="text-[12px] text-gray-400 mb-2">专业的磁盘空间治理工具</div>
-                    <span className="px-2 py-1 bg-[#6B7FED]/10 text-[#6B7FED] rounded-lg text-[11px] font-medium">v0.5.0</span>
+                    <span className="px-2 py-1 bg-[#6B7FED]/10 text-[#6B7FED] rounded-lg text-[11px] font-medium">v{version}</span>
                   </div>
                 </div>
               </SectionCard>
@@ -318,9 +356,9 @@ export function Settings() {
                 <SettingRow label="使用许可">
                   <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-500/[0.1] text-emerald-700 dark:text-emerald-400 rounded-lg text-[11px] font-medium border border-emerald-200/60 dark:border-emerald-500/20">开源版</span>
                 </SettingRow>
-                {['查看更新日志', '发送反馈', '帮助文档'].map((item) => (
-                  <SettingRow key={item} label={item}>
-                    <button className="flex items-center gap-1 text-[12px] text-[#6B7FED] hover:text-[#5468E8] transition-colors">打开<ExternalLink className="w-3 h-3" /></button>
+                {aboutSupportLinks.map((item) => (
+                  <SettingRow key={item.id} label={item.label}>
+                    <button onClick={() => void openExternalLink(item.href)} className="flex items-center gap-1 text-[12px] text-[#6B7FED] hover:text-[#5468E8] transition-colors">打开<ExternalLink className="w-3 h-3" /></button>
                   </SettingRow>
                 ))}
               </SectionCard>

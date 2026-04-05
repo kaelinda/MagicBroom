@@ -1,10 +1,11 @@
-import { HardDrive, Zap, TrendingUp, ChevronRight, Activity, Clock } from 'lucide-react'
+import { HardDrive, Zap, ChevronRight, Activity, Clock } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
 import { useMagicBroom } from '../hooks/useMagicBroom'
 import { RiskBadge } from '../components/RiskBadge'
 import { cardClass } from '../styles'
 import { formatSize } from '../utils'
+import { dashboardQuickActionItems } from '../navigation'
 
 function formatScanTime(timestamp: number): string {
   const diff = Date.now() - timestamp
@@ -230,7 +231,7 @@ export function Dashboard() {
         <div className={`col-span-8 ${cardClass} p-6`}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100">占用最多</h2>
-            <Link to="/clean" className="text-[12px] text-[#6B7FED] hover:text-[#5468E8] flex items-center gap-0.5 font-medium">
+            <Link to="/space-analysis" className="text-[12px] text-[#6B7FED] hover:text-[#5468E8] flex items-center gap-0.5 font-medium">
               查看全部
               <ChevronRight className="w-3.5 h-3.5" />
             </Link>
@@ -252,16 +253,16 @@ export function Dashboard() {
         </div>
 
         <div className="col-span-4 space-y-4">
-          <Link to="/clean" className={`${cardClass} p-5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] transition-all group block`}>
-            <TrendingUp className="w-6 h-6 text-[#6B7FED] mb-3" />
-            <div className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 mb-0.5 group-hover:text-[#6B7FED] transition-colors">快速清理</div>
-            <div className="text-[12px] text-gray-400">选择并清理可释放的空间</div>
-          </Link>
-          <Link to="/clean" className={`${cardClass} p-5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] transition-all group block`}>
-            <HardDrive className="w-6 h-6 text-emerald-500 mb-3" />
-            <div className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 mb-0.5 group-hover:text-[#6B7FED] transition-colors">清理详情</div>
-            <div className="text-[12px] text-gray-400">按环境和类型查看清理项</div>
-          </Link>
+          {dashboardQuickActionItems.map((item) => {
+            const Icon = item.icon
+            return (
+              <Link key={item.path} to={item.path} className={`${cardClass} p-5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] transition-all group block`}>
+                <Icon className={`w-6 h-6 mb-3 ${item.iconClassName}`} />
+                <div className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 mb-0.5 group-hover:text-[#6B7FED] transition-colors">{item.label}</div>
+                <div className="text-[12px] text-gray-400">{item.description}</div>
+              </Link>
+            )
+          })}
         </div>
       </div>
     </div>

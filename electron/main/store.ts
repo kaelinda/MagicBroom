@@ -49,6 +49,11 @@ export function updateSettings(partial: Partial<AppSettings>): AppSettings {
   return store.store
 }
 
+export function resetSettings(): AppSettings {
+  store.clear()
+  return store.store
+}
+
 export function getExcludedPaths(): string[] {
   return store.get('excludedPaths')
 }

@@ -54,7 +54,7 @@ export function CelebrationScreen({ freedBytes, itemCount, failedCount, onDone }
           className="inline-flex items-center gap-2 h-[42px] px-6 bg-gradient-to-b from-[#6B7FED] to-[#5468E8] text-white rounded-xl text-[13px] font-medium shadow-[0_2px_8px_rgba(107,127,237,0.3)] hover:shadow-[0_4px_12px_rgba(107,127,237,0.4)] transition-all"
         >
           <ArrowLeft className="w-4 h-4" />
-          返回控制台
+          返回清理结果
         </button>
       </div>
     </div>

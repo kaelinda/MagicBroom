@@ -1,17 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Sparkles, Settings, Zap, PanelLeftClose, PanelLeft, Clock3 } from 'lucide-react'
+import { Zap, PanelLeftClose, PanelLeft } from 'lucide-react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-
-const mainMenuItems = [
-  { path: '/', label: '首页', icon: LayoutDashboard },
-  { path: '/clean', label: '清理', icon: Sparkles },
-  { path: '/scheduled-tasks', label: '定时任务', icon: Clock3 },
-]
-
-const bottomMenuItems = [
-  { path: '/settings', label: '设置', icon: Settings },
-]
+import { bottomNavigationItems, mainNavigationItems, type NavigationItem } from '../navigation'
 
 const COLLAPSE_BREAKPOINT = 1100
 
@@ -28,7 +19,7 @@ export function Sidebar() {
     return () => mq.removeEventListener('change', handler)
   }, [])
 
-  const renderLink = (item: (typeof mainMenuItems)[0]) => {
+  const renderLink = (item: NavigationItem) => {
     const Icon = item.icon
     const isActive =
       item.path === '/'
@@ -83,7 +74,7 @@ export function Sidebar() {
     <aside
       className={`${collapsed ? 'w-[64px]' : 'w-[232px]'} flex flex-col border-r border-black/[0.06] dark:border-white/[0.06] relative transition-[width] duration-200`}
       role="navigation"
-      aria-label="主导���"
+      aria-label="主导航"
       style={{
         background: 'var(--sidebar-bg)',
         backdropFilter: 'blur(40px) saturate(180%)',
@@ -114,12 +105,12 @@ export function Sidebar() {
             <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-[0.08em]">功能</span>
           </div>
         )}
-        <ul className="space-y-[2px]" role="list">{mainMenuItems.map(renderLink)}</ul>
+        <ul className="space-y-[2px]" role="list">{mainNavigationItems.map(renderLink)}</ul>
       </nav>
 
       {/* Bottom */}
       <div className={`${collapsed ? 'px-2' : 'px-3'} pb-4`}>
-        <ul className="space-y-[2px]" role="list">{bottomMenuItems.map(renderLink)}</ul>
+        <ul className="space-y-[2px]" role="list">{bottomNavigationItems.map(renderLink)}</ul>
         <button
           onClick={() => setCollapsed((c) => !c)}
           aria-label={collapsed ? '展开侧边栏' : '收起侧边栏'}

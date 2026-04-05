@@ -1,6 +1,17 @@
-import { useState, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Sparkles, Info, Filter, FolderOpen, Terminal, ChevronDown, ChevronRight, Ghost, Clock, Bot } from 'lucide-react'
+import {
+  Sparkles,
+  Info,
+  Filter,
+  FolderOpen,
+  Terminal,
+  ChevronDown,
+  ChevronRight,
+  Ghost,
+  Clock,
+  Bot,
+} from 'lucide-react'
 import { useMagicBroom } from '../hooks/useMagicBroom'
 import { useToast } from '../context/ToastContext'
 import { RiskBadge } from '../components/RiskBadge'
@@ -10,6 +21,15 @@ import { cardClass } from '../styles'
 import { formatSize } from '../utils'
 import { environments, matchesAnyEnvironment } from '../shared/environments'
 import type { RiskLevel } from '../context/ScanContext'
+import { buildSelectionPresetIds, type SelectionPreset } from '../selection-presets'
+import {
+  applyChildCleaningToResults,
+  collectSelectedChildItems,
+  computeCombinedSelectionSize,
+  toggleChildSelection,
+  toggleParentSelection,
+  type ChildDirectoryItem,
+} from '../subdirectory-selection'
 
 type ViewMode = 'all' | 'environment' | 'agent'
 
@@ -22,26 +42,76 @@ export function CleanPage() {
   const [showConfirm, setShowConfirm] = useState(false)
   const [cleanResult, setCleanResult] = useState<{ freed: number; count: number; failed: number } | null>(null)
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set())
+  const [loadingChildren, setLoadingChildren] = useState<Set<string>>(new Set())
+  const [selectedChildIds, setSelectedChildIds] = useState<Set<string>>(new Set())
+  const [childItemsByParent, setChildItemsByParent] = useState<Record<string, ChildDirectoryItem[]>>({})
+  const [cleanedChildItems, setCleanedChildItems] = useState<ChildDirectoryItem[]>([])
 
-  // --- 数据准备 ---
-  const existingResults = state.results.filter((r) => r.exists && r.size > 0)
+  useEffect(() => {
+    setExpandedItems(new Set())
+    setLoadingChildren(new Set())
+    setSelectedChildIds(new Set())
+    setChildItemsByParent({})
+    setCleanedChildItems([])
+  }, [state.lastScanTime, state.status])
+
+  const displayResults = useMemo(
+    () => applyChildCleaningToResults(state.results, cleanedChildItems),
+    [state.results, cleanedChildItems],
+  )
+
+  const existingResults = useMemo(
+    () => displayResults.filter((result) => result.exists && result.size > 0),
+    [displayResults],
+  )
 
   const filteredResults = useMemo(() => {
     let items = existingResults
     if (riskFilter !== 'all') {
-      items = items.filter((r) => r.risk === riskFilter)
+      items = items.filter((result) => result.risk === riskFilter)
     }
     return items
   }, [existingResults, riskFilter])
 
-  // 当前可见项的 ID 集合（用于"全选安全项"）
-  const visibleIds = useMemo(() => new Set(filteredResults.map((r) => r.id)), [filteredResults])
+  const visibleIds = useMemo(() => new Set(filteredResults.map((result) => result.id)), [filteredResults])
 
-  const selectedSize = state.results
-    .filter((r) => state.selectedItems.has(r.id))
-    .reduce((sum, r) => sum + r.size, 0)
+  const selectedChildItems = useMemo(
+    () => collectSelectedChildItems(childItemsByParent, selectedChildIds),
+    [childItemsByParent, selectedChildIds],
+  )
 
-  // --- 空状态 ---
+  const selectedParentItems = useMemo(
+    () => displayResults.filter((result) => state.selectedItems.has(result.id)),
+    [displayResults, state.selectedItems],
+  )
+
+  const selectedSize = useMemo(
+    () => computeCombinedSelectionSize(
+      selectedParentItems.reduce((sum, result) => sum + result.size, 0),
+      selectedChildItems,
+    ),
+    [selectedChildItems, selectedParentItems],
+  )
+
+  const selectedCount = state.selectedItems.size + selectedChildItems.length
+
+  const parentRiskMap = useMemo(
+    () => new Map(displayResults.map((result) => [result.id, result.risk])),
+    [displayResults],
+  )
+
+  const selectedConfirmItems = useMemo(
+    () => [
+      ...selectedParentItems.map((item) => ({ name: item.name, risk: item.risk })),
+      ...selectedChildItems.map((item) => ({
+        name: `${item.name}（子目录）`,
+        risk: parentRiskMap.get(item.parentId) ?? 'safe',
+      })),
+    ],
+    [parentRiskMap, selectedChildItems, selectedParentItems],
+  )
+
   if (state.status === 'idle') {
     return (
       <div className="p-8 max-w-[1400px] mx-auto">
@@ -79,23 +149,118 @@ export function CleanPage() {
         failedCount={cleanResult.failed}
         onDone={() => {
           setCleanResult(null)
-          dispatch({ type: 'RESET' })
-          navigate('/')
+          navigate('/clean')
         }}
       />
     )
   }
 
-  const handleClean = async () => {
-    setShowConfirm(false)
-    const result = await executeCleaning()
-    if (result) {
-      setCleanResult({
-        freed: result.freed,
-        count: result.succeeded.length,
-        failed: result.failed.length,
+  const clearChildSelectionForAll = () => {
+    setSelectedChildIds(new Set())
+  }
+
+  const handleToggleParent = (itemId: string) => {
+    const children = childItemsByParent[itemId] ?? []
+    const next = toggleParentSelection(itemId, state.selectedItems, selectedChildIds, children)
+    dispatch({ type: 'SET_SELECTION', ids: next.parentSelection })
+    setSelectedChildIds(next.childSelection)
+  }
+
+  const handleToggleChild = (child: ChildDirectoryItem) => {
+    const next = toggleChildSelection(child, state.selectedItems, selectedChildIds)
+    dispatch({ type: 'SET_SELECTION', ids: next.parentSelection })
+    setSelectedChildIds(next.childSelection)
+  }
+
+  const handleToggleChildrenPanel = async (itemId: string, itemPath: string) => {
+    const nextExpanded = new Set(expandedItems)
+    if (nextExpanded.has(itemId)) {
+      nextExpanded.delete(itemId)
+      setExpandedItems(nextExpanded)
+      return
+    }
+
+    nextExpanded.add(itemId)
+    setExpandedItems(nextExpanded)
+
+    if (childItemsByParent[itemId] || loadingChildren.has(itemId)) {
+      return
+    }
+
+    setLoadingChildren((current) => new Set(current).add(itemId))
+
+    try {
+      const entries = await window.api?.shell.listDirectoryChildren(itemPath)
+      const childItems = (entries ?? [])
+        .filter((entry) => entry.size > 0)
+        .map((entry) => ({
+          id: `${itemId}::${entry.name}`,
+          parentId: itemId,
+          name: entry.name,
+          path: entry.path,
+          size: entry.size,
+        }))
+
+      setChildItemsByParent((current) => ({
+        ...current,
+        [itemId]: childItems,
+      }))
+    } catch (error) {
+      addToast(`读取子目录失败：${String(error)}`, 'error')
+    } finally {
+      setLoadingChildren((current) => {
+        const next = new Set(current)
+        next.delete(itemId)
+        return next
       })
     }
+  }
+
+  const handleClean = async () => {
+    setShowConfirm(false)
+
+    const parentPaths = selectedParentItems
+      .filter((item) => item.exists)
+      .map((item) => item.path)
+
+    const childPaths = selectedChildItems.map((item) => item.path)
+    const paths = [...new Set([...parentPaths, ...childPaths])]
+
+    const result = await executeCleaning(paths)
+    if (!result) return
+
+    const succeededPathSet = new Set(result.succeeded)
+    const cleanedChildren = selectedChildItems.filter((item) => succeededPathSet.has(item.path))
+
+    if (cleanedChildren.length > 0) {
+      setCleanedChildItems((current) => {
+        const seen = new Set(current.map((item) => item.path))
+        return [
+          ...current,
+          ...cleanedChildren.filter((item) => !seen.has(item.path)),
+        ]
+      })
+
+      setChildItemsByParent((current) => {
+        const next = { ...current }
+        for (const [parentId, childItems] of Object.entries(current)) {
+          next[parentId] = childItems.filter((item) => !succeededPathSet.has(item.path))
+        }
+        return next
+      })
+
+      setSelectedChildIds((current) => {
+        const next = new Set(current)
+        cleanedChildren.forEach((item) => next.delete(item.id))
+        return next
+      })
+    }
+
+    setCleanResult({
+      freed: result.freed,
+      count: result.succeeded.length,
+      failed: result.failed.length,
+    })
   }
 
   const toggleGroup = (key: string) => {
@@ -105,91 +270,188 @@ export function CleanPage() {
     setCollapsedGroups(next)
   }
 
-  // --- 视图渲染 ---
+  const applyPreset = (preset: SelectionPreset) => {
+    const nextIds = buildSelectionPresetIds(existingResults, preset, visibleIds)
+    dispatch({ type: 'SET_SELECTION', ids: nextIds })
+    clearChildSelectionForAll()
+  }
 
-  const renderItem = (item: typeof filteredResults[0]) => (
-    <div key={item.id} className="p-4 hover:bg-indigo-50/40 dark:hover:bg-indigo-500/[0.06] transition-colors duration-150">
-      <div className="flex items-start gap-3">
-        <label className="mt-1 relative flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            checked={state.selectedItems.has(item.id)}
-            onChange={() => dispatch({ type: 'TOGGLE_ITEM', id: item.id })}
-            className="peer sr-only"
-          />
-          <div className="w-[18px] h-[18px] rounded-[5px] border-[1.5px] border-gray-300 dark:border-gray-600 peer-checked:border-[#6B7FED] peer-checked:bg-[#6B7FED] flex items-center justify-center transition-all">
-            {state.selectedItems.has(item.id) && (
-              <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                <path d="M1 3.5L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            )}
-          </div>
-        </label>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            <h3 className="text-[13px] font-medium text-gray-900 dark:text-gray-100">{item.name}</h3>
-            <RiskBadge level={item.risk} />
-          </div>
-          <p className="text-[12px] text-gray-400 mb-1">{item.impact}</p>
-          <div className="text-[11px] text-gray-400 font-mono truncate">{item.path}</div>
-        </div>
-        <div className="flex-shrink-0 flex flex-col items-end gap-1.5 ml-4">
-          <div className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 tabular-nums">{formatSize(item.size)}</div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={(e) => { e.stopPropagation(); window.api?.shell.showInFinder(item.path) }}
-              className="flex items-center gap-1 text-[10px] text-[#6B7FED] hover:text-[#5468E8] transition-colors"
-              title="在 Finder 中显示"
-            >
-              <FolderOpen className="w-3 h-3" />
-              Finder
-            </button>
-            {item.clean_command && (
-              <button
-                onClick={async (e) => {
-                  e.stopPropagation()
-                  addToast(`正在执行 ${item.clean_command}...`, 'info')
-                  const res = await window.api?.clean.runCommand(item.clean_command!)
-                  if (res?.success) addToast('命令执行成功', 'success')
-                  else addToast(`命令失败：${res?.output || '未知错误'}`, 'error')
-                }}
-                className="flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
-                title={`运行 ${item.clean_command}`}
-              >
-                <Terminal className="w-3 h-3" />
-                命令
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+  const renderChildItems = (parentId: string) => {
+    const children = childItemsByParent[parentId] ?? []
 
-  // "全部"视图：平铺列表按大小排序
-  const renderAllView = () => {
-    const sorted = [...filteredResults].sort((a, b) => b.size - a.size)
+    if (loadingChildren.has(parentId)) {
+      return (
+        <div className="mt-3 ml-8 pl-4 border-l border-indigo-100/60 dark:border-indigo-400/20">
+          <p className="text-[12px] text-gray-400">正在读取子目录...</p>
+        </div>
+      )
+    }
+
+    if (children.length === 0) {
+      return (
+        <div className="mt-3 ml-8 pl-4 border-l border-indigo-100/60 dark:border-indigo-400/20">
+          <p className="text-[12px] text-gray-400">没有可单独清理的子目录</p>
+        </div>
+      )
+    }
+
     return (
-      <div className="divide-y divide-gray-100/60 dark:divide-white/[0.06]">
-        {sorted.map(renderItem)}
+      <div className="mt-3 ml-8 pl-4 border-l border-indigo-100/60 dark:border-indigo-400/20 space-y-2">
+        {children.map((child) => (
+          <div
+            key={child.id}
+            className="flex items-start gap-3 rounded-xl border border-gray-100/80 dark:border-white/[0.06] bg-gray-50/60 dark:bg-white/[0.02] px-3 py-3"
+          >
+            <label className="mt-0.5 relative flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={selectedChildIds.has(child.id)}
+                onChange={() => handleToggleChild(child)}
+                className="peer sr-only"
+              />
+              <div className="w-[16px] h-[16px] rounded-[5px] border-[1.5px] border-gray-300 dark:border-gray-600 peer-checked:border-[#6B7FED] peer-checked:bg-[#6B7FED] flex items-center justify-center transition-all">
+                {selectedChildIds.has(child.id) && (
+                  <svg width="9" height="7" viewBox="0 0 10 8" fill="none">
+                    <path d="M1 3.5L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </div>
+            </label>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-0.5">
+                <h4 className="text-[12px] font-medium text-gray-900 dark:text-gray-100">{child.name}</h4>
+                <span className="inline-flex items-center rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-medium text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300">
+                  子目录
+                </span>
+              </div>
+              <div className="text-[11px] text-gray-400 font-mono truncate">{child.path}</div>
+            </div>
+            <div className="flex flex-col items-end gap-1">
+              <div className="text-[12px] font-semibold text-gray-800 dark:text-gray-200 tabular-nums">{formatSize(child.size)}</div>
+              <button
+                onClick={() => window.api?.shell.showInFinder(child.path)}
+                className="flex items-center gap-1 text-[10px] text-[#6B7FED] hover:text-[#5468E8] transition-colors"
+              >
+                <FolderOpen className="w-3 h-3" />
+                Finder
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     )
   }
 
-  // "按环境"视图：环境分组
-  const renderEnvironmentView = () => {
-    const groups = environments.map((env) => {
-      const items = filteredResults.filter((r) => r.tags.some((t) => env.tags.includes(t)))
-      return { ...env, items, totalSize: items.reduce((s, i) => s + i.size, 0) }
-    }).filter((g) => g.items.length > 0)
+  const renderItem = (item: typeof filteredResults[number]) => {
+    const isExpanded = expandedItems.has(item.id)
+    const hasLoadedChildren = item.id in childItemsByParent
 
-    // "其他"分组：不匹配任何环境
-    const otherItems = filteredResults.filter((r) => !matchesAnyEnvironment(r.tags))
+    return (
+      <div
+        key={item.id}
+        className="p-4 hover:bg-indigo-50/40 dark:hover:bg-indigo-500/[0.06] transition-colors duration-150"
+      >
+        <div className="flex items-start gap-3">
+          <label className="mt-1 relative flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={state.selectedItems.has(item.id)}
+              onChange={() => handleToggleParent(item.id)}
+              className="peer sr-only"
+            />
+            <div className="w-[18px] h-[18px] rounded-[5px] border-[1.5px] border-gray-300 dark:border-gray-600 peer-checked:border-[#6B7FED] peer-checked:bg-[#6B7FED] flex items-center justify-center transition-all">
+              {state.selectedItems.has(item.id) && (
+                <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                  <path d="M1 3.5L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </div>
+          </label>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <h3 className="text-[13px] font-medium text-gray-900 dark:text-gray-100">{item.name}</h3>
+              <RiskBadge level={item.risk} />
+            </div>
+            <p className="text-[12px] text-gray-400 mb-1">{item.impact}</p>
+            <div className="text-[11px] text-gray-400 font-mono truncate">{item.path}</div>
+          </div>
+          <div className="flex-shrink-0 flex flex-col items-end gap-1.5 ml-4">
+            <div className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 tabular-nums">{formatSize(item.size)}</div>
+            <div className="flex items-center gap-2 flex-wrap justify-end">
+              <button
+                onClick={(event) => {
+                  event.stopPropagation()
+                  void handleToggleChildrenPanel(item.id, item.path)
+                }}
+                className="flex items-center gap-1 text-[10px] text-indigo-600 dark:text-indigo-300 hover:text-indigo-700 dark:hover:text-indigo-200 transition-colors"
+                title="展开子目录"
+              >
+                {isExpanded ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+                {loadingChildren.has(item.id) ? '读取中' : hasLoadedChildren ? '子目录' : '展开'}
+              </button>
+              <button
+                onClick={(event) => {
+                  event.stopPropagation()
+                  window.api?.shell.showInFinder(item.path)
+                }}
+                className="flex items-center gap-1 text-[10px] text-[#6B7FED] hover:text-[#5468E8] transition-colors"
+                title="在 Finder 中显示"
+              >
+                <FolderOpen className="w-3 h-3" />
+                Finder
+              </button>
+              {item.clean_command && (
+                <button
+                  onClick={async (event) => {
+                    event.stopPropagation()
+                    addToast(`正在执行 ${item.clean_command}...`, 'info')
+                    const result = await window.api?.clean.runCommand(item.clean_command)
+                    if (result?.success) addToast('命令执行成功', 'success')
+                    else addToast(`命令失败：${result?.output || '未知错误'}`, 'error')
+                  }}
+                  className="flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+                  title={`运行 ${item.clean_command}`}
+                >
+                  <Terminal className="w-3 h-3" />
+                  命令
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {isExpanded && renderChildItems(item.id)}
+      </div>
+    )
+  }
+
+  const renderAllView = () => {
+    const sorted = [...filteredResults].sort((left, right) => right.size - left.size)
+    return <div className="divide-y divide-gray-100/60 dark:divide-white/[0.06]">{sorted.map(renderItem)}</div>
+  }
+
+  const renderEnvironmentView = () => {
+    const groups = environments
+      .map((environment) => {
+        const items = filteredResults.filter((result) => result.tags.some((tag) => environment.tags.includes(tag)))
+        return {
+          ...environment,
+          items,
+          totalSize: items.reduce((sum, item) => sum + item.size, 0),
+        }
+      })
+      .filter((group) => group.items.length > 0)
+
+    const otherItems = filteredResults.filter((result) => !matchesAnyEnvironment(result.tags))
     if (otherItems.length > 0) {
       groups.push({
-        id: 'other', name: '其他', icon: Info as any, tags: [],
-        description: '', items: otherItems,
-        totalSize: otherItems.reduce((s, i) => s + i.size, 0),
+        id: 'other',
+        name: '其他',
+        icon: Info as typeof environments[number]['icon'],
+        tags: [],
+        description: '',
+        items: otherItems,
+        totalSize: otherItems.reduce((sum, item) => sum + item.size, 0),
       })
     }
 
@@ -198,6 +460,7 @@ export function CleanPage() {
         {groups.map((group) => {
           const Icon = group.icon
           const isCollapsed = collapsedGroups.has(group.id)
+
           return (
             <div key={group.id}>
               <button
@@ -226,20 +489,19 @@ export function CleanPage() {
     )
   }
 
-  // "AI & 会话"视图：orphan/stale/tools 分组
   const renderAgentView = () => {
-    const agentItems = filteredResults.filter((r) => r.tags.some((t) => t === 'agent'))
-    const orphanUnknown = agentItems.filter((i) => i.tags.includes('orphan-unknown'))
-    const orphanDeleted = agentItems.filter((i) => i.tags.includes('orphan-deleted'))
-    const stale = agentItems.filter((i) => i.tags.includes('stale'))
-    const tools = agentItems.filter((i) => !i.tags.includes('orphan') && !i.tags.includes('stale'))
+    const agentItems = filteredResults.filter((result) => result.tags.some((tag) => tag === 'agent'))
+    const orphanUnknown = agentItems.filter((item) => item.tags.includes('orphan-unknown'))
+    const orphanDeleted = agentItems.filter((item) => item.tags.includes('orphan-deleted'))
+    const stale = agentItems.filter((item) => item.tags.includes('stale'))
+    const tools = agentItems.filter((item) => !item.tags.includes('orphan') && !item.tags.includes('stale'))
 
     const groups = [
       { key: 'orphan-unknown', label: '残留会话（无法识别原始项目）', icon: Ghost, items: orphanUnknown, color: 'text-red-500' },
       { key: 'orphan-deleted', label: '孤儿会话（项目目录已删除）', icon: Ghost, items: orphanDeleted, color: 'text-orange-500' },
       { key: 'stale', label: '陈旧会话（超过 30 天未活跃）', icon: Clock, items: stale, color: 'text-amber-500' },
       { key: 'tools', label: 'AI 工具缓存', icon: Bot, items: tools, color: 'text-violet-500' },
-    ].filter((g) => g.items.length > 0)
+    ].filter((group) => group.items.length > 0)
 
     if (groups.length === 0) {
       return (
@@ -255,7 +517,8 @@ export function CleanPage() {
         {groups.map((group) => {
           const GroupIcon = group.icon
           const isCollapsed = collapsedGroups.has(group.key)
-          const groupSize = group.items.reduce((s, i) => s + i.size, 0)
+          const groupSize = group.items.reduce((sum, item) => sum + item.size, 0)
+
           return (
             <div key={group.key}>
               <button
@@ -282,8 +545,6 @@ export function CleanPage() {
     )
   }
 
-  const selectedItems = state.results.filter((r) => state.selectedItems.has(r.id))
-
   return (
     <div className="p-8 max-w-[1400px] mx-auto">
       <div className="mb-6">
@@ -291,13 +552,12 @@ export function CleanPage() {
         <p className="text-[13px] text-gray-500 dark:text-gray-400">扫描并清理可释放的磁盘空间</p>
       </div>
 
-      {/* 概要 */}
       <div className={`${cardClass} p-5 mb-5`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-8">
             <div>
               <div className="text-[12px] text-gray-400 mb-0.5">可释放总量</div>
-              <div className="text-[24px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em]">{formatSize(state.totalBytes)}</div>
+              <div className="text-[24px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em]">{formatSize(displayResults.reduce((sum, item) => sum + (item.exists ? item.size : 0), 0))}</div>
             </div>
             <div className="h-10 w-px bg-gray-100 dark:bg-white/[0.08]" />
             <div>
@@ -307,11 +567,11 @@ export function CleanPage() {
             <div className="h-10 w-px bg-gray-100 dark:bg-white/[0.08]" />
             <div>
               <div className="text-[12px] text-gray-400 mb-0.5">已选项目</div>
-              <div className="text-[24px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em]">{state.selectedItems.size} 项</div>
+              <div className="text-[24px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em]">{selectedCount} 项</div>
             </div>
           </div>
           <button
-            disabled={state.selectedItems.size === 0}
+            disabled={selectedCount === 0}
             data-clean-trigger
             onClick={() => setShowConfirm(true)}
             className="h-[42px] px-6 bg-gradient-to-b from-emerald-500 to-emerald-600 text-white rounded-xl flex items-center gap-2 text-[13px] font-medium shadow-[0_2px_8px_rgba(16,185,129,0.3)] disabled:from-gray-200 disabled:to-gray-200 dark:disabled:from-gray-700 dark:disabled:to-gray-700 disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed transition-all"
@@ -322,18 +582,16 @@ export function CleanPage() {
         </div>
       </div>
 
-      {/* 视图切换 + 风险过滤 */}
       <div className={`${cardClass} p-3 mb-5`}>
         <div className="flex items-center gap-3 flex-wrap">
-          {/* 视图 */}
           <span className="text-[12px] text-gray-400 ml-1">视图</span>
           <div className="flex gap-1.5">
-            {([['all', '全部'], ['environment', '按环境'], ['agent', 'AI & 会话']] as const).map(([v, label]) => (
+            {([['all', '全部'], ['environment', '按环境'], ['agent', 'AI & 会话']] as const).map(([value, label]) => (
               <button
-                key={v}
-                onClick={() => setView(v)}
+                key={value}
+                onClick={() => setView(value)}
                 className={`px-3 py-[6px] rounded-lg text-[12px] transition-all duration-200 ${
-                  view === v
+                  view === value
                     ? 'bg-[#6B7FED] text-white font-medium shadow-[0_1px_4px_rgba(107,127,237,0.3)]'
                     : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100/60 dark:hover:bg-white/[0.06]'
                 }`}
@@ -345,7 +603,6 @@ export function CleanPage() {
 
           <div className="w-px h-5 bg-gray-200 dark:bg-white/[0.1]" />
 
-          {/* 风险过滤 */}
           <Filter className="w-4 h-4 text-gray-400" />
           <div className="flex gap-1.5">
             {([['all', '全部'], ['safe', '安全'], ['warning', '警告'], ['danger', '危险']] as const).map(([value, label]) => (
@@ -365,10 +622,32 @@ export function CleanPage() {
         </div>
       </div>
 
-      {/* 结果列表 */}
+      <div className={`${cardClass} p-4 mb-5`}>
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="text-[12px] text-gray-400 ml-1">一键预选</span>
+          {([
+            ['safe', '仅选安全项'],
+            ['large-safe', '安全且 > 1 GB'],
+            ['agent', '仅 AI & 会话'],
+            ['current-view', '选中当前视图'],
+          ] as const).map(([preset, label]) => (
+            <button
+              key={preset}
+              onClick={() => applyPreset(preset)}
+              className="px-3 py-[7px] rounded-lg text-[12px] text-gray-600 dark:text-gray-300 bg-gray-50/70 dark:bg-white/[0.05] hover:bg-[#6B7FED]/10 hover:text-[#6B7FED] border border-gray-100/80 dark:border-white/[0.08] transition-all duration-200"
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className={`${cardClass} overflow-hidden`}>
         <div className="p-4 border-b border-gray-100/80 dark:border-white/[0.06] flex items-center justify-between">
-          <h2 className="text-[14px] font-semibold text-gray-900 dark:text-gray-100">清理项目</h2>
+          <div>
+            <h2 className="text-[14px] font-semibold text-gray-900 dark:text-gray-100">清理项目</h2>
+            <p className="text-[11px] text-gray-400 mt-1">可展开子目录并只勾选想清理的那几个目录</p>
+          </div>
           <span className="text-[12px] text-gray-400">{filteredResults.length} 项</span>
         </div>
 
@@ -386,24 +665,26 @@ export function CleanPage() {
         )}
       </div>
 
-      {/* 底部操作栏 */}
       <div className={`${cardClass} p-4 mt-5`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-5 text-[12px] text-gray-500 dark:text-gray-400">
             <span>
-              已选择 <span className="font-semibold text-gray-900 dark:text-gray-100">{state.selectedItems.size}</span> / {existingResults.length} 项
+              已选择 <span className="font-semibold text-gray-900 dark:text-gray-100">{selectedCount}</span> / {existingResults.length} 项
             </span>
             <span>
               可清理 <span className="font-semibold text-[#6B7FED]">{formatSize(selectedSize)}</span>
             </span>
             <button
-              onClick={() => dispatch({ type: 'SELECT_SAFE', visibleIds })}
+              onClick={() => applyPreset('safe')}
               className="text-[#6B7FED] hover:text-[#5468E8] font-medium transition-colors"
             >
               全选安全项
             </button>
             <button
-              onClick={() => dispatch({ type: 'DESELECT_ALL' })}
+              onClick={() => {
+                dispatch({ type: 'DESELECT_ALL' })
+                clearChildSelectionForAll()
+              }}
               className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 font-medium transition-colors"
             >
               取消全选
@@ -414,7 +695,7 @@ export function CleanPage() {
 
       {showConfirm && (
         <CleanConfirmDialog
-          items={selectedItems}
+          items={selectedConfirmItems}
           totalSize={selectedSize}
           onConfirm={handleClean}
           onCancel={() => setShowConfirm(false)}

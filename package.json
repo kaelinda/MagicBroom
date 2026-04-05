@@ -1,6 +1,6 @@
 {
   "name": "magicbroom",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Mac 开发者磁盘清理工具",
   "main": "./out/main/index.js",
   "author": "MagicBroom",
