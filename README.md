@@ -19,6 +19,7 @@
 - **命令型安全清理** — Homebrew/Docker/Simulator 推荐运行原生命令（`brew cleanup`、`docker system prune`），比直接删文件更安全
 - **Scanner 去重** — 自动检测父子路径重叠，避免重复计数虚高
 - **通配符路径** — 自动匹配版本号变化的目录（如 Android Studio 多版本）
+- **定时任务** — 基于 macOS launchd 的每日自动扫描，可自定义执行时间和清理模式
 - **废纸篓安全** — 所有删除操作走废纸篓（可恢复），废纸篓清理保留 48h 冷却期
 - **保护路径** — 硬编码保护 ~/Documents、~/Desktop、~/.ssh 等重要目录
 - **排除目录** — 自定义排除路径，默认保护 AI 工具工作目录
@@ -151,19 +152,19 @@ npm run build    # 构建生产版本
 - **组件**: Radix UI + Lucide Icons + Recharts
 - **持久化**: electron-store（设置）+ JSON（规则）
 - **更新**: electron-updater (GitHub Releases)
-- **测试**: Vitest（38 个测试用例）
+- **测试**: Vitest（82 个测试用例）
 - **构建**: electron-vite 3 + electron-builder
 
 ## 项目结构
 
 ```
-electron/main/     → Electron 主进程（Scanner、Cleaner、RulesEngine、Store、Tray、Updater）
+electron/main/     → Electron 主进程（Scanner、Cleaner、RulesEngine、ScheduledTasks、Store、Tray、Updater）
 electron/preload/  → contextBridge 安全 IPC
 src/               → React 渲染进程（Dashboard、ScanResults、DeveloperMode、AgentMode、SpaceAnalysis、Settings）
 rules/daily.json   → 日常模式规则（43 条）
 rules/developer/   → 开发者模式规则（13 个环境，97 条）
 rules/agent/       → Agent 模式规则（15 条）
-tests/             → Vitest 测试（38 个）
+tests/             → Vitest 测试（82 个）
 ```
 
 ## 贡献清理规则
