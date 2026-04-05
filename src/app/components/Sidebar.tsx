@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Sparkles, Settings, Zap, PanelLeftClose, PanelLeft } from 'lucide-react'
+import { LayoutDashboard, Sparkles, Settings, Zap, PanelLeftClose, PanelLeft, Clock3 } from 'lucide-react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 const mainMenuItems = [
   { path: '/', label: '首页', icon: LayoutDashboard },
   { path: '/clean', label: '清理', icon: Sparkles },
+  { path: '/scheduled-tasks', label: '定时任务', icon: Clock3 },
 ]
 
 const bottomMenuItems = [

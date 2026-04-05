@@ -8,6 +8,7 @@ import { CleanPage } from './app/pages/CleanPage'
 import { SpaceAnalysis } from './app/pages/SpaceAnalysis'
 import { EnvironmentDetail } from './app/pages/EnvironmentDetail'
 import { Settings } from './app/pages/Settings'
+import { ScheduledTasks } from './app/pages/ScheduledTasks'
 
 /** 应用主题：dark/light 直接设 class，system 跟随系统偏好 */
 export function applyTheme(theme: string) {
@@ -53,6 +54,7 @@ export default function App() {
               <Route path="clean" element={<CleanPage />} />
               <Route path="space-analysis" element={<SpaceAnalysis />} />
               <Route path="environment/:envId" element={<EnvironmentDetail />} />
+              <Route path="scheduled-tasks" element={<ScheduledTasks />} />
               <Route path="settings" element={<Settings />} />
               {/* 旧路由重定向 */}
               <Route path="scan-results" element={<Navigate to="/clean" replace />} />

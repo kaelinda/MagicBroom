@@ -1,10 +1,13 @@
 import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'path'
 import { registerIpcHandlers } from './ipc-handlers'
+import { scheduledTaskManager } from './scheduled-task-manager'
+import { parseScheduledTaskArg } from './scheduled-tasks'
 import { createTray, shouldMinimizeToTray, destroyTray } from './tray'
 import { initAutoUpdater, checkForUpdates } from './updater'
 
 const isDev = !app.isPackaged
+const scheduledTaskId = parseScheduledTaskArg(process.argv)
 
 let mainWindow: BrowserWindow | null = null
 let isQuitting = false
@@ -52,6 +55,22 @@ function createWindow(): void {
 
 app.whenReady().then(() => {
   registerIpcHandlers()
+
+  scheduledTaskManager.syncEnabledTasks().catch((error) => {
+    console.error('[scheduled-task] sync failed', error)
+  })
+
+  if (scheduledTaskId) {
+    app.dock?.hide()
+    scheduledTaskManager
+      .runScheduledTaskFromCli(scheduledTaskId)
+      .catch((error) => console.error('[scheduled-task] run failed', error))
+      .finally(() => {
+        app.quit()
+      })
+    return
+  }
+
   createWindow()
 
   // 创建托盘图标

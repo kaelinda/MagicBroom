@@ -6,6 +6,7 @@ import { RulesEngine } from './rules-engine'
 import { updateTrayConfig, getTrayConfig } from './tray'
 import { checkForUpdates, getAppVersion } from './updater'
 import { getSettings, updateSettings, getExcludedPaths } from './store'
+import { scheduledTaskManager } from './scheduled-task-manager'
 import type { ScanMode } from './types'
 
 const scanner = new Scanner()
@@ -98,6 +99,35 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('updater:get-version', async () => {
     return getAppVersion()
+  })
+
+  ipcMain.handle('schedule:list', async () => {
+    return scheduledTaskManager.listTasks()
+  })
+
+  ipcMain.handle(
+    'schedule:update',
+    async (
+      _event,
+      args: { taskId: string; patch: Record<string, unknown> },
+    ) => {
+      return scheduledTaskManager.updateTaskConfig(
+        args.taskId,
+        args.patch as Partial<import('./scheduled-tasks').ScheduledTaskDefinition>,
+      )
+    },
+  )
+
+  ipcMain.handle('schedule:toggle', async (_event, args: { taskId: string; enabled: boolean }) => {
+    return scheduledTaskManager.toggleTask(args.taskId, args.enabled)
+  })
+
+  ipcMain.handle('schedule:run-now', async (_event, args: { taskId: string }) => {
+    return scheduledTaskManager.runNow(args.taskId)
+  })
+
+  ipcMain.handle('schedule:logs', async (_event, args?: { taskId?: string }) => {
+    return scheduledTaskManager.getLogs(args?.taskId)
   })
 
   // 命令型清理：执行推荐的清理命令

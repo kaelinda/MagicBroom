@@ -49,6 +49,17 @@ contextBridge.exposeInMainWorld('api', {
     update: (settings: Record<string, unknown>) =>
       ipcRenderer.invoke('settings:update', settings),
   },
+  schedule: {
+    list: () => ipcRenderer.invoke('schedule:list'),
+    update: (taskId: string, patch: Record<string, unknown>) =>
+      ipcRenderer.invoke('schedule:update', { taskId, patch }),
+    toggle: (taskId: string, enabled: boolean) =>
+      ipcRenderer.invoke('schedule:toggle', { taskId, enabled }),
+    runNow: (taskId: string) =>
+      ipcRenderer.invoke('schedule:run-now', { taskId }),
+    logs: (taskId?: string) =>
+      ipcRenderer.invoke('schedule:logs', taskId ? { taskId } : undefined),
+  },
   updater: {
     check: () => ipcRenderer.invoke('updater:check'),
     getVersion: () => ipcRenderer.invoke('updater:get-version'),
