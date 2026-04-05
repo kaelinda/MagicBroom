@@ -418,14 +418,14 @@ export function CleanPage() {
                   void navigator.clipboard.writeText(displayPath)
                   addToast('路径已复制', 'success')
                 }}
-                className="flex w-full min-w-0 items-center gap-1 text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-500 font-mono"
+                className="flex w-full min-w-0 items-center justify-start gap-1 text-left text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-500 font-mono"
                 title={`点击复制：${displayPath}`}
               >
                 <Copy className="w-3 h-3 flex-shrink-0" />
-                <span className="truncate flex-1 min-w-0">{displayPath}</span>
+                <span className="truncate flex-1 min-w-0 text-left">{displayPath}</span>
               </button>
             ) : (
-              <div className="text-[11px] text-gray-400 font-mono truncate">{item.path}</div>
+              <div className="w-full text-left text-[11px] text-gray-400 font-mono truncate">{item.path}</div>
             )}
           </div>
           <div className="flex-shrink-0 flex flex-col items-end gap-1.5 ml-4">

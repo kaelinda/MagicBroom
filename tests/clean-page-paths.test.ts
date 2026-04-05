@@ -1,4 +1,5 @@
 import { createElement } from 'react'
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { getSessionDisplayPath } from '../src/app/pages/CleanPage'
@@ -47,5 +48,15 @@ describe('CleanConfirmDialog', () => {
     expect(html).toContain('dark:border-white/[0.08]')
     expect(html).toContain('dark:text-gray-100')
     expect(html).toContain('dark:bg-white/[0.03]')
+  })
+})
+
+describe('CleanPage path row alignment', () => {
+  it('keeps both path variants explicitly left aligned', () => {
+    const source = readFileSync('src/app/pages/CleanPage.tsx', 'utf8')
+
+    expect(source).toContain('className="flex w-full min-w-0 items-center justify-start gap-1 text-left text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-500 font-mono"')
+    expect(source).toContain('className="truncate flex-1 min-w-0 text-left"')
+    expect(source).toContain('className="w-full text-left text-[11px] text-gray-400 font-mono truncate"')
   })
 })
