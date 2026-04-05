@@ -34,6 +34,11 @@ function formatTime(hour: number, minute: number): string {
   return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
 }
 
+function formatSchedule(schedule: ScheduledTaskView['schedule']): string {
+  const time = formatTime(schedule.hour, schedule.minute)
+  return schedule.weekday === undefined ? `每日 ${time}` : `每${formatWeekday(schedule.weekday)} ${time}`
+}
+
 function formatDateTime(value: string): string {
   return new Date(value).toLocaleString('zh-CN', {
     month: '2-digit',
@@ -149,6 +154,8 @@ function SchedulePicker({
   busy: boolean
   onScheduleChange: (patch: Partial<ScheduledTaskView['schedule']>) => void
 }) {
+  const isDaily = task.schedule.weekday === undefined
+
   return (
     <div className="mt-4 rounded-[30px] border border-white/[0.08] dark:border-white/[0.06] bg-[linear-gradient(180deg,rgba(255,255,255,0.055),rgba(255,255,255,0.02))] dark:bg-[radial-gradient(circle_at_top_right,rgba(107,127,237,0.14),transparent_32%),linear-gradient(180deg,rgba(255,255,255,0.045),rgba(255,255,255,0.02))] px-5 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
       <div className="flex items-center justify-between gap-4 mb-4">
@@ -157,31 +164,60 @@ function SchedulePicker({
           计划执行时间
         </div>
         <div className="px-3 py-1.5 rounded-full bg-white/[0.04] text-[#98A6FF] text-[12px] font-medium border border-white/[0.08] dark:border-[#6B7FED]/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-          每{formatWeekday(task.schedule.weekday)} {formatTime(task.schedule.hour, task.schedule.minute)}
+          {formatSchedule(task.schedule)}
         </div>
       </div>
 
+      {/* 每日/每周 切换 */}
       <div className="rounded-[24px] bg-black/[0.08] dark:bg-black/[0.14] border border-white/[0.04] p-2 mb-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-        <div className="grid grid-cols-7 gap-2">
-          {WEEKDAY_OPTIONS.map((option) => {
-            const active = task.schedule.weekday === option.value
-            return (
-              <button
-                key={option.value}
-                type="button"
-                disabled={busy}
-                onClick={() => onScheduleChange({ weekday: option.value })}
-                className={`w-full min-w-0 h-[44px] px-0 rounded-[14px] text-[13px] font-medium transition-all border ${
-                  active
-                    ? 'bg-[#6B7FED] text-white border-[#6B7FED] shadow-[0_10px_24px_rgba(107,127,237,0.24)]'
-                    : 'bg-transparent text-gray-500 dark:text-gray-400 border-transparent hover:bg-white/[0.04] hover:text-[#A4B0FF]'
-                } disabled:opacity-60 disabled:cursor-not-allowed`}
-              >
-                {option.label}
-              </button>
-            )
-          })}
+        <div className="flex gap-2 mb-2">
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => onScheduleChange({ weekday: undefined })}
+            className={`px-4 h-[36px] rounded-[12px] text-[13px] font-medium transition-all border ${
+              isDaily
+                ? 'bg-[#6B7FED] text-white border-[#6B7FED] shadow-[0_6px_16px_rgba(107,127,237,0.24)]'
+                : 'bg-transparent text-gray-500 dark:text-gray-400 border-transparent hover:bg-white/[0.04] hover:text-[#A4B0FF]'
+            } disabled:opacity-60 disabled:cursor-not-allowed`}
+          >
+            每日
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => { if (isDaily) onScheduleChange({ weekday: 0 }) }}
+            className={`px-4 h-[36px] rounded-[12px] text-[13px] font-medium transition-all border ${
+              !isDaily
+                ? 'bg-[#6B7FED] text-white border-[#6B7FED] shadow-[0_6px_16px_rgba(107,127,237,0.24)]'
+                : 'bg-transparent text-gray-500 dark:text-gray-400 border-transparent hover:bg-white/[0.04] hover:text-[#A4B0FF]'
+            } disabled:opacity-60 disabled:cursor-not-allowed`}
+          >
+            每周
+          </button>
         </div>
+        {!isDaily && (
+          <div className="grid grid-cols-7 gap-2">
+            {WEEKDAY_OPTIONS.map((option) => {
+              const active = task.schedule.weekday === option.value
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  disabled={busy}
+                  onClick={() => onScheduleChange({ weekday: option.value })}
+                  className={`w-full min-w-0 h-[44px] px-0 rounded-[14px] text-[13px] font-medium transition-all border ${
+                    active
+                      ? 'bg-[#6B7FED] text-white border-[#6B7FED] shadow-[0_10px_24px_rgba(107,127,237,0.24)]'
+                      : 'bg-transparent text-gray-500 dark:text-gray-400 border-transparent hover:bg-white/[0.04] hover:text-[#A4B0FF]'
+                  } disabled:opacity-60 disabled:cursor-not-allowed`}
+                >
+                  {option.label}
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-[160px_28px_minmax(0,1fr)] items-start gap-4 max-[880px]:grid-cols-1">
@@ -354,7 +390,7 @@ export function ScheduledTasks() {
                           <div className="text-[10px] uppercase tracking-[0.08em] text-gray-400 mb-1">执行计划</div>
                           <div className="text-[13px] text-gray-800 dark:text-gray-200 flex items-center gap-2">
                             <Clock3 className="w-3.5 h-3.5 text-[#6B7FED]" />
-                            {formatWeekday(task.schedule.weekday)} {formatTime(task.schedule.hour, task.schedule.minute)}
+                            {formatSchedule(task.schedule)}
                           </div>
                         </div>
                         <div className="rounded-xl bg-gray-50/80 dark:bg-white/[0.04] border border-gray-100/80 dark:border-white/[0.06] px-3 py-2.5">

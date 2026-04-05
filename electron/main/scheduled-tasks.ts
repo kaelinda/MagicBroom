@@ -3,7 +3,7 @@ import type { RuleResult, ScanMode } from './types'
 export type ScheduledTaskAction = 'scan-only' | 'safe-clean'
 
 export interface ScheduledTaskSchedule {
-  weekday: number
+  weekday?: number
   hour: number
   minute: number
 }
@@ -65,6 +65,16 @@ const MAX_LOG_ENTRIES = 50
 export function getDefaultScheduledTasks(): ScheduledTaskDefinition[] {
   return [
     {
+      id: 'smart-daily-scan',
+      name: '每日 Smart 扫描',
+      description: '每天凌晨执行 Smart Scan，并发送结果通知',
+      mode: 'smart',
+      action: 'scan-only',
+      enabled: false,
+      notify: true,
+      schedule: { hour: 6, minute: 0 },
+    },
+    {
       id: 'smart-weekly-scan',
       name: '每周 Smart 扫描',
       description: '每周日凌晨执行 Smart Scan，并发送结果通知',
@@ -110,6 +120,12 @@ export function buildLaunchAgentPlist(
   ]
     .map((arg) => `    <string>${arg}</string>`)
     .join('\n')
+  const weekdayEntry =
+    task.schedule.weekday === undefined
+      ? ''
+      : `    <key>Weekday</key>
+    <integer>${task.schedule.weekday}</integer>
+`
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -123,9 +139,7 @@ ${programArguments}
   </array>
   <key>StartCalendarInterval</key>
   <dict>
-    <key>Weekday</key>
-    <integer>${task.schedule.weekday}</integer>
-    <key>Hour</key>
+${weekdayEntry}    <key>Hour</key>
     <integer>${task.schedule.hour}</integer>
     <key>Minute</key>
     <integer>${task.schedule.minute}</integer>

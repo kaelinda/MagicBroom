@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Sparkles,
@@ -11,6 +11,7 @@ import {
   Ghost,
   Clock,
   Bot,
+  Copy,
 } from 'lucide-react'
 import { useMagicBroom } from '../hooks/useMagicBroom'
 import { useToast } from '../context/ToastContext'
@@ -20,8 +21,8 @@ import { CelebrationScreen } from '../components/CelebrationScreen'
 import { cardClass } from '../styles'
 import { formatSize } from '../utils'
 import { environments, matchesAnyEnvironment } from '../shared/environments'
-import type { RiskLevel } from '../context/ScanContext'
-import { buildSelectionPresetIds, type SelectionPreset } from '../selection-presets'
+import type { RiskLevel, ScanItem } from '../context/ScanContext'
+import { buildSelectionPresetIds, resolvePresetToggle, type SelectionPreset } from '../selection-presets'
 import {
   applyChildCleaningToResults,
   collectSelectedChildItems,
@@ -32,6 +33,14 @@ import {
 } from '../subdirectory-selection'
 
 type ViewMode = 'all' | 'environment' | 'agent'
+
+export function getSessionDisplayPath(item: Pick<ScanItem, 'path' | 'impact' | 'tags'>) {
+  if (item.tags.includes('expired-deleted')) {
+    const match = item.impact.match(/项目目录\s+(.+?)\s+已不存在/)
+    if (match) return match[1]
+  }
+  return item.path
+}
 
 export function CleanPage() {
   const { state, dispatch, executeCleaning } = useMagicBroom()
@@ -47,6 +56,8 @@ export function CleanPage() {
   const [selectedChildIds, setSelectedChildIds] = useState<Set<string>>(new Set())
   const [childItemsByParent, setChildItemsByParent] = useState<Record<string, ChildDirectoryItem[]>>({})
   const [cleanedChildItems, setCleanedChildItems] = useState<ChildDirectoryItem[]>([])
+  const [activePreset, setActivePreset] = useState<SelectionPreset | null>(null)
+  const hasNotifiedRef = useRef(false)
 
   useEffect(() => {
     setExpandedItems(new Set())
@@ -54,7 +65,24 @@ export function CleanPage() {
     setSelectedChildIds(new Set())
     setChildItemsByParent({})
     setCleanedChildItems([])
+    setActivePreset(null)
   }, [state.lastScanTime, state.status])
+
+  useEffect(() => {
+    if (state.status === 'complete' && !hasNotifiedRef.current) {
+      hasNotifiedRef.current = true
+      const expiredItems = state.results.filter(
+        (result) => result.exists && result.tags.some((tag) => tag.startsWith('expired-')),
+      )
+      if (expiredItems.length > 0) {
+        const totalSize = expiredItems.reduce((sum, result) => sum + result.size, 0)
+        addToast(`发现 ${expiredItems.length} 个失效会话，可释放 ${formatSize(totalSize)}`, 'info')
+      }
+    }
+    if (state.status !== 'complete') {
+      hasNotifiedRef.current = false
+    }
+  }, [state.status, state.results, addToast])
 
   const displayResults = useMemo(
     () => applyChildCleaningToResults(state.results, cleanedChildItems),
@@ -271,9 +299,18 @@ export function CleanPage() {
   }
 
   const applyPreset = (preset: SelectionPreset) => {
+    const nextPreset = resolvePresetToggle(activePreset, preset)
+    if (nextPreset === null) {
+      dispatch({ type: 'DESELECT_ALL' })
+      clearChildSelectionForAll()
+      setActivePreset(null)
+      return
+    }
+
     const nextIds = buildSelectionPresetIds(existingResults, preset, visibleIds)
     dispatch({ type: 'SET_SELECTION', ids: nextIds })
     clearChildSelectionForAll()
+    setActivePreset(nextPreset)
   }
 
   const renderChildItems = (parentId: string) => {
@@ -345,6 +382,7 @@ export function CleanPage() {
   const renderItem = (item: typeof filteredResults[number]) => {
     const isExpanded = expandedItems.has(item.id)
     const hasLoadedChildren = item.id in childItemsByParent
+    const displayPath = getSessionDisplayPath(item)
 
     return (
       <div
@@ -373,7 +411,22 @@ export function CleanPage() {
               <RiskBadge level={item.risk} />
             </div>
             <p className="text-[12px] text-gray-400 mb-1">{item.impact}</p>
-            <div className="text-[11px] text-gray-400 font-mono truncate">{item.path}</div>
+            {item.tags.some((tag) => tag.startsWith('expired-') || tag === 'stale') ? (
+              <button
+                onClick={(event) => {
+                  event.stopPropagation()
+                  void navigator.clipboard.writeText(displayPath)
+                  addToast('路径已复制', 'success')
+                }}
+                className="flex w-full min-w-0 items-center gap-1 text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-500 font-mono"
+                title={`点击复制：${displayPath}`}
+              >
+                <Copy className="w-3 h-3 flex-shrink-0" />
+                <span className="truncate flex-1 min-w-0">{displayPath}</span>
+              </button>
+            ) : (
+              <div className="text-[11px] text-gray-400 font-mono truncate">{item.path}</div>
+            )}
           </div>
           <div className="flex-shrink-0 flex flex-col items-end gap-1.5 ml-4">
             <div className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 tabular-nums">{formatSize(item.size)}</div>
@@ -491,14 +544,22 @@ export function CleanPage() {
 
   const renderAgentView = () => {
     const agentItems = filteredResults.filter((result) => result.tags.some((tag) => tag === 'agent'))
-    const orphanUnknown = agentItems.filter((item) => item.tags.includes('orphan-unknown'))
-    const orphanDeleted = agentItems.filter((item) => item.tags.includes('orphan-deleted'))
-    const stale = agentItems.filter((item) => item.tags.includes('stale'))
-    const tools = agentItems.filter((item) => !item.tags.includes('orphan') && !item.tags.includes('stale'))
+    const expiredUnknown = agentItems
+      .filter((item) => item.tags.includes('expired-unknown'))
+      .sort((left, right) => right.size - left.size)
+    const expiredDeleted = agentItems
+      .filter((item) => item.tags.includes('expired-deleted'))
+      .sort((left, right) => right.size - left.size)
+    const stale = agentItems
+      .filter((item) => item.tags.includes('stale'))
+      .sort((left, right) => right.size - left.size)
+    const tools = agentItems
+      .filter((item) => !item.tags.includes('expired') && !item.tags.includes('stale'))
+      .sort((left, right) => right.size - left.size)
 
     const groups = [
-      { key: 'orphan-unknown', label: '残留会话（无法识别原始项目）', icon: Ghost, items: orphanUnknown, color: 'text-red-500' },
-      { key: 'orphan-deleted', label: '孤儿会话（项目目录已删除）', icon: Ghost, items: orphanDeleted, color: 'text-orange-500' },
+      { key: 'expired-unknown', label: '失效会话（无法识别原始项目）', icon: Ghost, items: expiredUnknown, color: 'text-red-500' },
+      { key: 'expired-deleted', label: '失效会话（项目目录已删除）', icon: Ghost, items: expiredDeleted, color: 'text-orange-500' },
       { key: 'stale', label: '陈旧会话（超过 30 天未活跃）', icon: Clock, items: stale, color: 'text-amber-500' },
       { key: 'tools', label: 'AI 工具缓存', icon: Bot, items: tools, color: 'text-violet-500' },
     ].filter((group) => group.items.length > 0)
@@ -521,18 +582,33 @@ export function CleanPage() {
 
           return (
             <div key={group.key}>
-              <button
-                onClick={() => toggleGroup(group.key)}
-                className="w-full p-4 flex items-center justify-between hover:bg-gray-50/40 dark:hover:bg-white/[0.04] transition-colors border-b border-gray-100/80 dark:border-white/[0.06]"
-              >
-                <div className="flex items-center gap-2.5">
-                  {isCollapsed ? <ChevronRight className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
-                  <GroupIcon className={`w-4 h-4 ${group.color}`} />
-                  <span className="text-[13px] font-semibold text-gray-900 dark:text-gray-100">{group.label}</span>
-                  <span className="text-[12px] text-gray-400">{group.items.length} 项</span>
+              <div className="w-full p-4 flex items-center justify-between hover:bg-gray-50/40 dark:hover:bg-white/[0.04] transition-colors border-b border-gray-100/80 dark:border-white/[0.06] gap-4">
+                <button
+                  onClick={() => toggleGroup(group.key)}
+                  className="flex items-center gap-2.5 flex-1 min-w-0 text-left"
+                >
+                  {isCollapsed ? <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />}
+                  <GroupIcon className={`w-4 h-4 ${group.color} flex-shrink-0`} />
+                  <span className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 truncate">{group.label}</span>
+                  <span className="text-[12px] text-gray-400 flex-shrink-0">{group.items.length} 项</span>
+                </button>
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <button
+                    onClick={() => {
+                      const ids = group.items.filter((item) => item.exists).map((item) => item.id)
+                      const allSelected = ids.length > 0 && ids.every((id) => state.selectedItems.has(id))
+                      const next = new Set(state.selectedItems)
+                      if (allSelected) ids.forEach((id) => next.delete(id))
+                      else ids.forEach((id) => next.add(id))
+                      dispatch({ type: 'SET_SELECTION', ids: next })
+                    }}
+                    className="text-[12px] text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors"
+                  >
+                    {group.items.filter((item) => item.exists).every((item) => state.selectedItems.has(item.id)) ? '取消全选' : '全选'}
+                  </button>
+                  <span className="text-[13px] font-semibold text-gray-700 dark:text-gray-300 tabular-nums">{formatSize(groupSize)}</span>
                 </div>
-                <span className="text-[13px] font-semibold text-gray-700 dark:text-gray-300 tabular-nums">{formatSize(groupSize)}</span>
-              </button>
+              </div>
               {!isCollapsed && (
                 <div className="divide-y divide-gray-100/60 dark:divide-white/[0.06]">
                   {group.items.map(renderItem)}
@@ -634,7 +710,11 @@ export function CleanPage() {
             <button
               key={preset}
               onClick={() => applyPreset(preset)}
-              className="px-3 py-[7px] rounded-lg text-[12px] text-gray-600 dark:text-gray-300 bg-gray-50/70 dark:bg-white/[0.05] hover:bg-[#6B7FED]/10 hover:text-[#6B7FED] border border-gray-100/80 dark:border-white/[0.08] transition-all duration-200"
+              className={`px-3 py-[7px] rounded-lg text-[12px] border transition-all duration-200 ${
+                activePreset === preset
+                  ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-400/20'
+                  : 'text-gray-600 dark:text-gray-300 bg-gray-50/70 dark:bg-white/[0.05] hover:bg-[#6B7FED]/10 hover:text-[#6B7FED] border-gray-100/80 dark:border-white/[0.08]'
+              }`}
             >
               {label}
             </button>
@@ -684,6 +764,7 @@ export function CleanPage() {
               onClick={() => {
                 dispatch({ type: 'DESELECT_ALL' })
                 clearChildSelectionForAll()
+                setActivePreset(null)
               }}
               className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 font-medium transition-colors"
             >

@@ -59,7 +59,7 @@ interface ScheduledTaskView {
   installed: boolean
   plistPath: string
   schedule: {
-    weekday: number
+    weekday?: number
     hour: number
     minute: number
   }

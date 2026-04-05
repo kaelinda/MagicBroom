@@ -22,7 +22,7 @@ export function RiskBadge({ level }: { level: RiskLevel }) {
   const config = riskConfig[level]
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2 py-[3px] rounded-[6px] text-[11px] font-medium border ${config.className}`}
+      className={`inline-flex flex-shrink-0 whitespace-nowrap items-center gap-1.5 px-2 py-[3px] rounded-[6px] text-[11px] font-medium border ${config.className}`}
     >
       <div className={`w-[5px] h-[5px] rounded-full ${config.dot}`} />
       {config.label}

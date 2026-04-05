@@ -1,14 +1,23 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Zap, PanelLeftClose, PanelLeft } from 'lucide-react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { bottomNavigationItems, mainNavigationItems, type NavigationItem } from '../navigation'
+import { useScan } from '../context/ScanContext'
 
 const COLLAPSE_BREAKPOINT = 1100
 
 export function Sidebar() {
   const location = useLocation()
+  const { state } = useScan()
   const [collapsed, setCollapsed] = useState(false)
+
+  const expiredCount = useMemo(
+    () => state.status === 'complete'
+      ? state.results.filter((result) => result.exists && result.tags.some((tag) => tag.startsWith('expired-'))).length
+      : 0,
+    [state.status, state.results],
+  )
 
   // 窗口 < 1100px 自动折叠
   useEffect(() => {
@@ -32,7 +41,7 @@ export function Sidebar() {
         aria-label={item.label}
         aria-current={isActive ? 'page' : undefined}
         className={`
-          flex items-center ${collapsed ? 'justify-center' : 'gap-3'} px-3 py-[9px] rounded-[10px] text-[13px] transition-all duration-200
+          flex items-center ${collapsed ? 'justify-center relative' : 'gap-3'} px-3 py-[9px] rounded-[10px] text-[13px] transition-all duration-200
           ${
             isActive
               ? 'bg-gradient-to-b from-[#6B7FED] to-[#5468E8] text-white shadow-[0_1px_5px_rgba(84,104,232,0.35),inset_0_1px_0_rgba(255,255,255,0.22)]'
@@ -42,6 +51,14 @@ export function Sidebar() {
       >
         <Icon className="w-[18px] h-[18px] flex-shrink-0" style={{ strokeWidth: isActive ? 2.2 : 1.8 }} />
         {!collapsed && <span className={isActive ? 'font-medium' : ''}>{item.label}</span>}
+        {!collapsed && item.path === '/clean' && expiredCount > 0 && (
+          <span className="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] text-center leading-[18px]">
+            {expiredCount}
+          </span>
+        )}
+        {collapsed && item.path === '/clean' && expiredCount > 0 && (
+          <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full" />
+        )}
       </Link>
     )
 

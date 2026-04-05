@@ -6,6 +6,34 @@ import type { RuleDefinition, ScanMode } from './types'
 
 const STALE_DAYS = 30
 const STALE_MS = STALE_DAYS * 24 * 60 * 60 * 1000
+const RISK_PRIORITY: Record<RuleDefinition['risk'], number> = {
+  safe: 0,
+  warning: 1,
+  danger: 2,
+}
+
+export function formatRelativeTime(days: number): string {
+  if (Number.isNaN(days) || days < 0) return '活跃时间未知'
+  if (days < 1) return '今天'
+  if (days === 1) return '昨天'
+  if (days < 7) return `${days} 天前`
+  if (days < 30) return `${Math.floor(days / 7)} 周前`
+  if (days < 365) return `${Math.floor(days / 30)} 个月前`
+  return `${Math.floor(days / 365)} 年前`
+}
+
+export function dedupeRulesByPath(rules: RuleDefinition[]): RuleDefinition[] {
+  const rulesByPath = new Map<string, RuleDefinition>()
+
+  for (const rule of rules) {
+    const existing = rulesByPath.get(rule.path)
+    if (!existing || RISK_PRIORITY[rule.risk] > RISK_PRIORITY[existing.risk]) {
+      rulesByPath.set(rule.path, rule)
+    }
+  }
+
+  return [...rulesByPath.values()]
+}
 
 function getRulesDir(): string {
   if (app.isPackaged) {
@@ -140,7 +168,7 @@ async function extractCwdFromJsonl(filePath: string): Promise<string | null> {
 
 /**
  * 动态扫描 ~/.claude/projects/ 目录，按状态分类：
- * - 孤儿会话：项目目录已不存在（warning，建议确认后删除）
+ * - 失效会话：项目目录已不存在或无法识别原始项目（safe/warning，建议确认后删除）
  * - 陈旧会话：最近修改超过 30 天（warning，可能不再需要）
  *
  * 通过读取 .jsonl 中的 cwd 字段判定真实项目路径，避免目录名解码歧义。
@@ -203,38 +231,38 @@ async function generateClaudeProjectRules(): Promise<RuleDefinition[]> {
     const tilded = '~/.claude/projects/' + entry
 
     if (!projectExists && !projectCwd) {
-      // 无法识别：连项目路径都解析不出来，最可能是残留垃圾
+      // 无法识别：连项目路径都解析不出来，最可能是失效会话残留
       const daysInfo = latestMtime > 0
-        ? `${Math.floor((now - latestMtime) / (24 * 60 * 60 * 1000))} 天未活跃`
+        ? formatRelativeTime(Math.floor((now - latestMtime) / (24 * 60 * 60 * 1000)))
         : '活跃时间未知'
       rules.push({
-        id: `claude-orphan-${entry.toLowerCase().slice(0, 40)}`,
-        name: `残留会话：${shortName}（${daysInfo}）`,
+        id: `claude-expired-${entry.toLowerCase().slice(0, 40)}`,
+        name: `失效会话：${shortName}（${daysInfo}，无法识别原始项目）`,
         path: tilded,
         risk: 'safe',
         size_estimate: '10 MB - 500 MB',
         impact: `无法识别原始项目路径，可能是已删除项目的残留数据，删除后对话记录不可恢复`,
-        tags: ['agent', 'claude-code', 'orphan', 'orphan-unknown'],
+        tags: ['agent', 'claude-code', 'expired', 'expired-unknown'],
       })
     } else if (!projectExists && projectCwd) {
       // 项目已删除：知道原始路径但目录已不存在
       const daysInfo = latestMtime > 0
-        ? `${Math.floor((now - latestMtime) / (24 * 60 * 60 * 1000))} 天未活跃`
+        ? formatRelativeTime(Math.floor((now - latestMtime) / (24 * 60 * 60 * 1000)))
         : '活跃时间未知'
       rules.push({
-        id: `claude-orphan-${entry.toLowerCase().slice(0, 40)}`,
-        name: `孤儿会话：${shortName}（${daysInfo}，项目已删除）`,
+        id: `claude-expired-${entry.toLowerCase().slice(0, 40)}`,
+        name: `失效会话：${shortName}（${daysInfo}，项目已删除）`,
         path: tilded,
         risk: 'warning',
         size_estimate: '10 MB - 500 MB',
         impact: `项目目录 ${projectCwd} 已不存在，删除后该项目的对话记录不可恢复`,
-        tags: ['agent', 'claude-code', 'orphan', 'orphan-deleted'],
+        tags: ['agent', 'claude-code', 'expired', 'expired-deleted'],
       })
     } else if (latestMtime > 0 && now - latestMtime > STALE_MS) {
       const daysAgo = Math.floor((now - latestMtime) / (24 * 60 * 60 * 1000))
       rules.push({
         id: `claude-stale-${entry.toLowerCase().slice(0, 40)}`,
-        name: `陈旧会话：${shortName}（${daysAgo} 天未活跃）`,
+        name: `陈旧会话：${shortName}（${formatRelativeTime(daysAgo)}）`,
         path: tilded,
         risk: 'warning',
         size_estimate: '10 MB - 500 MB',
@@ -261,7 +289,7 @@ export class RulesEngine {
         this.getCachedRawRules('agent'),
       ])
       const claudeRules = await generateClaudeProjectRules()
-      rawRules = [...devRules, ...agentRules, ...claudeRules]
+      rawRules = dedupeRulesByPath([...devRules, ...agentRules, ...claudeRules])
     } else {
       // 缓存命中：缓存的是原始规则，通配符每次展开（目录可能变化）
       rawRules = await this.getCachedRawRules(mode)

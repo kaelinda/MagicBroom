@@ -1,5 +1,5 @@
 export interface ScheduleShape {
-  weekday: number
+  weekday?: number
   hour: number
   minute: number
 }

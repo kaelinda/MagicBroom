@@ -3,6 +3,7 @@ import { dashboardQuickActionItems, mainNavigationItems } from '../src/app/navig
 import {
   ONE_GB,
   buildSelectionPresetIds,
+  resolvePresetToggle,
   type SelectionPreset,
 } from '../src/app/selection-presets'
 import { applyCleaningResult, type ScanStateForUpdate } from '../src/app/scan-state'
@@ -99,11 +100,11 @@ describe('selection presets', () => {
     const ids = select('agent', [
       makeItem('agent-cache', { tags: ['agent'] }),
       makeItem('stale-session', { tags: ['stale'] }),
-      makeItem('orphan-session', { tags: ['orphan-deleted'] }),
+      makeItem('expired-session', { tags: ['expired-deleted'] }),
       makeItem('xcode-cache', { tags: ['ios'] }),
     ])
 
-    expect(ids).toEqual(new Set(['agent-cache', 'stale-session', 'orphan-session']))
+    expect(ids).toEqual(new Set(['agent-cache', 'stale-session', 'expired-session']))
   })
 
   it('limits current-view preset to visible items that still exist', () => {
@@ -118,6 +119,12 @@ describe('selection presets', () => {
     )
 
     expect(ids).toEqual(new Set(['visible-a']))
+  })
+
+  it('toggles an already active preset off so the page can clear selection', () => {
+    expect(resolvePresetToggle('safe', 'safe')).toBeNull()
+    expect(resolvePresetToggle('safe', 'agent')).toBe('agent')
+    expect(resolvePresetToggle(null, 'current-view')).toBe('current-view')
   })
 })
 

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { readFile, mkdtemp, mkdir, rm } from 'fs/promises'
 import { join } from 'path'
 import { tmpdir } from 'os'
-import { expandWildcardRules } from '../electron/main/rules-engine'
+import { dedupeRulesByPath, expandWildcardRules } from '../electron/main/rules-engine'
 import type { RuleDefinition } from '../electron/main/types'
 
 function makeRule(id: string, path: string): RuleDefinition {
@@ -258,6 +258,20 @@ describe('JSON 规则文件验证', () => {
 })
 
 describe('RulesEngine — smart 模式', () => {
+  it('按 path 去重并保留更高风险级别的规则', () => {
+    const deduped = dedupeRulesByPath([
+      makeRule('safe-gradle', '~/.gradle/caches'),
+      { ...makeRule('warning-gradle', '~/.gradle/caches'), risk: 'warning' },
+      { ...makeRule('danger-gradle', '~/.gradle/caches'), risk: 'danger' },
+      makeRule('other', '~/.m2/repository'),
+    ])
+
+    expect(deduped).toEqual([
+      expect.objectContaining({ id: 'danger-gradle', path: '~/.gradle/caches', risk: 'danger' }),
+      expect.objectContaining({ id: 'other', path: '~/.m2/repository', risk: 'safe' }),
+    ])
+  })
+
   it('smart 模式加载 developer + agent 规则（不含 daily）', async () => {
     // 读取各模式的规则文件，验证 smart 模式应包含的规则来源
     const rulesDir = join(__dirname, '..', 'rules')

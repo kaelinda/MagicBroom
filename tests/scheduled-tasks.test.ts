@@ -28,26 +28,29 @@ function makeResult(
 }
 
 describe('scheduled tasks defaults', () => {
-  it('returns the three preset tasks for v1', () => {
+  it('returns the preset tasks including the daily smart scan', () => {
     const tasks = getDefaultScheduledTasks()
 
     expect(tasks.map((task) => task.id)).toEqual([
+      'smart-daily-scan',
       'smart-weekly-scan',
       'developer-weekly-safe-clean',
       'agent-weekly-safe-clean',
     ])
     expect(tasks.map((task) => task.action)).toEqual([
       'scan-only',
+      'scan-only',
       'safe-clean',
       'safe-clean',
     ])
-    expect(tasks.every((task) => task.schedule.weekday === 0)).toBe(true)
+    expect(tasks[0].schedule).toEqual({ hour: 6, minute: 0 })
+    expect(tasks.slice(1).every((task) => task.schedule.weekday === 0)).toBe(true)
   })
 })
 
 describe('buildLaunchAgentPlist', () => {
   it('renders a launchd plist for the scheduled task', () => {
-    const task = getDefaultScheduledTasks()[0]
+    const task = getDefaultScheduledTasks()[1]
 
     const plist = buildLaunchAgentPlist(task, {
       appId: 'com.magicbroom.app',
@@ -61,6 +64,24 @@ describe('buildLaunchAgentPlist', () => {
     expect(plist).toContain('<string>--scheduled-task</string>')
     expect(plist).toContain('<string>smart-weekly-scan</string>')
     expect(plist).toContain('<key>Weekday</key>')
+    expect(plist).toContain('<integer>0</integer>')
+  })
+
+  it('omits launchd Weekday for daily tasks', () => {
+    const task = getDefaultScheduledTasks()[0]
+
+    const plist = buildLaunchAgentPlist(task, {
+      appId: 'com.magicbroom.app',
+      executablePath: '/Applications/MagicBroom.app/Contents/MacOS/MagicBroom',
+      stdoutPath: '/tmp/magicbroom.stdout.log',
+      stderrPath: '/tmp/magicbroom.stderr.log',
+    })
+
+    expect(plist).toContain('<string>com.magicbroom.app.task.smart-daily-scan</string>')
+    expect(plist).not.toContain('<key>Weekday</key>')
+    expect(plist).toContain('<key>Hour</key>')
+    expect(plist).toContain('<integer>6</integer>')
+    expect(plist).toContain('<key>Minute</key>')
     expect(plist).toContain('<integer>0</integer>')
   })
 })
@@ -103,11 +124,11 @@ describe('mergeScheduledTasks', () => {
       },
     ])
 
-    expect(tasks).toHaveLength(3)
-    expect(tasks[0].enabled).toBe(true)
-    expect(tasks[0].notify).toBe(false)
-    expect(tasks[0].schedule.hour).toBe(1)
-    expect(tasks[1].enabled).toBe(false)
+    expect(tasks).toHaveLength(4)
+    expect(tasks[1].enabled).toBe(true)
+    expect(tasks[1].notify).toBe(false)
+    expect(tasks[1].schedule.hour).toBe(1)
+    expect(tasks[2].enabled).toBe(false)
   })
 })
 
