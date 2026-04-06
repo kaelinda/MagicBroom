@@ -383,6 +383,7 @@ export function CleanPage() {
     const isExpanded = expandedItems.has(item.id)
     const hasLoadedChildren = item.id in childItemsByParent
     const displayPath = getSessionDisplayPath(item)
+    const cleanCommand = item.clean_command
 
     return (
       <div
@@ -453,17 +454,17 @@ export function CleanPage() {
                 <FolderOpen className="w-3 h-3" />
                 Finder
               </button>
-              {item.clean_command && (
+              {cleanCommand && (
                 <button
                   onClick={async (event) => {
                     event.stopPropagation()
-                    addToast(`正在执行 ${item.clean_command}...`, 'info')
-                    const result = await window.api?.clean.runCommand(item.clean_command)
+                    addToast(`正在执行 ${cleanCommand}...`, 'info')
+                    const result = await window.api?.clean.runCommand(cleanCommand)
                     if (result?.success) addToast('命令执行成功', 'success')
                     else addToast(`命令失败：${result?.output || '未知错误'}`, 'error')
                   }}
                   className="flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
-                  title={`运行 ${item.clean_command}`}
+                  title={`运行 ${cleanCommand}`}
                 >
                   <Terminal className="w-3 h-3" />
                   命令
@@ -628,7 +629,7 @@ export function CleanPage() {
         <p className="text-[13px] text-gray-500 dark:text-gray-400">扫描并清理可释放的磁盘空间</p>
       </div>
 
-      <div className="sticky top-0 z-10 -mx-8 px-8 pt-0 pb-5 bg-[var(--background)]">
+      <div className="sticky top-0 z-10 -mx-8 px-8 pt-0 pb-5 backdrop-blur-xl bg-transparent">
         <div className={`${cardClass} p-5`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-8">
