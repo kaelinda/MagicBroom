@@ -628,33 +628,35 @@ export function CleanPage() {
         <p className="text-[13px] text-gray-500 dark:text-gray-400">扫描并清理可释放的磁盘空间</p>
       </div>
 
-      <div className={`${cardClass} p-5 mb-5`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <div>
-              <div className="text-[12px] text-gray-400 mb-0.5">可释放总量</div>
-              <div className="text-[24px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em]">{formatSize(displayResults.reduce((sum, item) => sum + (item.exists ? item.size : 0), 0))}</div>
+      <div className="sticky top-0 z-10 -mx-8 px-8 pt-0 pb-5 bg-[var(--background)]">
+        <div className={`${cardClass} p-5`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-8">
+              <div>
+                <div className="text-[12px] text-gray-400 mb-0.5">可释放总量</div>
+                <div className="text-[24px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em]">{formatSize(displayResults.reduce((sum, item) => sum + (item.exists ? item.size : 0), 0))}</div>
+              </div>
+              <div className="h-10 w-px bg-gray-100 dark:bg-white/[0.08]" />
+              <div>
+                <div className="text-[12px] text-gray-400 mb-0.5">已选清理量</div>
+                <div className="text-[24px] font-semibold text-[#6B7FED] tracking-[-0.02em]">{formatSize(selectedSize)}</div>
+              </div>
+              <div className="h-10 w-px bg-gray-100 dark:bg-white/[0.08]" />
+              <div>
+                <div className="text-[12px] text-gray-400 mb-0.5">已选项目</div>
+                <div className="text-[24px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em]">{selectedCount} 项</div>
+              </div>
             </div>
-            <div className="h-10 w-px bg-gray-100 dark:bg-white/[0.08]" />
-            <div>
-              <div className="text-[12px] text-gray-400 mb-0.5">已选清理量</div>
-              <div className="text-[24px] font-semibold text-[#6B7FED] tracking-[-0.02em]">{formatSize(selectedSize)}</div>
-            </div>
-            <div className="h-10 w-px bg-gray-100 dark:bg-white/[0.08]" />
-            <div>
-              <div className="text-[12px] text-gray-400 mb-0.5">已选项目</div>
-              <div className="text-[24px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em]">{selectedCount} 项</div>
-            </div>
+            <button
+              disabled={selectedCount === 0}
+              data-clean-trigger
+              onClick={() => setShowConfirm(true)}
+              className="h-[42px] px-6 bg-gradient-to-b from-emerald-500 to-emerald-600 text-white rounded-xl flex items-center gap-2 text-[13px] font-medium shadow-[0_2px_8px_rgba(16,185,129,0.3)] disabled:from-gray-200 disabled:to-gray-200 dark:disabled:from-gray-700 dark:disabled:to-gray-700 disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed transition-all"
+            >
+              <Sparkles className="w-4 h-4" />
+              执行清理
+            </button>
           </div>
-          <button
-            disabled={selectedCount === 0}
-            data-clean-trigger
-            onClick={() => setShowConfirm(true)}
-            className="h-[42px] px-6 bg-gradient-to-b from-emerald-500 to-emerald-600 text-white rounded-xl flex items-center gap-2 text-[13px] font-medium shadow-[0_2px_8px_rgba(16,185,129,0.3)] disabled:from-gray-200 disabled:to-gray-200 dark:disabled:from-gray-700 dark:disabled:to-gray-700 disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed transition-all"
-          >
-            <Sparkles className="w-4 h-4" />
-            执行清理
-          </button>
         </div>
       </div>
 
