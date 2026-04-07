@@ -1,8 +1,8 @@
 # MagicBroom
 
-专为 Mac 用户和开发者设计的磁盘空间清理工具。
+专为 Mac 用户和开发者设计的磁盘空间清理和下载归档工具。
 
-不是传统的"垃圾清理"工具 —— MagicBroom 帮你看清磁盘空间被谁占用，按场景安全清理，每个清理项都有风险等级和删除影响说明。
+不是传统的"垃圾清理"工具。MagicBroom 帮你看清磁盘空间被谁占用，按场景安全清理；也能把 Downloads 里该处理的文件先给建议，再归档沉底。
 
 ## 特性
 
@@ -15,6 +15,9 @@
 ### 核心能力
 
 - **155 条清理规则** — 覆盖日常 + 13 种开发环境 + 15 款 AI 工具
+- **Downloads Inbox** — 单独处理 `~/Downloads` 顶层文件，给出“安装包 / 文档 / 图片”建议归档，而不是一把删掉
+- **建议理由 + expired 沉底** — 每条建议都告诉你为什么该处理，超过 14 天未改动的文件会进入各分组下的 `expired/`
+- **物理归档目录** — 归档到 `~/Downloads/_MagicBroom/Installers|Documents|Images[/expired]`，Finder 里看得见，心智稳定
 - **风险分级系统** — 每个清理项标注 安全/警告/危险 + 删除后影响说明 + 风险/大小排序
 - **命令型安全清理** — Homebrew/Docker/Simulator 推荐运行原生命令（`brew cleanup`、`docker system prune`），比直接删文件更安全
 - **Scanner 去重** — 自动检测父子路径重叠，避免重复计数虚高
@@ -152,19 +155,19 @@ npm run build    # 构建生产版本
 - **组件**: Radix UI + Lucide Icons + Recharts
 - **持久化**: electron-store（设置）+ JSON（规则）
 - **更新**: electron-updater (GitHub Releases)
-- **测试**: Vitest（82 个测试用例）
+- **测试**: Vitest（95 个测试用例）
 - **构建**: electron-vite 3 + electron-builder
 
 ## 项目结构
 
 ```
-electron/main/     → Electron 主进程（Scanner、Cleaner、RulesEngine、ScheduledTasks、Store、Tray、Updater）
+electron/main/     → Electron 主进程（Scanner、Cleaner、ArchiveService、RulesEngine、ScheduledTasks、Store、Tray、Updater）
 electron/preload/  → contextBridge 安全 IPC
-src/               → React 渲染进程（Dashboard、ScanResults、DeveloperMode、AgentMode、SpaceAnalysis、Settings）
+src/               → React 渲染进程（Dashboard、Clean、DownloadsInbox、SpaceAnalysis、ScheduledTasks、Settings）
 rules/daily.json   → 日常模式规则（43 条）
 rules/developer/   → 开发者模式规则（13 个环境，97 条）
 rules/agent/       → Agent 模式规则（15 条）
-tests/             → Vitest 测试（82 个）
+tests/             → Vitest 测试（95 个）
 ```
 
 ## 贡献清理规则

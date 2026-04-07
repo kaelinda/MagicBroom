@@ -111,7 +111,7 @@ export function Settings() {
     window.api?.settings.get().then((s: any) => {
       if (s) applySettings(s)
     }).catch(() => {})
-    window.api?.updater.getVersion().then((v) => setVersion(v)).catch(() => setVersion('0.6.0'))
+    window.api?.updater.getVersion().then((v) => setVersion(v)).catch(() => setVersion('0.9.0'))
   }, [applySettings])
 
   const persist = useCallback((key: string, value: unknown) => {

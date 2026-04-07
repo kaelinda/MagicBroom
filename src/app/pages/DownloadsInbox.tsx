@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   Archive,
+  CircleHelp,
   FileText,
   FolderOpen,
   Image as ImageIcon,
@@ -18,6 +19,7 @@ import { formatSize } from '../utils'
 
 type InboxTab = 'suggested' | 'expired'
 type StreamKey = DownloadInboxStream
+const ONBOARDING_STORAGE_KEY = 'magicbroom:downloads-inbox:onboarding-dismissed'
 
 const streamMeta: Record<StreamKey, { label: string; icon: typeof Package; empty: string }> = {
   installers: {
@@ -48,10 +50,19 @@ export function DownloadsInbox() {
   const [collapsedArchivedGroups, setCollapsedArchivedGroups] = useState<Set<StreamKey>>(
     () => new Set(['installers', 'documents', 'images']),
   )
+  const [showOnboarding, setShowOnboarding] = useState(false)
 
   useEffect(() => {
     setSelectedIds((current) => new Set([...current].filter((id) => suggestions.some((item) => item.id === id))))
   }, [suggestions])
+
+  useEffect(() => {
+    try {
+      setShowOnboarding(window.localStorage.getItem(ONBOARDING_STORAGE_KEY) !== '1')
+    } catch {
+      setShowOnboarding(true)
+    }
+  }, [])
 
   const suggestionGroups = useMemo(() => groupSuggestionsByStream(suggestions), [suggestions])
   const archivedGroups = useMemo(() => groupArchivedByStream(archived), [archived])
@@ -124,6 +135,15 @@ export function DownloadsInbox() {
     })
   }
 
+  function dismissOnboarding() {
+    setShowOnboarding(false)
+    try {
+      window.localStorage.setItem(ONBOARDING_STORAGE_KEY, '1')
+    } catch {
+      // Ignore storage failures and keep the UI usable.
+    }
+  }
+
   if (loading) {
     return (
       <div className="p-8 max-w-[1400px] mx-auto">
@@ -172,6 +192,30 @@ export function DownloadsInbox() {
           刷新
         </button>
       </div>
+
+      {showOnboarding && (
+        <div className={`${cardClass} p-4 mb-5 border border-[#6B7FED]/15 dark:border-[#6B7FED]/20`}>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#6B7FED]/10 text-[#6B7FED] flex items-center justify-center flex-shrink-0">
+                <CircleHelp className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 mb-1">先看建议处理，再看 expired</div>
+                <div className="text-[12px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                  `建议处理` 是当前还停在 Downloads 顶层的文件。`expired` 只是已经沉底的旧归档，还在 Downloads 体系里，不是垃圾桶。
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={dismissOnboarding}
+              className="text-[12px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors flex-shrink-0"
+            >
+              知道了
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className={`${cardClass} p-5 mb-5`}>
         <div className="flex items-center justify-between gap-6 flex-wrap">

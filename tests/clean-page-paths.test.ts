@@ -60,3 +60,15 @@ describe('CleanPage path row alignment', () => {
     expect(source).toContain('className="w-full text-left text-[11px] text-gray-400 font-mono truncate"')
   })
 })
+
+describe('DownloadsInbox onboarding banner', () => {
+  it('persists first-run dismissal locally and explains suggested vs expired', () => {
+    const source = readFileSync('src/app/pages/DownloadsInbox.tsx', 'utf8')
+
+    expect(source).toContain("const ONBOARDING_STORAGE_KEY = 'magicbroom:downloads-inbox:onboarding-dismissed'")
+    expect(source).toContain("window.localStorage.getItem(ONBOARDING_STORAGE_KEY) !== '1'")
+    expect(source).toContain("window.localStorage.setItem(ONBOARDING_STORAGE_KEY, '1')")
+    expect(source).toContain('先看建议处理，再看 expired')
+    expect(source).toContain('不是垃圾桶')
+  })
+})
