@@ -5,6 +5,7 @@ import { ToastProvider } from './app/context/ToastContext'
 import { AppLayout } from './app/components/AppLayout'
 import { Dashboard } from './app/pages/Dashboard'
 import { CleanPage } from './app/pages/CleanPage'
+import { DownloadsInbox } from './app/pages/DownloadsInbox'
 import { SpaceAnalysis } from './app/pages/SpaceAnalysis'
 import { EnvironmentDetail } from './app/pages/EnvironmentDetail'
 import { Settings } from './app/pages/Settings'
@@ -52,6 +53,7 @@ export default function App() {
             <Route element={<AppLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="clean" element={<CleanPage />} />
+              <Route path="downloads-inbox" element={<DownloadsInbox />} />
               <Route path="space-analysis" element={<SpaceAnalysis />} />
               <Route path="environment/:envId" element={<EnvironmentDetail />} />
               <Route path="scheduled-tasks" element={<ScheduledTasks />} />

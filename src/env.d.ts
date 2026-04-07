@@ -1,6 +1,16 @@
 /// <reference types="vite/client" />
 
 interface MagicBroomAPI {
+  downloadsInbox: {
+    list: () => Promise<{
+      suggestions: DownloadInboxSuggestion[]
+      archived: ArchivedDownloadItem[]
+    }>
+    archive: (items: Array<{ id: string; sourcePath: string; targetPath: string }>) => Promise<{
+      succeeded: Array<{ id: string; sourcePath: string; targetPath: string }>
+      failed: Array<{ id: string; sourcePath: string; error: string }>
+    }>
+  }
   schedule: {
     list: () => Promise<ScheduledTaskView[]>
     update: (taskId: string, patch: Partial<ScheduledTaskView>) => Promise<ScheduledTaskView[]>
@@ -81,6 +91,34 @@ interface ScheduledTaskLog {
   totalBytes: number
   freedBytes: number
   errors: string[]
+}
+
+type DownloadInboxStream = 'installers' | 'documents' | 'images'
+
+interface DownloadInboxSuggestion {
+  id: string
+  name: string
+  path: string
+  size: number
+  modifiedAt: number
+  modifiedLabel: string
+  stream: DownloadInboxStream
+  kind: 'dmg' | 'pkg' | 'zip' | 'image' | 'screenshot' | 'pdf'
+  typeLabel: string
+  reason: string
+  targetPath: string
+  expired: boolean
+}
+
+interface ArchivedDownloadItem {
+  id: string
+  name: string
+  path: string
+  size: number
+  modifiedAt: number
+  modifiedLabel: string
+  stream: DownloadInboxStream
+  typeLabel: string
 }
 
 interface Window {

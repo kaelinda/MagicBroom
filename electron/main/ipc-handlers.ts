@@ -9,10 +9,12 @@ import { getSettings, updateSettings, getExcludedPaths, resetSettings } from './
 import { scheduledTaskManager } from './scheduled-task-manager'
 import { listImmediateChildDirectories } from './directory-children'
 import type { ScanMode } from './types'
+import { ArchiveService } from './archive-service'
 
 const scanner = new Scanner()
 const cleaner = new Cleaner()
 const rulesEngine = new RulesEngine()
+const archiveService = new ArchiveService()
 
 export function registerIpcHandlers(): void {
   ipcMain.handle('scan:start', async (event, args: { mode: ScanMode; profiles: string[] }) => {
@@ -80,6 +82,14 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('shell:list-directory-children', async (_event, args: { path: string }) => {
     return listImmediateChildDirectories(args.path)
+  })
+
+  ipcMain.handle('downloads-inbox:list', async () => {
+    return archiveService.listDownloadsInbox()
+  })
+
+  ipcMain.handle('downloads-inbox:archive', async (_event, args: { items: Array<{ id: string; sourcePath: string; targetPath: string }> }) => {
+    return archiveService.archiveItems(args.items)
   })
 
   // 设置持久化

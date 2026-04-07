@@ -48,6 +48,11 @@ contextBridge.exposeInMainWorld('api', {
     listDirectoryChildren: (path: string) =>
       ipcRenderer.invoke('shell:list-directory-children', { path }),
   },
+  downloadsInbox: {
+    list: () => ipcRenderer.invoke('downloads-inbox:list'),
+    archive: (items: Array<{ id: string; sourcePath: string; targetPath: string }>) =>
+      ipcRenderer.invoke('downloads-inbox:archive', { items }),
+  },
   settings: {
     get: () => ipcRenderer.invoke('settings:get'),
     update: (settings: Record<string, unknown>) =>

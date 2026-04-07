@@ -37,6 +37,13 @@ export const topbarCommands: TopbarCommand[] = [
     description: '查看并处理可释放空间的项目列表',
   },
   {
+    id: 'go-downloads-inbox',
+    label: '打开下载收件箱',
+    keywords: ['下载', 'downloads', '收件箱', '归档', '安装包', 'pdf', '截图'],
+    path: '/downloads-inbox',
+    description: '查看 Downloads 建议项，并归档到 _MagicBroom',
+  },
+  {
     id: 'go-scheduled-tasks',
     label: '打开定时任务',
     keywords: ['定时', '任务', '计划', 'launchd'],

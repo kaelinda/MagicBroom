@@ -45,10 +45,15 @@ describe('app navigation', () => {
     expect(mainNavigationItems.map((item) => item.path)).toContain('/space-analysis')
   })
 
-  it('splits dashboard quick actions between clean and analysis flows', () => {
+  it('surfaces downloads inbox as a first-class destination', () => {
+    expect(mainNavigationItems.map((item) => item.path)).toContain('/downloads-inbox')
+  })
+
+  it('keeps dashboard quick actions aligned with clean, analysis, and downloads flows', () => {
     expect(dashboardQuickActionItems).toEqual([
       expect.objectContaining({ path: '/clean' }),
       expect.objectContaining({ path: '/space-analysis' }),
+      expect.objectContaining({ path: '/downloads-inbox' }),
     ])
   })
 })
@@ -58,12 +63,14 @@ describe('topbar commands', () => {
     const commandIds = topbarCommands.map((command) => command.id)
     expect(commandIds).toContain('smart-scan')
     expect(commandIds).toContain('go-space-analysis')
+    expect(commandIds).toContain('go-downloads-inbox')
     expect(commandIds).toContain('go-settings')
   })
 
   it('filters commands by localized labels and keywords', () => {
     expect(filterTopbarCommands('分析').map((command) => command.id)).toContain('go-space-analysis')
     expect(filterTopbarCommands('扫描').map((command) => command.id)).toContain('smart-scan')
+    expect(filterTopbarCommands('下载').map((command) => command.id)).toContain('go-downloads-inbox')
   })
 })
 

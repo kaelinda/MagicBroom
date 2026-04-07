@@ -1,5 +1,6 @@
 import {
   Clock3,
+  Download,
   HardDrive,
   LayoutDashboard,
   PieChart,
@@ -24,6 +25,7 @@ export const mainNavigationItems: NavigationItem[] = [
   { path: '/', label: '首页', icon: LayoutDashboard },
   { path: '/space-analysis', label: '空间分析', icon: PieChart },
   { path: '/clean', label: '清理', icon: Sparkles },
+  { path: '/downloads-inbox', label: '下载收件箱', icon: Download },
   { path: '/scheduled-tasks', label: '定时任务', icon: Clock3 },
 ]
 
@@ -45,5 +47,12 @@ export const dashboardQuickActionItems: DashboardQuickActionItem[] = [
     description: '按环境和类型查看空间大头',
     icon: HardDrive,
     iconClassName: 'text-emerald-500',
+  },
+  {
+    path: '/downloads-inbox',
+    label: '下载收件箱',
+    description: '把 Downloads 里的待处理文件归档沉底',
+    icon: Download,
+    iconClassName: 'text-amber-500',
   },
 ]

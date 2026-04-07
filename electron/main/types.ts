@@ -55,6 +55,64 @@ export interface CleanCallbacks {
   onProgress: (item: string, freed: number) => void
 }
 
+export type DownloadInboxStream = 'installers' | 'documents' | 'images'
+
+export type DownloadInboxKind = 'dmg' | 'pkg' | 'zip' | 'image' | 'screenshot' | 'pdf'
+
+export interface DownloadInboxSuggestion {
+  id: string
+  name: string
+  path: string
+  size: number
+  modifiedAt: number
+  modifiedLabel: string
+  stream: DownloadInboxStream
+  kind: DownloadInboxKind
+  typeLabel: string
+  reason: string
+  targetPath: string
+  expired: boolean
+}
+
+export interface ArchivedDownloadItem {
+  id: string
+  name: string
+  path: string
+  size: number
+  modifiedAt: number
+  modifiedLabel: string
+  stream: DownloadInboxStream
+  typeLabel: string
+}
+
+export interface DownloadsInboxData {
+  suggestions: DownloadInboxSuggestion[]
+  archived: ArchivedDownloadItem[]
+}
+
+export interface ArchivePlanItem {
+  id: string
+  sourcePath: string
+  targetPath: string
+}
+
+export interface ArchiveSuccess {
+  id: string
+  sourcePath: string
+  targetPath: string
+}
+
+export interface ArchiveFailure {
+  id: string
+  sourcePath: string
+  error: string
+}
+
+export interface ArchiveResult {
+  succeeded: ArchiveSuccess[]
+  failed: ArchiveFailure[]
+}
+
 /** 硬编码禁止清理的绝对路径 */
 export const PROTECTED_SYSTEM_PATHS = [
   '/Applications',
