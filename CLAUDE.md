@@ -38,6 +38,11 @@ npm run lint      # TypeScript 类型检查
 - 路由: HashRouter（兼容 Electron file:// 协议）
 - 进度: scan:progress 300ms 批量发送
 
+## GitHub Release 发布
+
+发布 Release 时需要用 keyring 的 token（有 repo scope），而非 GITHUB_TOKEN 环境变量（scope 为 none）。
+使用 `GITHUB_TOKEN="" gh release create ...` 来临时清除环境变量，让 gh 回退到 keyring 认证。
+
 ## 规则格式
 
 JSON 文件在 `rules/` 目录，schema 见设计文档。risk: safe | warning | danger。
