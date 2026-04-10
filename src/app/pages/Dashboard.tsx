@@ -1,8 +1,10 @@
-import { HardDrive, Zap, ChevronRight, Activity, Clock } from 'lucide-react'
+import { HardDrive, Zap, ChevronRight, Activity, Clock, Loader2, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
 import { useMagicBroom } from '../hooks/useMagicBroom'
+import { useCleanAction } from '../hooks/useCleanAction'
 import { RiskBadge } from '../components/RiskBadge'
+import { CleanConfirmDialog } from '../components/CleanConfirmDialog'
 import { cardClass } from '../styles'
 import { formatSize } from '../utils'
 import { dashboardQuickActionItems } from '../navigation'
@@ -28,6 +30,7 @@ const TAG_COLORS: Record<string, string> = {
   browser: '#F59E0B',
   system: '#94A3B8',
   cache: '#94A3B8',
+  agent: '#EC4899',
 }
 
 function getTagColor(tags: string[]): string {
@@ -39,6 +42,7 @@ function getTagColor(tags: string[]): string {
 
 export function Dashboard() {
   const { state, startScan } = useMagicBroom()
+  const { cleanItem, cleanItems, excludePath, showInFinder, showConfirm, confirmProps, cleaningIds } = useCleanAction()
 
   // 引导式空状态
   if (state.status === 'idle') {
@@ -50,16 +54,16 @@ export function Dashboard() {
           </div>
           <h1 className="text-[20px] font-semibold text-gray-900 dark:text-gray-100 mb-2">欢迎使用 MagicBroom</h1>
           <p className="text-[14px] text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
-            专为 Mac 开发者设计的磁盘清理工具。
+            先找出谁占了空间，再安全处理。
             <br />
-            智能扫描开发环境与 AI 工具缓存。
+            扫描开发环境、AI 工具缓存和常见系统占用。
           </p>
           <button
             onClick={() => startScan('smart')}
             className="inline-flex items-center gap-2 h-[44px] px-6 bg-gradient-to-b from-[#6B7FED] to-[#5468E8] text-white rounded-xl text-[14px] font-medium shadow-[0_2px_8px_rgba(107,127,237,0.3),inset_0_1px_0_rgba(255,255,255,0.15)] hover:shadow-[0_4px_12px_rgba(107,127,237,0.4)] transition-all"
           >
             <Zap className="w-5 h-5" />
-            Smart Scan
+            开始扫描
           </button>
         </div>
       </div>
@@ -102,6 +106,8 @@ export function Dashboard() {
   // 有数据 — 控制台
   const existingResults = state.results.filter((r) => r.exists && r.size > 0)
   const topItems = [...existingResults].sort((a, b) => b.size - a.size).slice(0, 5)
+  const safeItems = existingResults.filter((r) => r.risk === 'safe')
+  const safeTotal = safeItems.reduce((sum, r) => sum + r.size, 0)
 
   // 饼图数据：按主 tag 分组
   const tagGroups = new Map<string, { name: string; value: number; color: string }>()
@@ -115,6 +121,7 @@ export function Dashboard() {
         ios: 'iOS 开发', xcode: 'Xcode', docker: 'Docker',
         frontend: '前端', npm: 'npm', python: 'Python',
         browser: '浏览器', system: '系统', cache: '缓存',
+        agent: 'Agent',
       }
       tagGroups.set(mainTag, {
         name: nameMap[mainTag] || mainTag,
@@ -171,16 +178,25 @@ export function Dashboard() {
                 <div className="text-[11px] text-gray-400">可释放</div>
               </div>
             </div>
-            <div className="flex-1 space-y-2.5">
-              {pieData.map((item, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <div className="w-[10px] h-[10px] rounded-[3px] flex-shrink-0" style={{ backgroundColor: item.color }} />
-                  <div className="flex-1 flex items-center justify-between">
-                    <span className="text-[13px] text-gray-700 dark:text-gray-300">{item.name}</span>
+            <div className="flex-1 space-y-1">
+              {pieData.map((item, i) => {
+                const tag = [...tagGroups.entries()].find(([, v]) => v.name === item.name)?.[0]
+                return (
+                  <div key={i} className="group flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-[#6B7FED]/[0.06] dark:hover:bg-[#6B7FED]/[0.08] transition-colors cursor-default">
+                    <div className="w-[10px] h-[10px] rounded-[3px] flex-shrink-0" style={{ backgroundColor: item.color }} />
+                    <span className="text-[13px] text-gray-700 dark:text-gray-300 flex-1">{item.name}</span>
                     <span className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 tabular-nums">{formatSize(item.value)}</span>
+                    {tag && (
+                      <Link
+                        to={`/clean?tag=${tag}`}
+                        className="opacity-0 group-hover:opacity-100 text-[11px] text-[#6B7FED] border border-[#6B7FED]/30 rounded-md px-2 py-0.5 hover:bg-[#6B7FED]/10 transition-all"
+                      >
+                        清理 →
+                      </Link>
+                    )}
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
 
@@ -212,17 +228,26 @@ export function Dashboard() {
           <div className={`${cardClass} p-5`}>
             <div className="text-[12px] text-gray-400 mb-1">安全项目</div>
             <div className="text-[24px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em]">
-              {existingResults.filter((r) => r.risk === 'safe').length}
+              {safeItems.length}
             </div>
             <div className="text-[11px] text-gray-400 mt-0.5">可放心清理</div>
           </div>
-          <div className={`${cardClass} p-5`}>
-            <div className="text-[12px] text-gray-400 mb-1">需注意项目</div>
-            <div className="text-[24px] font-semibold text-amber-600 dark:text-amber-400 tracking-[-0.02em]">
-              {existingResults.filter((r) => r.risk !== 'safe').length}
+          {/* 一键清理安全项 */}
+          <button
+            disabled={safeTotal === 0}
+            onClick={() => void cleanItems(safeItems)}
+            className={`w-full text-left p-5 rounded-2xl transition-all ${
+              safeTotal > 0
+                ? 'bg-gradient-to-br from-[#6B7FED] to-[#5468E8] text-white shadow-[0_2px_8px_rgba(107,127,237,0.3)] hover:shadow-[0_4px_12px_rgba(107,127,237,0.4)]'
+                : 'bg-gray-100 dark:bg-white/[0.04] text-gray-400 cursor-not-allowed'
+            }`}
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <Sparkles className="w-4 h-4" />
+              <span className="text-[12px] opacity-80">一键清理安全项</span>
             </div>
-            <div className="text-[11px] text-gray-400 mt-0.5">建议查看影响说明</div>
-          </div>
+            <div className="text-[20px] font-semibold tracking-[-0.02em]">{formatSize(safeTotal)}</div>
+          </button>
         </div>
       </div>
 
@@ -237,18 +262,44 @@ export function Dashboard() {
             </Link>
           </div>
           <div className="space-y-2">
-            {topItems.map((item) => (
-              <div key={item.id} className="flex items-center gap-4 p-3.5 rounded-xl border border-gray-100/60 dark:border-white/[0.08] hover:border-indigo-100 dark:hover:border-indigo-500/20 hover:bg-indigo-50/40 dark:hover:bg-indigo-500/[0.06] transition-all duration-150">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-[13px] font-medium text-gray-900 dark:text-gray-100">{item.name}</span>
-                    <RiskBadge level={item.risk} />
+            {topItems.map((item) => {
+              const isCleaning = cleaningIds.has(item.id)
+              return (
+                <div key={item.id} className={`group flex items-center gap-4 p-3.5 rounded-xl border border-gray-100/60 dark:border-white/[0.08] hover:border-indigo-100 dark:hover:border-indigo-500/20 hover:bg-indigo-50/40 dark:hover:bg-indigo-500/[0.06] transition-all duration-150 ${isCleaning ? 'opacity-50 pointer-events-none' : ''}`}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="text-[13px] font-medium text-gray-900 dark:text-gray-100">{item.name}</span>
+                      <RiskBadge level={item.risk} />
+                    </div>
+                    <div className="text-[12px] text-gray-400 truncate font-mono">{item.path}</div>
                   </div>
-                  <div className="text-[12px] text-gray-400 truncate font-mono">{item.path}</div>
+                  <div className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 tabular-nums">{formatSize(item.size)}</div>
+                  <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      disabled={isCleaning}
+                      onClick={() => void cleanItem(item)}
+                      className="text-[11px] px-2 py-1 rounded-md bg-emerald-500 text-white hover:bg-emerald-600 transition-colors"
+                    >
+                      {isCleaning ? <Loader2 className="w-3 h-3 animate-spin" /> : '清理'}
+                    </button>
+                    {item.risk !== 'safe' && (
+                      <button
+                        onClick={() => void excludePath(item.path)}
+                        className="text-[11px] px-2 py-1 rounded-md border border-gray-200 dark:border-white/[0.1] text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors"
+                      >
+                        排除
+                      </button>
+                    )}
+                    <button
+                      onClick={() => showInFinder(item.path)}
+                      className="text-[11px] px-2 py-1 rounded-md border border-gray-200 dark:border-white/[0.1] text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors"
+                    >
+                      Finder
+                    </button>
+                  </div>
                 </div>
-                <div className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 tabular-nums">{formatSize(item.size)}</div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 
@@ -265,6 +316,10 @@ export function Dashboard() {
           })}
         </div>
       </div>
+
+      {showConfirm && confirmProps && (
+        <CleanConfirmDialog {...confirmProps} />
+      )}
     </div>
   )
 }

@@ -37,7 +37,11 @@ describe('CleanConfirmDialog', () => {
     const html = renderToStaticMarkup(createElement(CleanConfirmDialog, {
       items: [
         { name: 'Gradle Cache', risk: 'safe' as const },
-        { name: 'Android SDK', risk: 'warning' as const },
+        {
+          name: 'Android SDK',
+          risk: 'warning' as const,
+          impact: '删除后需要重新下载部分 Android 组件',
+        },
       ],
       totalSize: 2 * 1024 * 1024 * 1024,
       onConfirm: () => undefined,
@@ -48,6 +52,33 @@ describe('CleanConfirmDialog', () => {
     expect(html).toContain('dark:border-white/[0.08]')
     expect(html).toContain('dark:text-gray-100')
     expect(html).toContain('dark:bg-white/[0.03]')
+  })
+
+  it('surfaces concrete high-risk items and their impact summary', () => {
+    const html = renderToStaticMarkup(createElement(CleanConfirmDialog, {
+      items: [
+        {
+          name: 'Android SDK',
+          risk: 'warning' as const,
+          impact: '删除后需要重新下载部分 Android 组件',
+        },
+        {
+          name: 'Docker Volumes',
+          risk: 'danger' as const,
+          impact: '删除后未备份的数据卷不可恢复',
+        },
+        { name: 'npm Cache', risk: 'safe' as const },
+      ],
+      totalSize: 3 * 1024 * 1024 * 1024,
+      onConfirm: () => undefined,
+      onCancel: () => undefined,
+    }))
+
+    expect(html).toContain('需重点确认')
+    expect(html).toContain('Android SDK')
+    expect(html).toContain('Docker Volumes')
+    expect(html).toContain('删除后需要重新下载部分 Android 组件')
+    expect(html).toContain('删除后未备份的数据卷不可恢复')
   })
 })
 
@@ -61,14 +92,25 @@ describe('CleanPage path row alignment', () => {
   })
 })
 
+describe('CleanPage idle state', () => {
+  it('lets users start scanning directly instead of sending them back to the dashboard', () => {
+    const source = readFileSync('src/app/pages/CleanPage.tsx', 'utf8')
+
+    expect(source).toContain('还没有扫描结果')
+    expect(source).toContain('先扫描一次，我会把可安全处理的项目整理给你')
+    expect(source).toContain('开始扫描')
+    expect(source).toContain("onClick={() => startScan('smart')}")
+  })
+})
+
 describe('DownloadsInbox onboarding banner', () => {
-  it('persists first-run dismissal locally and explains suggested vs expired', () => {
+  it('persists first-run dismissal locally and explains suggested vs old archive copy', () => {
     const source = readFileSync('src/app/pages/DownloadsInbox.tsx', 'utf8')
 
     expect(source).toContain("const ONBOARDING_STORAGE_KEY = 'magicbroom:downloads-inbox:onboarding-dismissed'")
     expect(source).toContain("window.localStorage.getItem(ONBOARDING_STORAGE_KEY) !== '1'")
     expect(source).toContain("window.localStorage.setItem(ONBOARDING_STORAGE_KEY, '1')")
-    expect(source).toContain('先看建议处理，再看 expired')
+    expect(source).toContain('先看建议处理，再看旧归档')
     expect(source).toContain('不是垃圾桶')
   })
 })

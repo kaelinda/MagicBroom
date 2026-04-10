@@ -9,7 +9,7 @@ function formatSize(bytes: number): string {
 }
 
 interface CleanConfirmDialogProps {
-  items: Array<{ name: string; risk: RiskLevel }>
+  items: Array<{ name: string; risk: RiskLevel; impact?: string }>
   totalSize: number
   onConfirm: () => void
   onCancel: () => void
@@ -18,6 +18,7 @@ interface CleanConfirmDialogProps {
 export function CleanConfirmDialog({ items, totalSize, onConfirm, onCancel }: CleanConfirmDialogProps) {
   const warningCount = items.filter((i) => i.risk === 'warning').length
   const dangerCount = items.filter((i) => i.risk === 'danger').length
+  const highlightedItems = items.filter((i) => i.risk !== 'safe').slice(0, 3)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="确认清理">
@@ -75,6 +76,31 @@ export function CleanConfirmDialog({ items, totalSize, onConfirm, onCancel }: Cl
               <p className="text-[12px] text-amber-700 dark:text-amber-200 leading-relaxed">
                 包含 {warningCount + dangerCount} 个需要注意的项目，请确认已查看其删除影响。
               </p>
+            </div>
+          )}
+
+          {highlightedItems.length > 0 && (
+            <div className="rounded-xl border border-gray-100/70 bg-gray-50/70 p-3 dark:border-white/[0.08] dark:bg-white/[0.03]">
+              <div className="mb-2 text-[12px] font-semibold text-gray-900 dark:text-gray-100">需重点确认</div>
+              <div className="space-y-2">
+                {highlightedItems.map((item, index) => (
+                  <div key={`${item.name}-${item.risk}-${item.impact ?? index}`} className="rounded-lg border border-gray-100/80 bg-white/80 p-2.5 dark:border-white/[0.06] dark:bg-black/[0.12]">
+                    <div className="mb-1 flex items-center justify-between gap-3">
+                      <span className="text-[12px] font-medium text-gray-900 dark:text-gray-100">{item.name}</span>
+                      <span className={`text-[10px] font-semibold ${
+                        item.risk === 'danger'
+                          ? 'text-red-500 dark:text-red-300'
+                          : 'text-amber-600 dark:text-amber-300'
+                      }`}>
+                        {item.risk === 'danger' ? '危险' : '警告'}
+                      </span>
+                    </div>
+                    {item.impact && (
+                      <p className="text-[11px] leading-relaxed text-gray-500 dark:text-gray-400">{item.impact}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

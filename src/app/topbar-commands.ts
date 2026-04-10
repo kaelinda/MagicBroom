@@ -3,14 +3,14 @@ export interface TopbarCommand {
   label: string
   keywords: string[]
   path?: string
-  action?: 'smart-scan'
+  action?: 'smart-scan' | 'clean-safe'
   description: string
 }
 
 export const topbarCommands: TopbarCommand[] = [
   {
     id: 'smart-scan',
-    label: '开始 Smart Scan',
+    label: '开始扫描',
     keywords: ['扫描', 'smart', 'scan', '开始扫描', '重新扫描'],
     action: 'smart-scan',
     description: '重新分析磁盘空间并生成最新结果',
@@ -39,9 +39,9 @@ export const topbarCommands: TopbarCommand[] = [
   {
     id: 'go-downloads-inbox',
     label: '打开下载收件箱',
-    keywords: ['下载', 'downloads', '收件箱', '归档', '安装包', 'pdf', '截图'],
+    keywords: ['下载', 'downloads', '收件箱', '归档', '旧归档', '安装包', 'pdf', '截图'],
     path: '/downloads-inbox',
-    description: '查看 Downloads 建议项，并归档到 _MagicBroom',
+    description: '查看 Downloads 建议项和旧归档，并归档到 _MagicBroom',
   },
   {
     id: 'go-scheduled-tasks',
@@ -56,6 +56,48 @@ export const topbarCommands: TopbarCommand[] = [
     keywords: ['设置', '偏好', '主题', '通知'],
     path: '/settings',
     description: '管理主题、排除目录和通知偏好',
+  },
+  {
+    id: 'clean-safe',
+    label: '清理所有安全项',
+    keywords: ['clean safe', '清理安全', '一键清理', '安全清理', 'clean all safe'],
+    action: 'clean-safe',
+    description: '清理所有风险等级为"安全"的项目',
+  },
+  {
+    id: 'filter-ios',
+    label: '查看 iOS 开发',
+    keywords: ['filter ios', 'ios', 'xcode', '过滤 ios'],
+    path: '/clean?tag=ios',
+    description: '跳转到清理页并筛选 iOS 相关项目',
+  },
+  {
+    id: 'filter-docker',
+    label: '查看 Docker',
+    keywords: ['filter docker', 'docker', '容器', '过滤 docker'],
+    path: '/clean?tag=docker',
+    description: '跳转到清理页并筛选 Docker 相关项目',
+  },
+  {
+    id: 'filter-frontend',
+    label: '查看前端 / Node',
+    keywords: ['filter frontend', 'npm', 'node', 'node_modules', '前端', '过滤前端'],
+    path: '/clean?tag=frontend',
+    description: '跳转到清理页并筛选前端相关项目',
+  },
+  {
+    id: 'filter-python',
+    label: '查看 Python / AI',
+    keywords: ['filter python', 'python', 'pip', 'conda', 'ai', '过滤 python'],
+    path: '/clean?tag=python',
+    description: '跳转到清理页并筛选 Python 相关项目',
+  },
+  {
+    id: 'filter-agent',
+    label: '查看 Agent',
+    keywords: ['filter agent', 'agent', 'claude', 'cursor', 'codex', 'copilot', 'openclaw', 'hermes', 'goose', '过滤 agent'],
+    path: '/clean?tag=agent',
+    description: '跳转到清理页并筛选 AI Agent 相关项目',
   },
 ]
 

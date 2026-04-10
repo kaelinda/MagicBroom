@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
   Sparkles,
   Info,
@@ -46,8 +46,10 @@ export function CleanPage() {
   const { state, dispatch, executeCleaning } = useMagicBroom()
   const { addToast } = useToast()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [view, setView] = useState<ViewMode>('all')
   const [riskFilter, setRiskFilter] = useState<'all' | RiskLevel>('all')
+  const [tagFilter, setTagFilter] = useState<string | null>(searchParams.get('tag'))
   const [showConfirm, setShowConfirm] = useState(false)
   const [cleanResult, setCleanResult] = useState<{ freed: number; count: number; failed: number } | null>(null)
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
@@ -96,11 +98,14 @@ export function CleanPage() {
 
   const filteredResults = useMemo(() => {
     let items = existingResults
+    if (tagFilter) {
+      items = items.filter((result) => result.tags.includes(tagFilter))
+    }
     if (riskFilter !== 'all') {
       items = items.filter((result) => result.risk === riskFilter)
     }
     return items
-  }, [existingResults, riskFilter])
+  }, [existingResults, riskFilter, tagFilter])
 
   const visibleIds = useMemo(() => new Set(filteredResults.map((result) => result.id)), [filteredResults])
 
@@ -131,10 +136,11 @@ export function CleanPage() {
 
   const selectedConfirmItems = useMemo(
     () => [
-      ...selectedParentItems.map((item) => ({ name: item.name, risk: item.risk })),
+      ...selectedParentItems.map((item) => ({ name: item.name, risk: item.risk, impact: item.impact })),
       ...selectedChildItems.map((item) => ({
         name: `${item.name}（子目录）`,
         risk: parentRiskMap.get(item.parentId) ?? 'safe',
+        impact: '仅清理当前选中的子目录，不会删除同级目录',
       })),
     ],
     [parentRiskMap, selectedChildItems, selectedParentItems],
@@ -145,8 +151,15 @@ export function CleanPage() {
       <div className="p-8 max-w-[1400px] mx-auto">
         <div className={`${cardClass} p-12 text-center`}>
           <Info className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-          <h2 className="text-[16px] font-medium text-gray-900 dark:text-gray-100 mb-1">尚未扫描</h2>
-          <p className="text-[13px] text-gray-400">返回首页开始 Smart Scan</p>
+          <h2 className="text-[16px] font-medium text-gray-900 dark:text-gray-100 mb-1">还没有扫描结果</h2>
+          <p className="text-[13px] text-gray-400 mb-5">先扫描一次，我会把可安全处理的项目整理给你</p>
+          <button
+            onClick={() => startScan('smart')}
+            className="inline-flex items-center gap-2 h-[40px] px-4 rounded-xl bg-gradient-to-b from-[#6B7FED] to-[#5468E8] text-[13px] font-medium text-white shadow-[0_2px_8px_rgba(107,127,237,0.3)] transition-all hover:shadow-[0_4px_12px_rgba(107,127,237,0.35)]"
+          >
+            <Sparkles className="w-4 h-4" />
+            开始扫描
+          </button>
         </div>
       </div>
     )
@@ -698,6 +711,18 @@ export function CleanPage() {
               </button>
             ))}
           </div>
+
+          {tagFilter && (
+            <>
+              <div className="w-px h-5 bg-gray-200 dark:bg-white/[0.1]" />
+              <button
+                onClick={() => { setTagFilter(null); setSearchParams({}) }}
+                className="flex items-center gap-1.5 px-3 py-[6px] rounded-lg text-[12px] bg-[#6B7FED]/10 text-[#6B7FED] font-medium"
+              >
+                {tagFilter} ×
+              </button>
+            </>
+          )}
         </div>
       </div>
 

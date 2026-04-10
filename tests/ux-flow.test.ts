@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { dashboardQuickActionItems, mainNavigationItems } from '../src/app/navigation'
 import {
@@ -56,6 +57,16 @@ describe('app navigation', () => {
       expect.objectContaining({ path: '/downloads-inbox' }),
     ])
   })
+
+  it('uses concise labels for primary destinations', () => {
+    expect(mainNavigationItems).toEqual([
+      expect.objectContaining({ path: '/', label: '首页' }),
+      expect.objectContaining({ path: '/space-analysis', label: '空间分析' }),
+      expect.objectContaining({ path: '/clean', label: '清理' }),
+      expect.objectContaining({ path: '/downloads-inbox', label: '下载收件箱' }),
+      expect.objectContaining({ path: '/scheduled-tasks', label: '定时任务' }),
+    ])
+  })
 })
 
 describe('topbar commands', () => {
@@ -71,6 +82,35 @@ describe('topbar commands', () => {
     expect(filterTopbarCommands('分析').map((command) => command.id)).toContain('go-space-analysis')
     expect(filterTopbarCommands('扫描').map((command) => command.id)).toContain('smart-scan')
     expect(filterTopbarCommands('下载').map((command) => command.id)).toContain('go-downloads-inbox')
+  })
+
+  it('describes downloads inbox with the renamed expired terminology', () => {
+    expect(topbarCommands.find((command) => command.id === 'go-downloads-inbox')).toEqual(
+      expect.objectContaining({
+        label: '打开下载收件箱',
+        description: expect.stringContaining('旧归档'),
+      }),
+    )
+  })
+})
+
+describe('empty state copy', () => {
+  it('prompts the user to scan directly from dashboard and analysis empty states', () => {
+    const dashboardSource = readFileSync('src/app/pages/Dashboard.tsx', 'utf8')
+    const analysisSource = readFileSync('src/app/pages/SpaceAnalysis.tsx', 'utf8')
+
+    expect(dashboardSource).toContain('开始扫描')
+    expect(dashboardSource).toContain('扫描开发环境、AI 工具缓存和常见系统占用')
+    expect(analysisSource).toContain('开始扫描')
+    expect(analysisSource).toContain('先扫描一次，再看空间主要被谁占了')
+  })
+
+  it('renames visible expired terminology to old archive language in DownloadsInbox', () => {
+    const source = readFileSync('src/app/pages/DownloadsInbox.tsx', 'utf8')
+
+    expect(source).toContain('旧归档')
+    expect(source).toContain('将沉底的旧文件')
+    expect(source).toContain('先看建议，再归档')
   })
 })
 

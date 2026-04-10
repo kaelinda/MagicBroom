@@ -34,3 +34,10 @@
 - **Context:** design review 已确认 `expired` 应该保持 archive 心智，不带强删除动作。discoverability 已通过侧栏入口 + 首页 quick action 解决，但首次心智仍需要轻量引导来防止误解
 - **Depends on:** Downloads Inbox 页面结构实现完成后，再决定引导落在 banner、tooltip 还是空状态说明
 - **Added:** 2026-04-06 via /plan-design-review
+
+## AI API：支持外部 AI 调用触发扫描和定时任务
+- **What:** 暴露本地 API（如 Unix socket 或 localhost HTTP），让 AI 工具（Claude Code、Cursor 等）可以程序化触发扫描、执行清理、管理定时任务
+- **Why:** MagicBroom 的目标用户是 AI Coder，他们的工作流已经在终端和 AI 助手中。如果 AI 能直接说"你的 DerivedData 有 12GB 了，要不要清一下？"并一键执行，比手动打开 App 操作强得多
+- **Context:** 可行方案包括：(1) MCP Server — 让 Claude Code 等直接通过 MCP 协议调用 MagicBroom 的扫描/清理能力；(2) CLI 子命令 — `magicbroom scan --mode smart --json` 输出结果供 AI 解析；(3) localhost HTTP API — Electron 主进程起一个轻量 HTTP server 监听本地端口。需要评估安全边界（认证、路径白名单、操作确认机制）
+- **Depends on:** v0.10 就地可操作优化完成后；需要先明确 API 范围（只读扫描 vs 可写清理）
+- **Added:** 2026-04-10 via /office-hours
