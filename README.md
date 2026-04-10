@@ -14,7 +14,7 @@
 
 ### 核心能力
 
-- **155 条清理规则** — 覆盖日常 + 13 种开发环境 + 15 款 AI 工具
+- **164 条清理规则** — 覆盖日常 + 13 种开发环境 + 24 款 AI 工具/Agent
 - **Downloads Inbox** — 单独处理 `~/Downloads` 顶层文件，给出“安装包 / 文档 / 图片”建议归档，而不是一把删掉
 - **建议理由 + expired 沉底** — 每条建议都告诉你为什么该处理，超过 14 天未改动的文件会进入各分组下的 `expired/`
 - **物理归档目录** — 归档到 `~/Downloads/_MagicBroom/Installers|Documents|Images[/expired]`，Finder 里看得见，心智稳定
@@ -28,6 +28,9 @@
 - **排除目录** — 自定义排除路径，默认保护 AI 工具工作目录
 - **暗色模式** — 跟随系统 / 手动浅色 / 手动暗色，全页面适配，设置中可切换
 - **侧边栏折叠** — 窗口 < 1100px 自动折叠为 64px 图标模式，支持手动收起
+- **就地可操作** — Dashboard Top 5 和 SpaceAnalysis 分类卡片直接清理/排除/Finder，不用跳转页面
+- **⌘K 命令面板** — clean safe 一键清理安全项、filter ios/docker/agent 快速过滤分类
+- **饼图/柱状图切换** — SpaceAnalysis 分类视图支持柱状图和饼图两种展示模式
 - **键盘快捷键** — ⌘K 搜索、⌘⌫ 删除选中项、Enter 确认、Esc 取消
 - **无障碍** — ARIA 标签（role/aria-label/aria-current/aria-modal）
 - **错误通知** — 扫描/清理/命令执行 toast 通知
@@ -118,7 +121,7 @@ npm run build    # 构建生产版本
 | Flutter / Dart | 3 | Flutter SDK 缓存 / pub 包缓存 / Dart 分析服务器 |
 | JetBrains IDE | 3 | IDE 缓存 (2-20GB) / 插件配置 / 日志 |
 
-### Agent 模式（15 条 + 动态会话检测）
+### Agent 模式（24 条 + 动态会话检测）
 
 | 工具 | 规则数 | 说明 |
 |------|--------|------|
@@ -127,6 +130,10 @@ npm run build    # 构建生产版本
 | Codex CLI | 2 | 缓存 (safe) + 会话记录 (warning) |
 | Ollama | 1 | 本地模型（5-100 GB） |
 | LM Studio | 1 | 本地模型（5-100 GB） |
+| OpenClaw | 2 | 数据 (warning) + 缓存 (safe) |
+| HermesAgent | 1 | 配置与工具链 (warning) |
+| Goose Agent | 2 | 数据 (warning) + 缓存 (safe) |
+| Devon / SWE-agent / Amp / Cline | 4 | 各自配置与会话 (warning) |
 | 其他 | 7 | Copilot / Continue / Codeium·Windsurf / Aider / Tabby / Gemini CLI / Tabnine |
 
 **Claude Code 智能会话检测**：通过读取 `.jsonl` 中的 `cwd` 字段判定真实项目路径，自动分类为：
@@ -155,7 +162,7 @@ npm run build    # 构建生产版本
 - **组件**: Radix UI + Lucide Icons + Recharts
 - **持久化**: electron-store（设置）+ JSON（规则）
 - **更新**: electron-updater (GitHub Releases)
-- **测试**: Vitest（95 个测试用例）
+- **测试**: Vitest（101 个测试用例）
 - **构建**: electron-vite 3 + electron-builder
 
 ## 项目结构
@@ -166,8 +173,8 @@ electron/preload/  → contextBridge 安全 IPC
 src/               → React 渲染进程（Dashboard、Clean、DownloadsInbox、SpaceAnalysis、ScheduledTasks、Settings）
 rules/daily.json   → 日常模式规则（43 条）
 rules/developer/   → 开发者模式规则（13 个环境，97 条）
-rules/agent/       → Agent 模式规则（15 条）
-tests/             → Vitest 测试（95 个）
+rules/agent/       → Agent 模式规则（24 条）
+tests/             → Vitest 测试（101 个）
 ```
 
 ## 贡献清理规则
