@@ -1,4 +1,4 @@
-import { Smartphone, TabletSmartphone, Container, Globe, Code2, Beer, Gem, Cog, Zap, Coffee, Brackets, Feather, Puzzle } from 'lucide-react'
+import { Smartphone, TabletSmartphone, Container, Globe, Code2, Beer, Gem, Cog, Zap, Coffee, Brackets, Feather, Puzzle, Bot } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 export interface EnvironmentConfig {
@@ -27,6 +27,7 @@ export const environments: EnvironmentConfig[] = [
   { id: 'flutter', name: 'Flutter / Dart', icon: Feather, tags: ['flutter', 'dart'], description: 'Flutter SDK、Dart 包缓存' },
   { id: 'jetbrains', name: 'JetBrains IDE', icon: Puzzle, tags: ['jetbrains', 'ide-cache'], description: 'IDEA/WebStorm/PyCharm 缓存和插件' },
   { id: 'homebrew', name: 'Homebrew', icon: Beer, tags: ['homebrew', 'cask'], description: '包缓存、Cask 下载、旧版本' },
+  { id: 'agent', name: 'Agent', icon: Bot, tags: ['agent', 'claude-code', 'cursor', 'codex', 'copilot', 'continue', 'codeium', 'aider', 'ollama', 'lm-studio', 'tabby', 'gemini', 'tabnine', 'openclaw', 'hermes-agent', 'goose', 'devon', 'swe-agent'], description: 'AI 编程助手、Agent 框架缓存和会话' },
 ]
 
 /** 所有已知环境的 tags 集合，用于判断"其他"分组 */

@@ -150,7 +150,7 @@ export function DownloadsInbox() {
         <div className={`${cardClass} p-10 text-center`}>
           <Inbox className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-4 animate-pulse" />
           <h2 className="text-[16px] font-medium text-gray-900 dark:text-gray-100 mb-1">正在整理下载收件箱</h2>
-          <p className="text-[13px] text-gray-400">只扫描 Downloads 顶层文件，并读取已归档的 expired 文件</p>
+          <p className="text-[13px] text-gray-400">只扫描 Downloads 顶层文件，并读取已沉底的旧归档</p>
         </div>
       </div>
     )
@@ -181,7 +181,7 @@ export function DownloadsInbox() {
         <div>
           <h1 className="text-[22px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em] mb-1">下载收件箱</h1>
           <p className="text-[13px] text-gray-500 dark:text-gray-400">
-            先给建议，再归档。`expired` 只负责沉底旧归档，不会替你删除文件。
+            先看建议，再归档。旧归档只负责沉底，不会替你删除文件。
           </p>
         </div>
         <button
@@ -201,9 +201,9 @@ export function DownloadsInbox() {
                 <CircleHelp className="w-4 h-4" />
               </div>
               <div>
-                <div className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 mb-1">先看建议处理，再看 expired</div>
-                <div className="text-[12px] text-gray-500 dark:text-gray-400 leading-relaxed">
-                  `建议处理` 是当前还停在 Downloads 顶层的文件。`expired` 只是已经沉底的旧归档，还在 Downloads 体系里，不是垃圾桶。
+              <div className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 mb-1">先看建议处理，再看旧归档</div>
+              <div className="text-[12px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                  `建议处理` 是当前还停在 Downloads 顶层的文件。旧归档只是已经沉底的文件，还在 Downloads 体系里，不是垃圾桶。
                 </div>
               </div>
             </div>
@@ -221,8 +221,8 @@ export function DownloadsInbox() {
         <div className="flex items-center justify-between gap-6 flex-wrap">
           <div className="flex items-center gap-8 flex-wrap">
             <SummaryBlock label="待处理建议" value={`${suggestionCount}`} hint="只看 Downloads 顶层文件" />
-            <SummaryBlock label="将进入 expired" value={`${suggestionExpiredCount}`} hint="超过 14 天未改动" />
-            <SummaryBlock label="已归档旧文件" value={`${archived.length}`} hint="位于 _MagicBroom/*/expired" />
+            <SummaryBlock label="将沉底的旧文件" value={`${suggestionExpiredCount}`} hint="超过 14 天未改动" />
+            <SummaryBlock label="已沉底归档" value={`${archived.length}`} hint="位于 _MagicBroom 对应分组目录" />
           </div>
           {activeTab === 'suggested' && (
             <button
@@ -241,7 +241,7 @@ export function DownloadsInbox() {
           <div className="flex gap-1">
             {([
               { id: 'suggested' as InboxTab, label: '建议处理', count: suggestionCount, icon: Sparkles },
-              { id: 'expired' as InboxTab, label: 'expired', count: archived.length, icon: Archive },
+              { id: 'expired' as InboxTab, label: '旧归档', count: archived.length, icon: Archive },
             ]).map((tab) => {
               const Icon = tab.icon
               const isActive = activeTab === tab.id
@@ -272,13 +272,13 @@ export function DownloadsInbox() {
               <div className="py-10 text-center">
                 <Inbox className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                 <h2 className="text-[16px] font-medium text-gray-900 dark:text-gray-100 mb-1">当前没有待处理下载项</h2>
-                <p className="text-[13px] text-gray-400 mb-5">收件箱已经清空，旧文件都在 expired 里沉底了。</p>
+                <p className="text-[13px] text-gray-400 mb-5">收件箱已经清空，旧文件都在旧归档里沉底了。</p>
                 <button
                   onClick={() => setActiveTab('expired')}
                   className="inline-flex items-center gap-2 h-[40px] px-4 rounded-xl border border-gray-200/70 dark:border-white/[0.1] text-[12px] font-medium text-gray-600 dark:text-gray-300 hover:border-[#6B7FED] hover:text-[#6B7FED] transition-colors"
                 >
                   <Archive className="w-4 h-4" />
-                  查看 expired
+                  查看旧归档
                 </button>
               </div>
             ) : (
@@ -308,7 +308,7 @@ export function DownloadsInbox() {
             <div className="py-10 text-center">
               <Archive className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
               <h2 className="text-[16px] font-medium text-gray-900 dark:text-gray-100 mb-1">还没有沉到底部的旧归档</h2>
-              <p className="text-[13px] text-gray-400">等建议项被归档到 expired 后，这里会按分组展示历史文件。</p>
+              <p className="text-[13px] text-gray-400">等建议项被归档后，这里会按分组展示历史文件。</p>
             </div>
           ) : (
             <div className="space-y-5">
@@ -501,7 +501,7 @@ function SuggestionItem({
             </span>
             {item.expired && (
               <span className="inline-flex items-center rounded-full bg-amber-100/80 dark:bg-amber-500/[0.12] px-2 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-300">
-                将进入 expired
+                将进入旧归档
               </span>
             )}
           </div>

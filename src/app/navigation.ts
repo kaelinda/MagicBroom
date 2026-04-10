@@ -51,7 +51,7 @@ export const dashboardQuickActionItems: DashboardQuickActionItem[] = [
   {
     path: '/downloads-inbox',
     label: '下载收件箱',
-    description: '把 Downloads 里的待处理文件归档沉底',
+    description: '查看 Downloads 建议项和旧归档，并按类型归档沉底',
     icon: Download,
     iconClassName: 'text-amber-500',
   },

@@ -2,12 +2,15 @@ import { useMemo, useState } from 'react'
 import { Search, Sparkles } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useMagicBroom } from '../hooks/useMagicBroom'
+import { useCleanAction } from '../hooks/useCleanAction'
+import { CleanConfirmDialog } from '../components/CleanConfirmDialog'
 import { filterTopbarCommands } from '../topbar-commands'
 
 export function Topbar() {
   const navigate = useNavigate()
   const location = useLocation()
   const { startScan, state } = useMagicBroom()
+  const { cleanItems, showConfirm, confirmProps } = useCleanAction()
   const [query, setQuery] = useState('')
   const [focused, setFocused] = useState(false)
 
@@ -16,6 +19,9 @@ export function Topbar() {
   async function runCommand(command: (typeof commands)[number]) {
     if (command.action === 'smart-scan') {
       await startScan('smart')
+    } else if (command.action === 'clean-safe') {
+      const safeItems = state.results.filter((r) => r.exists && r.size > 0 && r.risk === 'safe')
+      if (safeItems.length > 0) void cleanItems(safeItems)
     } else if (command.path && command.path !== location.pathname) {
       navigate(command.path)
     }
@@ -91,6 +97,9 @@ export function Topbar() {
           {state.status === 'complete' ? '去清理' : '清理'}
         </Link>
       </div>
+      {showConfirm && confirmProps && (
+        <CleanConfirmDialog {...confirmProps} />
+      )}
     </header>
   )
 }

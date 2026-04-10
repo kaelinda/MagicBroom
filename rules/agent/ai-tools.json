@@ -148,5 +148,95 @@
     "impact": "包含 Tabnine 的模型、配置和缓存，删除后需重新登录和下载",
     "conditions": ["path_exists:~/.tabnine"],
     "tags": ["agent", "tabnine", "config"]
+  },
+  {
+    "id": "openclaw-data",
+    "name": "OpenClaw 数据",
+    "path": "~/.openclaw",
+    "risk": "warning",
+    "size_estimate": "100 MB - 2 GB",
+    "impact": "包含 OpenClaw 的配置、会话历史和工作区状态，删除后需重新配置",
+    "conditions": ["path_exists:~/.openclaw"],
+    "tags": ["agent", "openclaw", "config"]
+  },
+  {
+    "id": "openclaw-cache",
+    "name": "OpenClaw 缓存",
+    "path": "~/Library/Caches/openclaw",
+    "risk": "safe",
+    "size_estimate": "50 MB - 500 MB",
+    "impact": "删除后 OpenClaw 会重建缓存，不影响配置和会话",
+    "conditions": ["path_exists:~/Library/Caches/openclaw"],
+    "tags": ["agent", "openclaw", "cache"]
+  },
+  {
+    "id": "hermes-agent-data",
+    "name": "HermesAgent 数据",
+    "path": "~/.hermes-agent",
+    "risk": "warning",
+    "size_estimate": "100 MB - 1 GB",
+    "impact": "包含 HermesAgent 的配置、工具链和会话数据，删除后需重新配置",
+    "conditions": ["path_exists:~/.hermes-agent"],
+    "tags": ["agent", "hermes-agent", "config"]
+  },
+  {
+    "id": "goose-data",
+    "name": "Goose Agent 数据",
+    "path": "~/.config/goose",
+    "risk": "warning",
+    "size_estimate": "50 MB - 500 MB",
+    "impact": "包含 Goose 的配置和会话历史，删除后需重新配置",
+    "conditions": ["path_exists:~/.config/goose"],
+    "tags": ["agent", "goose", "config"]
+  },
+  {
+    "id": "goose-cache",
+    "name": "Goose Agent 缓存",
+    "path": "~/Library/Caches/goose",
+    "risk": "safe",
+    "size_estimate": "50 MB - 300 MB",
+    "impact": "删除后 Goose 会重建缓存",
+    "conditions": ["path_exists:~/Library/Caches/goose"],
+    "tags": ["agent", "goose", "cache"]
+  },
+  {
+    "id": "devon-data",
+    "name": "Devon Agent 数据",
+    "path": "~/.devon",
+    "risk": "warning",
+    "size_estimate": "100 MB - 1 GB",
+    "impact": "包含 Devon 的配置、计划和会话数据，删除后需重新配置",
+    "conditions": ["path_exists:~/.devon"],
+    "tags": ["agent", "devon", "config"]
+  },
+  {
+    "id": "swe-agent-data",
+    "name": "SWE-agent 数据",
+    "path": "~/.swe-agent",
+    "risk": "warning",
+    "size_estimate": "100 MB - 2 GB",
+    "impact": "包含 SWE-agent 的配置和执行日志，删除后需重新配置",
+    "conditions": ["path_exists:~/.swe-agent"],
+    "tags": ["agent", "swe-agent", "config"]
+  },
+  {
+    "id": "amp-agent-data",
+    "name": "Amp Agent 数据",
+    "path": "~/.amp",
+    "risk": "warning",
+    "size_estimate": "50 MB - 500 MB",
+    "impact": "包含 Amp 的配置和会话数据，删除后需重新配置",
+    "conditions": ["path_exists:~/.amp"],
+    "tags": ["agent", "amp", "config"]
+  },
+  {
+    "id": "cline-data",
+    "name": "Cline Agent 数据",
+    "path": "~/.cline",
+    "risk": "warning",
+    "size_estimate": "50 MB - 500 MB",
+    "impact": "包含 Cline 的配置和任务历史，删除后需重新配置",
+    "conditions": ["path_exists:~/.cline"],
+    "tags": ["agent", "cline", "config"]
   }
 ]

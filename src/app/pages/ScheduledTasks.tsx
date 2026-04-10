@@ -380,6 +380,20 @@ export function ScheduledTasks() {
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${task.action === 'safe-clean' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/[0.12] dark:text-emerald-300' : 'bg-blue-50 text-blue-700 dark:bg-blue-500/[0.12] dark:text-blue-300'}`}>
                           {task.action === 'safe-clean' ? '安全清理' : '仅扫描'}
                         </span>
+                        {(() => {
+                          const mode = (task as unknown as Record<string, unknown>).mode as string | undefined
+                          const modeLabels: Record<string, string> = { developer: '开发环境', agent: 'Agent', smart: '全部', daily: '日常' }
+                          const modeStyles: Record<string, string> = {
+                            agent: 'bg-pink-50 text-pink-700 dark:bg-pink-500/[0.12] dark:text-pink-300',
+                            smart: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/[0.12] dark:text-indigo-300',
+                          }
+                          const defaultStyle = 'bg-amber-50 text-amber-700 dark:bg-amber-500/[0.12] dark:text-amber-300'
+                          return mode ? (
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${modeStyles[mode] || defaultStyle}`}>
+                              {modeLabels[mode] || mode}
+                            </span>
+                          ) : null
+                        })()}
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${task.installed ? 'bg-gray-100 text-gray-600 dark:bg-white/[0.08] dark:text-gray-300' : 'bg-gray-50 text-gray-400 dark:bg-white/[0.04] dark:text-gray-500'}`}>
                           {task.installed ? '已安装 launchd' : '未安装'}
                         </span>
