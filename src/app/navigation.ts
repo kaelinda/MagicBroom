@@ -21,6 +21,20 @@ export interface DashboardQuickActionItem extends NavigationItem {
   iconClassName: string
 }
 
+export interface ToolCardItem {
+  toolId: string
+  label: string
+  description: string
+  icon: LucideIcon
+}
+
+export const launcherToolCards: ToolCardItem[] = [
+  { toolId: 'smart-scan', label: '快速清理', description: '扫描并清理可释放的空间', icon: Sparkles },
+  { toolId: 'space-analysis', label: '空间分析', description: '按环境和类型分析空间占用', icon: PieChart },
+  { toolId: 'downloads-inbox', label: '下载收件箱', description: '整理下载文件夹', icon: Download },
+  { toolId: 'scheduled-tasks', label: '定时任务', description: '管理自动清理任务', icon: Clock3 },
+]
+
 export const mainNavigationItems: NavigationItem[] = [
   { path: '/', label: '首页', icon: LayoutDashboard },
   { path: '/space-analysis', label: '空间分析', icon: PieChart },

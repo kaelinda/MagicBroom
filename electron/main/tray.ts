@@ -1,5 +1,6 @@
-import { Tray, Menu, nativeImage, app, BrowserWindow } from 'electron'
+import { Tray, Menu, nativeImage, app } from 'electron'
 import { join } from 'path'
+import { getMainWindow, createToolWindow } from './window-registry'
 
 let tray: Tray | null = null
 
@@ -22,7 +23,7 @@ function getIconPath(): string {
 }
 
 /** 创建一个简单的 Template 图标（macOS 会自动适配亮暗色） */
-function createTrayIcon(): nativeImage {
+function createTrayIcon(): Electron.NativeImage {
   // 尝试加载自定义图标文件
   try {
     const iconPath = getIconPath()
@@ -68,14 +69,15 @@ function createTrayIcon(): nativeImage {
   return icon
 }
 
-function buildContextMenu(mainWindow: BrowserWindow | null): Menu {
+function buildContextMenu(): Menu {
   return Menu.buildFromTemplate([
     {
       label: '显示 MagicBroom',
       click: () => {
-        if (mainWindow) {
-          mainWindow.show()
-          mainWindow.focus()
+        const win = getMainWindow()
+        if (win) {
+          win.show()
+          win.focus()
         }
       },
     },
@@ -83,20 +85,14 @@ function buildContextMenu(mainWindow: BrowserWindow | null): Menu {
     {
       label: '快速扫描',
       click: () => {
-        if (mainWindow) {
-          mainWindow.show()
-          mainWindow.webContents.send('tray:quick-scan')
-        }
+        createToolWindow('smart-scan')
       },
     },
     { type: 'separator' },
     {
       label: '设置',
       click: () => {
-        if (mainWindow) {
-          mainWindow.show()
-          mainWindow.webContents.send('tray:open-settings')
-        }
+        createToolWindow('settings')
       },
     },
     { type: 'separator' },
@@ -109,23 +105,25 @@ function buildContextMenu(mainWindow: BrowserWindow | null): Menu {
   ])
 }
 
-export function createTray(mainWindow: BrowserWindow): void {
+export function createTray(): void {
   if (tray) return
 
   const icon = createTrayIcon()
   tray = new Tray(icon)
   tray.setToolTip('MagicBroom — 磁盘空间管家')
 
-  const contextMenu = buildContextMenu(mainWindow)
+  const contextMenu = buildContextMenu()
   tray.setContextMenu(contextMenu)
 
   // macOS: 点击托盘图标显示窗口
   tray.on('click', () => {
-    if (mainWindow.isVisible()) {
-      mainWindow.hide()
+    const win = getMainWindow()
+    if (!win) return
+    if (win.isVisible()) {
+      win.hide()
     } else {
-      mainWindow.show()
-      mainWindow.focus()
+      win.show()
+      win.focus()
     }
   })
 }

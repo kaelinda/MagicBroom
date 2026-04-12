@@ -2,6 +2,21 @@ export type ScanMode = 'daily' | 'developer' | 'agent' | 'smart'
 
 export type RiskLevel = 'safe' | 'warning' | 'danger'
 
+export type ScanStatus = 'idle' | 'scanning' | 'complete' | 'error'
+
+/** 扫描结果条目（与 RuleResult 结构一致，用于跨窗口状态同步） */
+export interface ScanItem {
+  id: string
+  name: string
+  path: string
+  exists: boolean
+  size: number
+  risk: RiskLevel
+  impact: string
+  tags: string[]
+  clean_command?: string
+}
+
 export interface RuleDefinition {
   id: string
   name: string

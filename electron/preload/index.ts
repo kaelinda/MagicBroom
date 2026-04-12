@@ -12,6 +12,8 @@ contextBridge.exposeInMainWorld('api', {
   scan: {
     start: (mode: string, profiles: string[] = []) =>
       ipcRenderer.invoke('scan:start', { mode, profiles }),
+    getState: () =>
+      ipcRenderer.invoke('scan:get-state'),
     onProgress: (callback: (data: unknown) => void) =>
       createListener('scan:progress', callback),
     onComplete: (callback: (data: unknown) => void) =>
@@ -58,6 +60,14 @@ contextBridge.exposeInMainWorld('api', {
     update: (settings: Record<string, unknown>) =>
       ipcRenderer.invoke('settings:update', settings),
     reset: () => ipcRenderer.invoke('settings:reset'),
+    onChanged: (callback: (data: unknown) => void) =>
+      createListener('settings:changed', callback),
+  },
+  window: {
+    openTool: (toolId: string) =>
+      ipcRenderer.invoke('window:open-tool', { toolId }),
+    scanAndOpen: (mode?: string) =>
+      ipcRenderer.invoke('window:scan-and-open', { mode: mode || 'smart' }),
   },
   schedule: {
     list: () => ipcRenderer.invoke('schedule:list'),

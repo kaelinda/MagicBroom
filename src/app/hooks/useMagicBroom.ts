@@ -1,39 +1,11 @@
-import { useCallback, useEffect } from 'react'
-import { useScan, type ScanItem } from '../context/ScanContext'
+import { useCallback } from 'react'
+import { useScan } from '../context/ScanContext'
 import { useToast } from '../context/ToastContext'
 
-/** 连接 Electron IPC 的扫描/清理 hook */
+/** 扫描/清理动作 hook（IPC 监听已移至 ScanProvider） */
 export function useMagicBroom() {
   const { state, dispatch } = useScan()
   const { addToast } = useToast()
-
-  // 注册 IPC 事件监听（带清理）
-  useEffect(() => {
-    const api = window.api
-    if (!api) return
-
-    const offProgress = api.scan.onProgress((data: unknown) => {
-      const d = data as { items: ScanItem[]; progress: number }
-      dispatch({ type: 'SCAN_PROGRESS', items: d.items, progress: d.progress })
-    })
-
-    const offComplete = api.scan.onComplete((data: unknown) => {
-      const d = data as { results: ScanItem[]; totalBytes: number }
-      dispatch({ type: 'SCAN_COMPLETE', results: d.results, totalBytes: d.totalBytes })
-    })
-
-    const offError = api.scan.onError((data: unknown) => {
-      const d = data as { error: string }
-      dispatch({ type: 'SCAN_ERROR', error: d.error })
-      addToast(`扫描失败：${d.error}`, 'error')
-    })
-
-    return () => {
-      offProgress()
-      offComplete()
-      offError()
-    }
-  }, [dispatch, addToast])
 
   const startScan = useCallback(
     async (mode: 'daily' | 'developer' | 'agent' | 'smart') => {

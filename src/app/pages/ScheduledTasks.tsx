@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Clock3, LoaderCircle, Play, Bell, ShieldCheck, TerminalSquare, ChevronDown, CalendarDays } from 'lucide-react'
-import { Link } from 'react-router-dom'
 import { cardClass } from '../styles'
 import { useToast } from '../context/ToastContext'
 import { formatSize } from '../utils'
@@ -262,7 +261,7 @@ export function ScheduledTasks() {
 
       setTasks(nextTasks)
       setLogs(nextLogs)
-      setNotifyScheduled((settings.notifyScheduled as boolean | undefined) ?? true)
+      setNotifyScheduled(((settings as Record<string, unknown>).notifyScheduled as boolean | undefined) ?? true)
     } catch (error) {
       addToast(`加载定时任务失败：${String(error)}`, 'error')
     } finally {
@@ -338,7 +337,7 @@ export function ScheduledTasks() {
   }
 
   return (
-    <div className="p-8 max-w-[1400px] mx-auto">
+    <div className="p-5 max-w-[800px] mx-auto">
       <div className="mb-6">
         <h1 className="text-[22px] font-semibold text-gray-900 dark:text-gray-100 tracking-[-0.02em] mb-1">定时任务</h1>
         <p className="text-[13px] text-gray-500 dark:text-gray-400">用 macOS 原生 launchd 定时扫描和安全清理，不常驻后台守护进程。</p>
@@ -351,14 +350,14 @@ export function ScheduledTasks() {
             <div className="flex-1 min-w-0">
               <div className="text-[13px] font-medium text-gray-900 dark:text-gray-100">全局定时任务通知已关闭</div>
               <div className="text-[12px] text-gray-500 dark:text-gray-400 mt-1">
-                任务仍会按计划执行，但不会发送系统通知。你可以去 <Link className="text-[#6B7FED] hover:text-[#5468E8]" to="/settings">设置 → 通知</Link> 重新开启。
+                任务仍会按计划执行，但不会发送系统通知。你可以去 <button className="text-[#6B7FED] hover:text-[#5468E8] inline" onClick={() => window.api?.window?.openTool('settings')}>设置 → 通知</button> 重新开启。
               </div>
             </div>
           </div>
         </div>
       )}
 
-      <div className="grid grid-cols-[minmax(0,1.2fr)_minmax(340px,0.8fr)] gap-5 items-start">
+      <div className="flex flex-col gap-5">
         <div className={`${cardClass} overflow-hidden`}>
           <div className="px-5 py-4 border-b border-gray-100/80 dark:border-white/[0.06] flex items-center justify-between">
             <div>
