@@ -5,6 +5,7 @@ import { scheduledTaskManager } from './scheduled-task-manager'
 import { parseScheduledTaskArg } from './scheduled-tasks'
 import { createTray, shouldMinimizeToTray, destroyTray } from './tray'
 import { initAutoUpdater, checkForUpdates } from './updater'
+import { setMainWindow, getMainWindow, getToolWindows } from './window-registry'
 
 const isDev = !app.isPackaged
 const scheduledTaskId = parseScheduledTaskArg(process.argv)
@@ -14,20 +15,21 @@ let isQuitting = false
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 800,
-    minWidth: 1024,
-    minHeight: 640,
+    width: 720,
+    height: 520,
+    resizable: false,
     show: false,
     titleBarStyle: 'hiddenInset',
     trafficLightPosition: { x: 20, y: 24 },
-    backgroundColor: '#f5f7fa',
+    backgroundColor: '#1C1C1E',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,
       nodeIntegration: false,
     },
   })
+
+  setMainWindow(mainWindow)
 
   mainWindow.on('ready-to-show', () => {
     mainWindow?.show()
@@ -38,6 +40,11 @@ function createWindow(): void {
     if (!isQuitting && shouldMinimizeToTray()) {
       event.preventDefault()
       mainWindow?.hide()
+    } else {
+      // 退出时关闭所有工具窗口
+      for (const [, win] of getToolWindows()) {
+        if (!win.isDestroyed()) win.close()
+      }
     }
   })
 
@@ -75,7 +82,7 @@ app.whenReady().then(() => {
 
   // 创建托盘图标
   if (mainWindow) {
-    createTray(mainWindow)
+    createTray()
     initAutoUpdater(mainWindow)
 
     // 打包后自动检查更新
@@ -85,9 +92,10 @@ app.whenReady().then(() => {
   }
 
   app.on('activate', () => {
-    if (mainWindow) {
-      mainWindow.show()
-      mainWindow.focus()
+    const win = mainWindow || getMainWindow()
+    if (win && !win.isDestroyed()) {
+      win.show()
+      win.focus()
     } else {
       createWindow()
     }

@@ -10,6 +10,8 @@ import { scheduledTaskManager } from './scheduled-task-manager'
 import { listImmediateChildDirectories } from './directory-children'
 import type { ScanMode } from './types'
 import { ArchiveService } from './archive-service'
+import { broadcastToAll, createToolWindow } from './window-registry'
+import { updateScanState, resetScanState, getScanState } from './scan-state'
 
 const scanner = new Scanner()
 const cleaner = new Cleaner()
@@ -17,25 +19,27 @@ const rulesEngine = new RulesEngine()
 const archiveService = new ArchiveService()
 
 export function registerIpcHandlers(): void {
-  ipcMain.handle('scan:start', async (event, args: { mode: ScanMode; profiles: string[] }) => {
-    const sender = BrowserWindow.fromWebContents(event.sender)
-    if (!sender) return { error: '无效的窗口来源' }
-
+  ipcMain.handle('scan:start', async (_event, args: { mode: ScanMode; profiles: string[] }) => {
     const jobId = `scan-${Date.now()}`
     const rules = await rulesEngine.loadRules(args.mode)
 
     // Smart 和 Agent 模式不排除 AI 工具路径（默认排除列表含 ~/.claude 等路径）
     const excludedPaths = (args.mode === 'agent' || args.mode === 'smart') ? [] : getExcludedPaths()
 
+    resetScanState()
+
     scanner.scan(rules, {
       onProgress: (items, progress) => {
-        sender.webContents.send('scan:progress', { jobId, items, progress })
+        updateScanState({ results: items, progress })
+        broadcastToAll('scan:progress', { jobId, items, progress })
       },
       onComplete: (results, totalBytes) => {
-        sender.webContents.send('scan:complete', { jobId, results, totalBytes })
+        updateScanState({ status: 'complete', results, totalBytes, lastScanTime: Date.now() })
+        broadcastToAll('scan:complete', { jobId, results, totalBytes })
       },
       onError: (error) => {
-        sender.webContents.send('scan:error', { jobId, error: error.message })
+        updateScanState({ status: 'error' })
+        broadcastToAll('scan:error', { jobId, error: error.message })
       },
     }, excludedPaths)
 
@@ -46,12 +50,10 @@ export function registerIpcHandlers(): void {
     return cleaner.dryRun(args.items)
   })
 
-  ipcMain.handle('clean:execute', async (event, args: { items: string[] }) => {
-    const sender = BrowserWindow.fromWebContents(event.sender)
-
+  ipcMain.handle('clean:execute', async (_event, args: { items: string[] }) => {
     return cleaner.execute(args.items, {
       onProgress: (item, freed) => {
-        sender?.webContents.send('clean:progress', { item, freed })
+        broadcastToAll('clean:progress', { item, freed })
       },
     })
   })
@@ -98,7 +100,9 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle('settings:update', async (_event, args: Record<string, unknown>) => {
-    return updateSettings(args as any)
+    const result = updateSettings(args as any)
+    broadcastToAll('settings:changed', args)
+    return result
   })
 
   ipcMain.handle('settings:reset', async () => {
@@ -188,5 +192,46 @@ export function registerIpcHandlers(): void {
         resolve({ success: false, output: err.message })
       })
     })
+  })
+
+  // 多窗口：获取主进程扫描状态（新窗口打开时同步已有结果）
+  ipcMain.handle('scan:get-state', () => {
+    return getScanState()
+  })
+
+  // 多窗口：打开工具窗口
+  ipcMain.handle('window:open-tool', (_event, args: { toolId: string }) => {
+    createToolWindow(args.toolId)
+    return { success: true }
+  })
+
+  // 多窗口：打开 smart-scan 窗口并自动开始扫描
+  ipcMain.handle('window:scan-and-open', async (_event, args?: { mode?: string }) => {
+    const toolWin = createToolWindow('smart-scan')
+    if (!toolWin) return { error: '无法创建扫描窗口' }
+
+    const scanMode = (args?.mode as ScanMode) || 'smart'
+    const jobId = `scan-${Date.now()}`
+    const rules = await rulesEngine.loadRules(scanMode)
+    const excludedPaths = (scanMode === 'agent' || scanMode === 'smart') ? [] : getExcludedPaths()
+
+    resetScanState()
+
+    scanner.scan(rules, {
+      onProgress: (items, progress) => {
+        updateScanState({ results: items, progress })
+        broadcastToAll('scan:progress', { jobId, items, progress })
+      },
+      onComplete: (results, totalBytes) => {
+        updateScanState({ status: 'complete', results, totalBytes, lastScanTime: Date.now() })
+        broadcastToAll('scan:complete', { jobId, results, totalBytes })
+      },
+      onError: (error) => {
+        updateScanState({ status: 'error' })
+        broadcastToAll('scan:error', { jobId, error: error.message })
+      },
+    }, excludedPaths)
+
+    return { jobId }
   })
 }
