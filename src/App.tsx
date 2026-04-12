@@ -1,15 +1,9 @@
 import { useEffect } from 'react'
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import { ScanProvider } from './app/context/ScanContext'
 import { ToastProvider } from './app/context/ToastContext'
-import { AppLayout } from './app/components/AppLayout'
-import { Dashboard } from './app/pages/Dashboard'
-import { CleanPage } from './app/pages/CleanPage'
-import { DownloadsInbox } from './app/pages/DownloadsInbox'
-import { SpaceAnalysis } from './app/pages/SpaceAnalysis'
-import { EnvironmentDetail } from './app/pages/EnvironmentDetail'
-import { Settings } from './app/pages/Settings'
-import { ScheduledTasks } from './app/pages/ScheduledTasks'
+import { LauncherPage } from './app/pages/LauncherPage'
+import { ToolShell, EnvironmentToolShell } from './app/components/ToolShell'
 
 /** 应用主题：dark/light 直接设 class，system 跟随系统偏好 */
 export function applyTheme(theme: string) {
@@ -50,19 +44,14 @@ export default function App() {
       <ScanProvider>
         <HashRouter>
           <Routes>
-            <Route element={<AppLayout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="clean" element={<CleanPage />} />
-              <Route path="downloads-inbox" element={<DownloadsInbox />} />
-              <Route path="space-analysis" element={<SpaceAnalysis />} />
-              <Route path="environment/:envId" element={<EnvironmentDetail />} />
-              <Route path="scheduled-tasks" element={<ScheduledTasks />} />
-              <Route path="settings" element={<Settings />} />
-              {/* 旧路由重定向 */}
-              <Route path="scan-results" element={<Navigate to="/clean" replace />} />
-              <Route path="developer" element={<Navigate to="/clean" replace />} />
-              <Route path="agent" element={<Navigate to="/clean" replace />} />
-            </Route>
+            {/* Launcher — main window default route */}
+            <Route index element={<LauncherPage />} />
+
+            {/* Tool windows — each opens in its own BrowserWindow */}
+            <Route path="tool/:toolId" element={<ToolShell />} />
+
+            {/* Environment detail — separate route with envId param */}
+            <Route path="tool/environment/:envId" element={<EnvironmentToolShell />} />
           </Routes>
         </HashRouter>
       </ScanProvider>

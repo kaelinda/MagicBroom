@@ -38,6 +38,7 @@ export type ScanAction =
   | { type: 'DESELECT_ALL' }
   | { type: 'CLEAN_COMPLETE'; succeededPaths: string[] }
   | { type: 'RESET' }
+  | { type: 'HYDRATE'; state: { status: ScanStatus; progress: number; results: ScanItem[]; totalBytes: number; lastScanTime: number | null } }
 
 export const initialScanState: ScanState = {
   status: 'idle',
@@ -126,6 +127,15 @@ export function scanReducer(state: ScanState, action: ScanAction): ScanState {
       return applyCleaningResult(state, action.succeededPaths)
     case 'RESET':
       return initialScanState
+    case 'HYDRATE':
+      return {
+        ...state,
+        status: action.state.status,
+        progress: action.state.progress,
+        results: action.state.results,
+        totalBytes: action.state.totalBytes,
+        lastScanTime: action.state.lastScanTime,
+      }
     default:
       return state
   }

@@ -20,6 +20,7 @@ interface MagicBroomAPI {
   }
   scan: {
     start: (mode: 'daily' | 'developer' | 'agent' | 'smart', profiles?: string[]) => Promise<{ jobId: string }>
+    getState: () => Promise<{ status: string; progress: number; results: unknown[]; totalBytes: number; lastScanTime: number | null }>
     onProgress: (callback: (data: { jobId: string; items: unknown[]; progress: number }) => void) => () => void
     onComplete: (callback: (data: { jobId: string; results: unknown[]; totalBytes: number }) => void) => () => void
     onError: (callback: (data: { jobId: string; error: string }) => void) => () => void
@@ -38,6 +39,11 @@ interface MagicBroomAPI {
     get: () => Promise<Record<string, unknown>>
     update: (settings: Record<string, unknown>) => Promise<Record<string, unknown>>
     reset: () => Promise<Record<string, unknown>>
+    onChanged: (callback: (data: unknown) => void) => () => void
+  }
+  window: {
+    openTool: (toolId: string) => Promise<{ success: boolean }>
+    scanAndOpen: (mode?: string) => Promise<{ jobId?: string; error?: string }>
   }
   updater: {
     check: () => Promise<void>
